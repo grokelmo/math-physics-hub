@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>數學・物理 學習總入口 | Math &amp; Physics Hub</title>
+  <style>
+    :root {
+      --teal: #0d5c63;
+      --teal-dark: #0a4a50;
+      --cream: #f5efe6;
+      --cream-arc: #e8dfd0;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --link: #0d5c63;
+      --max: 920px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei",
+                   "Helvetica Neue", Arial, sans-serif;
+      background: #fff;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    a { color: var(--link); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover { color: var(--teal-dark); }
+
+    .nav {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      gap: 1.25rem;
+      font-size: 0.95rem;
+      border-bottom: 1px solid #eee;
+    }
+    .nav a { text-decoration: none; font-weight: 600; }
+    .nav a:hover { text-decoration: underline; }
+    .nav .current { color: var(--teal-dark); pointer-events: none; }
+
+    .banner {
+      background: var(--teal);
+      color: #fff;
+      text-align: center;
+      padding: 2.75rem 1.25rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .banner h1 {
+      font-size: clamp(1.55rem, 4vw, 2.1rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.35rem;
+    }
+    .banner .en {
+      font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+      font-weight: 400;
+      opacity: 0.92;
+    }
+    .banner::after {
+      content: "";
+      position: absolute;
+      left: -10%;
+      right: -10%;
+      bottom: -28px;
+      height: 56px;
+      background: var(--cream);
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    }
+
+    main {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 2rem 1.25rem 3.5rem;
+    }
+    .intro {
+      text-align: center;
+      margin-bottom: 2rem;
+      max-width: 36rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .intro .zh { font-size: 1.05rem; margin-bottom: 0.4rem; }
+    .intro .en { font-size: 0.95rem; color: var(--muted); }
+
+    .hub-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 640px) {
+      .hub-grid { grid-template-columns: 1fr; }
+    }
+    .hub-card {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(13, 92, 99, 0.08);
+      transition: box-shadow 0.2s, transform 0.15s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .hub-card:hover {
+      box-shadow: 0 6px 18px rgba(13, 92, 99, 0.16);
+      transform: translateY(-2px);
+      text-decoration: none;
+    }
+    .hub-art {
+      height: 180px;
+      overflow: hidden;
+      background: #f0ebe3;
+    }
+    .hub-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 0;
+    }
+    .hub-body {
+      padding: 1.1rem 1.2rem 1.35rem;
+    }
+    .hub-body h2 {
+      font-size: 1.2rem;
+      color: var(--teal);
+      margin-bottom: 0.15rem;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .hub-body .en-title {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 0.55rem;
+    }
+    .hub-body .desc-zh { font-size: 0.95rem; margin-bottom: 0.25rem; }
+    .hub-body .desc-en { font-size: 0.85rem; color: var(--muted); }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem 1rem 2rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      border-top: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav" aria-label="主導覽">
+    <a href="index.html" class="current">首頁</a>
+    <a href="數學科.html">數學科</a>
+    <a href="物理科.html">物理科</a>
+  </nav>
+
+  <header class="banner">
+    <h1>數學・物理 學習總入口</h1>
+    <p class="en">Math &amp; Physics Hub</p>
+  </header>
+
+  <main>
+    <div class="intro">
+      <p class="zh">這是給中學生使用的學習總入口，可由此開啟數學科或物理科的工具。</p>
+      <p class="en">A hub for secondary students. Open maths and physics tools from here.</p>
+    </div>
+
+    <div class="hub-grid">
+      <a class="hub-card" href="數學科.html">
+        <div class="hub-art">
+          <img src="images/home-maths.jpg" alt="數學科">
+        </div>
+        <div class="hub-body">
+          <h2>數學科</h2>
+          <p class="en-title">Maths</p>
+          <p class="desc-zh">指數、練習與數學工具</p>
+          <p class="desc-en">Indices, practice and maths tools</p>
+        </div>
+      </a>
+
+      <a class="hub-card" href="物理科.html">
+        <div class="hub-art">
+          <img src="images/home-physics.jpg" alt="物理科">
+        </div>
+        <div class="hub-body">
+          <h2>物理科</h2>
+          <p class="en-title">Physics</p>
+          <p class="desc-zh">單位、公式與物理工具</p>
+          <p class="desc-en">Units, formulae and physics tools</p>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <footer>
+    數學・物理 學習總入口 · Math &amp; Physics Hub
+  </footer>
+</body>
+</html>
