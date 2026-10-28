@@ -192,9 +192,31 @@ header h1{font-size:1.35rem;color:var(--primary-dark);font-weight:700;letter-spa
   header h1{font-size:1.5rem}
   .actions{position:sticky;bottom:12px}
 }
+
+    /* hub back button */
+    a.hub-back{
+      position:fixed;
+      top:max(0.65rem, env(safe-area-inset-top, 0px));
+      left:max(0.65rem, env(safe-area-inset-left, 0px));
+      z-index:99999;
+      width:2.6rem;height:2.6rem;
+      border-radius:999px;
+      background:#0d5c63;
+      color:#fff !important;
+      display:flex;align-items:center;justify-content:center;
+      text-decoration:none !important;
+      font-size:1.35rem;line-height:1;font-weight:700;
+      box-shadow:0 2px 10px rgba(13,92,99,.28);
+      -webkit-tap-highlight-color:transparent;
+    }
+    a.hub-back:hover{background:#0a4a50;color:#fff !important;}
+    a.hub-back:active{transform:scale(.96);}
+
 </style>
 </head>
 <body>
+<a class="hub-back" href="物理科.html" aria-label="返回上一頁" title="返回上一頁">←</a>
+
 <div class="wrap">
   <header>
     <h1 id="title">物理公式練習</h1>
