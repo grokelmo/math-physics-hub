@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>展開練習：拆括號</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Inter', "Noto Sans TC", "PingFang HK", "Microsoft JhengHei", sans-serif;
+      background-color: #f3f4f6;
+    }
+
+    /* Custom scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+
+    /* Dropzone slot hover and drag highlight effects */
+    .drop-slot {
+      transition: all 0.2s ease-in-out;
+      min-width: 4rem;
+      min-height: 3.5rem;
+    }
+    .drop-slot.drag-over {
+      border-color: #0D5665 !important;
+      background-color: #E8F3F5 !important;
+      transform: scale(1.05);
+    }
+    .drop-slot.selected-slot {
+      ring: 2px;
+      ring-color: #0D5665;
+      border-color: #0A4552;
+    }
+
+    /* Term bank item styling */
+    .term-tile {
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      transition: all 0.15s ease-in-out;
+    }
+    .term-tile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(13, 86, 101, 0.18);
+    }
+    .term-tile:active {
+      transform: translateY(0);
+    }
+    .term-tile.selected-term {
+      border-color: #0A4552 !important;
+      background-color: #E8F3F5 !important;
+      box-shadow: 0 0 0 3px rgba(13, 86, 101, 0.28) !important;
+    }
+
+    /* Card shake animation for error */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .animate-shake {
+      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    }
+
+    /* Confetti Canvas overlay */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-[#0D5665] selection:text-white">
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Main Header & Navigation -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- App Brand Title + Difficulty selector (top-left) -->
+      <div class="flex items-center flex-wrap gap-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0D5665] to-emerald-500 flex items-center justify-center text-white font-extrabold text-xl shadow-md">
+            E
+          </div>
+          <div>
+            <h1 class="text-lg font-bold text-slate-900 leading-tight" data-i18n="app_title">展開練習</h1>
+            <p class="text-xs text-slate-500 font-medium" data-i18n="app_subtitle">拆括號 · 代數恆等式</p>
+          </div>
+        </div>
+
+        <!-- Difficulty: 程度1 / 程度2 -->
+        <div id="difficulty-selector" class="flex items-center rounded-full bg-slate-100 border border-slate-200 p-0.5 shadow-sm" role="group" aria-label="Difficulty">
+          <button type="button" id="btn-diff-1" data-diff="1" class="diff-btn px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-[#0D5665] text-white shadow-sm" data-i18n="diff1">程度1</button>
+          <button type="button" id="btn-diff-2" data-diff="2" class="diff-btn px-3.5 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 hover:text-slate-800" data-i18n="diff2">程度2</button>
+        </div>
+      </div>
+
+      <!-- Stats Bar: Progress, Score, Streak, Lang -->
+      <div class="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm font-semibold">
+        <!-- Question Counter -->
+        <div class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+          <span id="question-progress-text">第 1 題／共 12 題</span>
+        </div>
+
+        <!-- Streak Counter -->
+        <div class="flex items-center space-x-1 px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+          <span>🔥</span>
+          <span id="streak-count">0</span>
+        </div>
+
+        <!-- Score Counter -->
+        <div class="flex items-center space-x-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span>⭐</span>
+          <span id="score-count">0</span>
+        </div>
+
+        <!-- Restart Button -->
+        <button id="btn-restart" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors" data-i18n-title="restart_title" title="重新開始">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        </button>
+
+        <!-- Language Toggle (top-right) -->
+        <button id="btn-lang-toggle" type="button" class="px-3 py-1.5 rounded-full bg-slate-800 text-white hover:bg-[#0A4552] border border-slate-700 text-xs font-bold shadow-sm transition-colors active:scale-95 min-w-[3.25rem]" title="Switch language">
+          EN
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="w-full bg-slate-100 h-1.5">
+      <div id="progress-bar-inner" class="bg-gradient-to-r from-[#0D5665] to-emerald-500 h-1.5 transition-all duration-300 w-0"></div>
+    </div>
+  </header>
+
+  <!-- Main Interactive Area (centered, no sidebar) -->
+  <main class="max-w-3xl mx-auto px-4 py-6 flex-1 w-full flex flex-col space-y-6">
+
+    <section class="flex flex-col space-y-6 w-full">
+
+      <!-- Question Card -->
+      <div id="question-card" class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 transition-all duration-200">
+        <!-- Top Card Tag (Level indicator only) -->
+        <div class="flex justify-between items-center mb-4">
+          <span id="card-level-tag" class="text-xs font-bold uppercase tracking-wider text-[#0D5665] bg-[#E8F3F5] px-2.5 py-1 rounded-md border border-[#C5E0E5]">
+            程度1
+          </span>
+          <span class="text-xs text-slate-400 font-medium" data-i18n="expand_instruction">請將以下因式展開（拆括號）</span>
+        </div>
+
+        <!-- Problem Display: factored expression -->
+        <div class="text-center py-6 bg-slate-50 rounded-xl border border-slate-100 mb-6">
+          <span class="text-xs text-slate-400 uppercase tracking-widest font-semibold block mb-1" data-i18n="expression_label">因式</span>
+          <div id="expression-display" class="text-3xl sm:text-4xl font-extrabold text-slate-800 tracking-wide font-mono">
+            (y + 5)(y − 5)
+          </div>
+        </div>
+
+        <!-- STEP 1: Identity Formula Selection -->
+        <div class="space-y-3 mb-6">
+          <div class="flex items-center space-x-2">
+            <span class="w-6 h-6 rounded-full bg-[#0D5665] text-white font-bold text-xs flex items-center justify-center">1</span>
+            <h3 class="font-bold text-slate-800 text-sm" data-i18n="step1_title">選擇對應的代數恆等式</h3>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <button data-identity="diff_sq" class="identity-btn p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-[#7BB5C0] text-left transition-all hover:shadow-sm focus:outline-none">
+              <span class="text-xs font-semibold text-slate-400 block mb-1" data-i18n="id_diff_sq">平方差</span>
+              <span class="text-sm font-bold font-mono text-slate-800 block">(a + b)(a − b)</span>
+              <span class="text-xs text-slate-500 font-mono block mt-0.5">= a² − b²</span>
+            </button>
+
+            <button data-identity="perf_sq_add" class="identity-btn p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-[#7BB5C0] text-left transition-all hover:shadow-sm focus:outline-none">
+              <span class="text-xs font-semibold text-slate-400 block mb-1" data-i18n="id_perf_sq_add">完全平方式 (+)</span>
+              <span class="text-sm font-bold font-mono text-slate-800 block">(a + b)²</span>
+              <span class="text-xs text-slate-500 font-mono block mt-0.5">= a² + 2ab + b²</span>
+            </button>
+
+            <button data-identity="perf_sq_sub" class="identity-btn p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-[#7BB5C0] text-left transition-all hover:shadow-sm focus:outline-none">
+              <span class="text-xs font-semibold text-slate-400 block mb-1" data-i18n="id_perf_sq_sub">完全平方式 (−)</span>
+              <span class="text-sm font-bold font-mono text-slate-800 block">(a − b)²</span>
+              <span class="text-xs text-slate-500 font-mono block mt-0.5">= a² − 2ab + b²</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: Interactive Expansion Dropzones -->
+        <div id="step2-container" class="space-y-3 opacity-40 pointer-events-none transition-opacity duration-300">
+          <div class="flex items-center space-x-2">
+            <span class="w-6 h-6 rounded-full bg-[#0D5665] text-white font-bold text-xs flex items-center justify-center">2</span>
+            <h3 class="font-bold text-slate-800 text-sm" data-i18n="step2_title">填入各項以完成展開</h3>
+          </div>
+
+          <!-- Dropzone Container -->
+          <div class="p-6 bg-[#E8F3F5]/60 rounded-xl border border-[#C5E0E5] flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-lg sm:text-2xl font-bold font-mono text-slate-700 min-h-[100px]" id="dropzone-area">
+            <span class="text-slate-400 text-sm font-normal italic" data-i18n="dropzone_placeholder">請先在上方選擇恆等式</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auto-Replenishing Term Bank Card -->
+      <div id="bank-card" class="bg-white rounded-2xl p-6 shadow-md border border-slate-200">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5 text-[#0D5665]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            <h3 class="font-bold text-slate-800 text-sm"><span data-i18n="term_bank">選項庫</span> <span class="text-xs font-normal text-slate-500" data-i18n="term_bank_hint">（拖曳或點按放入）</span></h3>
+          </div>
+          <button id="btn-clear-slots" class="text-xs font-semibold text-slate-500 hover:text-red-600 transition-colors" data-i18n="clear_slots">
+            清空格位
+          </button>
+        </div>
+
+        <!-- Term Bank Tiles Grid -->
+        <div id="term-bank" class="flex flex-wrap gap-2.5 min-h-[60px] items-center p-3 bg-slate-50 rounded-xl border border-slate-200">
+          <!-- Dynamically populated tiles -->
+        </div>
+      </div>
+
+      <!-- Action Control Buttons -->
+      <div class="flex items-center justify-between gap-4">
+        <button id="btn-hint" class="px-4 py-2.5 rounded-xl border border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100 text-xs sm:text-sm font-semibold transition-all flex items-center space-x-1.5 shadow-sm">
+          <span>💡</span>
+          <span data-i18n="need_hint">需要提示？</span>
+        </button>
+
+        <!-- Check Answer Button with Rapid Click Protection -->
+        <button id="check-btn" class="px-8 py-3 rounded-xl bg-gradient-to-r from-[#0D5665] to-emerald-600 hover:from-[#0A4552] hover:to-emerald-700 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" data-i18n="check_answer">
+          檢查答案
+        </button>
+      </div>
+
+      <!-- Inline Feedback / Hint Message Box -->
+      <div id="feedback-toast" class="hidden p-4 rounded-xl text-sm font-medium transition-all duration-200"></div>
+
+    </section>
+
+    <!-- Shown after 10 correct answers (always Chinese) -->
+    <div id="hkdse-congrats" class="hidden mt-2 mb-4 text-center px-4 py-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold text-lg sm:text-xl shadow-sm">
+      恭喜你，祝你HKDSE考試好好好！！
+    </div>
+
+  </main>
+
+  <!-- Victory Completion Modal Overlay -->
+  <div id="victory-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 text-center relative max-h-[90vh] overflow-y-auto">
+      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+        🏆
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2" data-i18n="victory_title">練習完成！</h2>
+      <p class="text-slate-500 text-sm mb-6" data-i18n="victory_subtitle">做得好！你已掌握代數恆等式展開！</p>
+
+      <!-- Stats Summary Grid -->
+      <div class="grid grid-cols-3 gap-3 mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+        <div>
+          <span class="text-xs text-slate-400 block font-medium" data-i18n="final_score">最終分數</span>
+          <span id="final-score" class="text-xl font-extrabold text-[#0D5665]">0</span>
+        </div>
+        <div>
+          <span class="text-xs text-slate-400 block font-medium" data-i18n="max_streak">最高連勝</span>
+          <span id="final-streak" class="text-xl font-extrabold text-amber-500">0</span>
+        </div>
+        <div>
+          <span class="text-xs text-slate-400 block font-medium" data-i18n="accuracy">正確率</span>
+          <span id="final-accuracy" class="text-xl font-extrabold text-emerald-600">100%</span>
+        </div>
+      </div>
+
+      <div class="flex justify-center gap-3">
+        <button id="btn-modal-restart" class="px-6 py-3 rounded-xl bg-[#0D5665] hover:bg-[#0A4552] text-white font-bold text-sm shadow-md transition-all" data-i18n="try_again">
+          再試一次
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---- i18n ----
+    const LANG_KEY = 'expansion-lab-lang';
+    let currentLang = 'zh';
+
+    const I18N = {
+      en: {
+        page_title: 'Expansion Lab: Expanding Brackets',
+        app_title: 'Expansion Lab',
+        app_subtitle: 'Expanding Brackets · Algebraic Identities',
+        level1: 'Level 1',
+        level2: 'Level 2',
+        diff1: 'Level 1',
+        diff2: 'Level 2',
+        q_of: 'Q {n} of {total}',
+        restart_title: 'Restart Quiz',
+        lang_switch_to: '中文',
+        expand_instruction: 'Expand the expression (remove brackets)',
+        expression_label: 'Factored form',
+        step1_title: 'Select the Matching Algebraic Identity',
+        step2_title: 'Fill in the Terms to Complete the Expansion',
+        id_diff_sq: 'Difference of Squares',
+        id_perf_sq_add: 'Perfect Square (+)',
+        id_perf_sq_sub: 'Perfect Square (−)',
+        dropzone_placeholder: 'Please select an identity above first',
+        term_bank: 'Term Bank',
+        term_bank_hint: '(Drag or tap term to place)',
+        clear_slots: 'Clear Slots',
+        need_hint: 'Need a Hint?',
+        check_answer: 'Check Answer',
+        victory_title: 'Quiz Completed!',
+        victory_subtitle: 'Excellent job mastering algebraic expansions!',
+        final_score: 'Final Score',
+        max_streak: 'Max Streak',
+        accuracy: 'Accuracy',
+        try_again: 'Try Again',
+        toast_select_identity: 'Please select an algebraic identity in Step 1 first!',
+        toast_fill_slots: 'Please fill in all empty dropzone slots in Step 2!',
+        toast_success: '🎉 Excellent! Spot on expansion!',
+        toast_wrong_identity: 'Incorrect identity chosen! Check whether it is (a+b)(a−b) or (a±b)².',
+        toast_wrong_slots: 'Identity is correct, but terms are wrong. Pick the fully expanded terms with powers (e.g. k², 9)!',
+        hint_prefix: '💡 Hint: '
+      },
+      zh: {
+        page_title: '展開練習：拆括號',
+        app_title: '展開練習',
+        app_subtitle: '拆括號 · 代數恆等式',
+        level1: '程度1',
+        level2: '程度2',
+        diff1: '程度1',
+        diff2: '程度2',
+        q_of: '第 {n} 題／共 {total} 題',
+        restart_title: '重新開始',
+        lang_switch_to: 'EN',
+        expand_instruction: '請將以下因式展開（拆括號）',
+        expression_label: '因式',
+        step1_title: '選擇對應的代數恆等式',
+        step2_title: '填入各項以完成展開',
+        id_diff_sq: '平方差',
+        id_perf_sq_add: '完全平方式 (+)',
+        id_perf_sq_sub: '完全平方式 (−)',
+        dropzone_placeholder: '請先在上方選擇恆等式',
+        term_bank: '選項庫',
+        term_bank_hint: '（拖曳或點按放入）',
+        clear_slots: '清空格位',
+        need_hint: '需要提示？',
+        check_answer: '檢查答案',
+        victory_title: '練習完成！',
+        victory_subtitle: '做得好！你已掌握代數恆等式展開！',
+        final_score: '最終分數',
+        max_streak: '最高連勝',
+        accuracy: '正確率',
+        try_again: '再試一次',
+        toast_select_identity: '請先在步驟 1 選擇代數恆等式！',
+        toast_fill_slots: '請在步驟 2 填滿所有空格！',
+        toast_success: '🎉 做得好！展開完全正確！',
+        toast_wrong_identity: '恆等式選錯了！請檢查是 (a+b)(a−b) 還是 (a±b)²。',
+        toast_wrong_slots: '恆等式正確，但項不對。請選帶次方的完整展開項（例如 k²、9）！',
+        hint_prefix: '💡 提示：'
+      }
+    };
+
+    function t(key) {
+      const pack = I18N[currentLang] || I18N.zh;
+      return (pack[key] !== undefined) ? pack[key] : ((I18N.en[key] !== undefined) ? I18N.en[key] : key);
+    }
+
+    function applyLang() {
+      document.documentElement.lang = currentLang === 'zh' ? 'zh-Hant' : 'en';
+      document.title = t('page_title');
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (key) el.textContent = t(key);
+      });
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        if (key) el.innerHTML = t(key);
+      });
+      document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (key) el.setAttribute('title', t(key));
+      });
+
+      const langBtn = document.getElementById('btn-lang-toggle');
+      if (langBtn) langBtn.textContent = t('lang_switch_to');
+
+      // Dynamic bits without resetting progress
+      if (typeof updateDifficultyUI === 'function') updateDifficultyUI();
+
+      if (typeof activeQuestions !== 'undefined' && activeQuestions.length) {
+        const progressEl = document.getElementById('question-progress-text');
+        if (progressEl) {
+          progressEl.textContent = t('q_of')
+            .replace('{n}', String(currentQuestionIndex + 1))
+            .replace('{total}', String(activeQuestions.length));
+        }
+
+        // Refresh empty dropzone placeholder only if no identity selected yet
+        if (!selectedIdentity) {
+          const drop = document.getElementById('dropzone-area');
+          if (drop) {
+            drop.innerHTML = '<span class="text-slate-400 text-sm font-normal italic">' + t('dropzone_placeholder') + '</span>';
+          }
+        }
+      }
+    }
+
+    function setLang(lang, persist) {
+      currentLang = (lang === 'en') ? 'en' : 'zh';
+      if (persist !== false) {
+        try { localStorage.setItem(LANG_KEY, currentLang); } catch (e) {}
+      }
+      applyLang();
+    }
+
+    function toggleLang() {
+      setLang(currentLang === 'zh' ? 'en' : 'zh');
+    }
+
+    function loadSavedLang() {
+      let saved = 'zh';
+      try {
+        const v = localStorage.getItem(LANG_KEY);
+        if (v === 'en' || v === 'zh') saved = v;
+      } catch (e) {}
+      currentLang = saved;
+    }
+
+    // Application Global State
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let correctCount = 0;
+    let currentStreak = 0;
+    let maxStreak = 0;
+    let totalAttempts = 0;
+    let selectedIdentity = null; // 'diff_sq', 'perf_sq_add', 'perf_sq_sub'
+    let currentSlots = []; // Stores strings for current dropzone entries
+    let selectedBankTerm = null; // Currently clicked term from term bank
+    
+    // CRITICAL: Lock flag to prevent rapid click / double submit race conditions
+    let isProcessing = false;
+
+    // Master Question Dataset
+    // Level 1: Basic Questions (coefficient 1 on variables)
+    // Dropzones (full expanded terms in slots — NO auto ² outside slots):
+    //   diff_sq:      □ − □           expectedSlots: [a², b²_simplified]
+    //   perf_sq_add:  □ + □ + □       expectedSlots: [a², 2ab, b²]
+    //   perf_sq_sub:  □ − □ + □       expectedSlots: [a², 2ab, b²]
+    // Variables allowed: x, y, p, m, k, a only
+    const LEVEL1_QUESTIONS = [
+      // 平方差（有時寫成 (a−b)(a+b)）
+      { id: 1, expr: "(x − 3)(x + 3)", type: "diff_sq", expectedIdentity: "diff_sq", expectedSlots: ["x²", "9"], bank: ["x²", "9", "x", "3", "6x", "6"], hint_en: "Same as (a+b)(a−b): expand to x² − 9.", hint_zh: "同 (a+b)(a−b) 一樣：展開得 x² − 9。" },
+      { id: 2, expr: "(a + 5)(a − 5)", type: "diff_sq", expectedIdentity: "diff_sq", expectedSlots: ["a²", "25"], bank: ["a²", "25", "a", "5", "10a", "10"], hint_en: "Difference of squares: a² − 25.", hint_zh: "平方差：a² − 25。" },
+      { id: 3, expr: "(y − 8)(y + 8)", type: "diff_sq", expectedIdentity: "diff_sq", expectedSlots: ["y²", "64"], bank: ["y²", "64", "y", "8", "16y", "16"], hint_en: "Expand to y² − 64.", hint_zh: "展開得 y² − 64。" },
+      { id: 4, expr: "(m + 4)(m − 4)", type: "diff_sq", expectedIdentity: "diff_sq", expectedSlots: ["m²", "16"], bank: ["m²", "16", "m", "4", "8m", "8"], hint_en: "Expand to m² − 16.", hint_zh: "展開得 m² − 16。" },
+      { id: 5, expr: "(p − 6)(p + 6)", type: "diff_sq", expectedIdentity: "diff_sq", expectedSlots: ["p²", "36"], bank: ["p²", "36", "p", "6", "12p", "12"], hint_en: "Expand to p² − 36.", hint_zh: "展開得 p² − 36。" },
+      { id: 6, expr: "(k + 9)(k − 9)", type: "diff_sq", expectedIdentity: "diff_sq", expectedSlots: ["k²", "81"], bank: ["k²", "81", "k", "9", "18k", "18"], hint_en: "Expand to k² − 81.", hint_zh: "展開得 k² − 81。" },
+      // 完全平方：一半 +、一半 −（負數常數）
+      { id: 7, expr: "(x − 3)²", type: "perf_sq_sub", expectedIdentity: "perf_sq_sub", expectedSlots: ["x²", "6x", "9"], bank: ["x²", "6x", "9", "x", "3x", "3"], hint_en: "(a−b)² = a² − 2ab + b² → x² − 6x + 9.", hint_zh: "(a−b)² = a² − 2ab + b² → x² − 6x + 9。" },
+      { id: 8, expr: "(y − 5)²", type: "perf_sq_sub", expectedIdentity: "perf_sq_sub", expectedSlots: ["y²", "10y", "25"], bank: ["y²", "10y", "25", "y", "5y", "5"], hint_en: "Form: y² − 10y + 25.", hint_zh: "形式：y² − 10y + 25。" },
+      { id: 9, expr: "(p + 3)²", type: "perf_sq_add", expectedIdentity: "perf_sq_add", expectedSlots: ["p²", "6p", "9"], bank: ["p²", "6p", "9", "p", "3p", "3"], hint_en: "Form: p² + 6p + 9.", hint_zh: "形式：p² + 6p + 9。" },
+      { id: 10, expr: "(a − 4)²", type: "perf_sq_sub", expectedIdentity: "perf_sq_sub", expectedSlots: ["a²", "8a", "16"], bank: ["a²", "8a", "16", "a", "4a", "4"], hint_en: "Form: a² − 8a + 16.", hint_zh: "形式：a² − 8a + 16。" },
+      { id: 11, expr: "(m + 7)²", type: "perf_sq_add", expectedIdentity: "perf_sq_add", expectedSlots: ["m²", "14m", "49"], bank: ["m²", "14m", "49", "m", "7m", "7"], hint_en: "Form: m² + 14m + 49.", hint_zh: "形式：m² + 14m + 49。" },
+      { id: 12, expr: "(k − 6)²", type: "perf_sq_sub", expectedIdentity: "perf_sq_sub", expectedSlots: ["k²", "12k", "36"], bank: ["k²", "12k", "36", "k", "6k", "6"], hint_en: "Form: k² − 12k + 36.", hint_zh: "形式：k² − 12k + 36。" }
+    ];
+
+    // Level 2: coefficient ≥ 2 on variables (diff of squares + perfect squares ±)
+    // Dual-variable questions use only {x,y,p,m,k,a}
+    const LEVEL2_QUESTIONS = [
+      { id: 101, expr: "(2k − 5)(2k + 5)", type: "diff_sq", expectedIdentity: "diff_sq", expectedSlots: ["4k²", "25"], bank: ["4k²", "25", "2k", "5", "4k", "10k"], hint_en: "(2k)² − 5² = 4k² − 25.", hint_zh: "(2k)² − 5² = 4k² − 25。" },
+      { id: 102, expr: "(3a + 4x)(3a − 4x)", type: "diff_sq", expectedIdentity: "diff_sq", expectedSlots: ["9a²", "16x²"], bank: ["9a²", "16x²", "3a", "4x", "9a", "16x"], hint_en: "9a² − 16x².", hint_zh: "9a² − 16x²。" },
+      { id: 103, expr: "(3y − 4)(3y + 4)", type: "diff_sq", expectedIdentity: "diff_sq", expectedSlots: ["9y²", "16"], bank: ["9y²", "16", "3y", "4", "9y", "12y"], hint_en: "9y² − 16.", hint_zh: "9y² − 16。" },
+      { id: 104, expr: "(4m + 5k)(4m − 5k)", type: "diff_sq", expectedIdentity: "diff_sq", expectedSlots: ["16m²", "25k²"], bank: ["16m²", "25k²", "4m", "5k", "16m", "25k"], hint_en: "16m² − 25k².", hint_zh: "16m² − 25k²。" },
+      { id: 105, expr: "(2p + 7)(2p − 7)", type: "diff_sq", expectedIdentity: "diff_sq", expectedSlots: ["4p²", "49"], bank: ["4p²", "49", "2p", "7", "4p", "14p"], hint_en: "4p² − 49.", hint_zh: "4p² − 49。" },
+      { id: 106, expr: "(5p − 4)(5p + 4)", type: "diff_sq", expectedIdentity: "diff_sq", expectedSlots: ["25p²", "16"], bank: ["25p²", "16", "5p", "4", "25p", "20p"], hint_en: "25p² − 16.", hint_zh: "25p² − 16。" },
+      { id: 107, expr: "(2y − 3)²", type: "perf_sq_sub", expectedIdentity: "perf_sq_sub", expectedSlots: ["4y²", "12y", "9"], bank: ["4y²", "12y", "9", "2y", "6y", "3"], hint_en: "4y² − 12y + 9.", hint_zh: "4y² − 12y + 9。" },
+      { id: 108, expr: "(4y + 3)²", type: "perf_sq_add", expectedIdentity: "perf_sq_add", expectedSlots: ["16y²", "24y", "9"], bank: ["16y²", "24y", "9", "4y", "12y", "3"], hint_en: "16y² + 24y + 9.", hint_zh: "16y² + 24y + 9。" },
+      { id: 109, expr: "(3m − 2k)²", type: "perf_sq_sub", expectedIdentity: "perf_sq_sub", expectedSlots: ["9m²", "12mk", "4k²"], bank: ["9m²", "12mk", "4k²", "3m", "2k", "6mk"], hint_en: "9m² − 12mk + 4k².", hint_zh: "9m² − 12mk + 4k²。" },
+      { id: 110, expr: "(5a − 2)²", type: "perf_sq_sub", expectedIdentity: "perf_sq_sub", expectedSlots: ["25a²", "20a", "4"], bank: ["25a²", "20a", "4", "5a", "10a", "2"], hint_en: "25a² − 20a + 4.", hint_zh: "25a² − 20a + 4。" },
+      { id: 111, expr: "(3k + 5)²", type: "perf_sq_add", expectedIdentity: "perf_sq_add", expectedSlots: ["9k²", "30k", "25"], bank: ["9k²", "30k", "25", "3k", "15k", "5"], hint_en: "9k² + 30k + 25.", hint_zh: "9k² + 30k + 25。" },
+      { id: 112, expr: "(2a − 5x)²", type: "perf_sq_sub", expectedIdentity: "perf_sq_sub", expectedSlots: ["4a²", "20ax", "25x²"], bank: ["4a²", "20ax", "25x²", "2a", "5x", "10ax"], hint_en: "4a² − 20ax + 25x².", hint_zh: "4a² − 20ax + 25x²。" }
+    ];
+
+    function questionHint(q) {
+      if (!q) return '';
+      if (currentLang === 'zh') return q.hint_zh || q.hint_en || q.hint || '';
+      return q.hint_en || q.hint_zh || q.hint || '';
+    }
+
+    let activeQuestions = [];
+    let selectedDifficulty = 1; // 1 = Level 1 (coeff 1), 2 = Level 2 (coeff ≥ 2)
+
+    function updateDifficultyUI() {
+      const isL2 = selectedDifficulty === 2;
+      const levelText = t(isL2 ? 'diff2' : 'diff1');
+      const cardTag = document.getElementById('card-level-tag');
+      if (cardTag) {
+        cardTag.textContent = levelText;
+        if (isL2) {
+          cardTag.className = "text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2.5 py-1 rounded-md border border-purple-100";
+        } else {
+          cardTag.className = "text-xs font-bold uppercase tracking-wider text-[#0D5665] bg-[#E8F3F5] px-2.5 py-1 rounded-md border border-[#C5E0E5]";
+        }
+      }
+      document.querySelectorAll('.diff-btn').forEach(btn => {
+        const d = Number(btn.dataset.diff);
+        const active = d === selectedDifficulty;
+        if (active) {
+          if (d === 2) {
+            btn.className = 'diff-btn px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-purple-600 text-white shadow-sm';
+          } else {
+            btn.className = 'diff-btn px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-[#0D5665] text-white shadow-sm';
+          }
+        } else {
+          btn.className = 'diff-btn px-3.5 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 hover:text-slate-800';
+        }
+        // Keep i18n label
+        btn.textContent = t(d === 2 ? 'diff2' : 'diff1');
+      });
+    }
+
+    function setDifficulty(level) {
+      const next = (Number(level) === 2) ? 2 : 1;
+      if (next === selectedDifficulty && activeQuestions.length) {
+        // Still allow re-click to restart same pool? Only switch when different — user asked switch resets.
+        // If same button clicked, no-op.
+        return;
+      }
+      selectedDifficulty = next;
+      initSession();
+    }
+
+    // Web Audio Synthesizer for SFX
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playSound(type) {
+      try {
+        initAudio();
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+        if (type === 'correct') {
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.12, now + idx * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.25);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + idx * 0.08);
+            osc.stop(now + idx * 0.08 + 0.25);
+          });
+        } else if (type === 'error') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.exponentialRampToValueAtTime(110, now + 0.25);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'select') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, now);
+          gain.gain.setValueAtTime(0.05, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        }
+      } catch (e) {
+        console.log("Audio not supported or blocked");
+      }
+    }
+
+    // Helper to shuffle array in place
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Initialize session from the selected difficulty pool only
+    function initSession() {
+      const pool = selectedDifficulty === 2 ? LEVEL2_QUESTIONS : LEVEL1_QUESTIONS;
+      activeQuestions = shuffle(pool);
+
+      currentQuestionIndex = 0;
+      score = 0;
+      correctCount = 0;
+      currentStreak = 0;
+      maxStreak = 0;
+      totalAttempts = 0;
+      isProcessing = false;
+
+      const congratsEl = document.getElementById('hkdse-congrats');
+      if (congratsEl) congratsEl.classList.add('hidden');
+
+      const victory = document.getElementById('victory-modal');
+      if (victory) victory.classList.add('hidden');
+
+      updateDifficultyUI();
+      updateStatsUI();
+      renderQuestion();
+    }
+
+    // Render current question
+    function renderQuestion() {
+      const q = activeQuestions[currentQuestionIndex];
+      if (!q) {
+        showVictoryScreen();
+        return;
+      }
+
+      // Hide feedback toast
+      const toast = document.getElementById('feedback-toast');
+      toast.classList.add('hidden');
+
+      // Update question text and headers
+      document.getElementById('expression-display').textContent = q.expr;
+
+      // Card tag follows selected difficulty (no auto level-up mid-quiz)
+      updateDifficultyUI();
+
+      document.getElementById('question-progress-text').textContent = t('q_of')
+        .replace('{n}', String(currentQuestionIndex + 1))
+        .replace('{total}', String(activeQuestions.length));
+      document.getElementById('progress-bar-inner').style.width = `${((currentQuestionIndex) / activeQuestions.length) * 100}%`;
+
+      // Reset Step 1 & Step 2 state
+      selectedIdentity = null;
+      currentSlots = [];
+      selectedBankTerm = null;
+
+      // Reset identity selection buttons styling
+      document.querySelectorAll('.identity-btn').forEach(btn => {
+        btn.classList.remove('border-[#0D5665]', 'bg-[#E8F3F5]', 'ring-2', 'ring-[#7BB5C0]');
+        btn.classList.add('border-slate-200', 'bg-white');
+      });
+
+      // Disable step 2 container until step 1 is picked
+      const step2 = document.getElementById('step2-container');
+      step2.classList.add('opacity-40', 'pointer-events-none');
+      document.getElementById('dropzone-area').innerHTML = '<span class="text-slate-400 text-sm font-normal italic">' + t('dropzone_placeholder') + '</span>';
+
+      // Render Term Bank
+      renderTermBank(q.bank);
+
+      // Re-enable check answer button and clear lock flag
+      isProcessing = false;
+      const checkBtn = document.getElementById('check-btn');
+      checkBtn.disabled = false;
+      checkBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+
+    // Render Term Bank Tiles
+    function renderTermBank(terms) {
+      const bankContainer = document.getElementById('term-bank');
+      bankContainer.innerHTML = '';
+
+      terms.forEach(term => {
+        const tile = document.createElement('div');
+        tile.className = 'term-tile px-4 py-2 bg-white border-2 border-slate-200 hover:border-[#3A8A98] text-slate-800 font-mono font-bold rounded-xl cursor-pointer shadow-sm text-center min-w-[50px] font-mono';
+        tile.textContent = term;
+        tile.setAttribute('draggable', 'true');
+        tile.dataset.term = term;
+
+        // Click to select
+        tile.addEventListener('click', () => {
+          playSound('select');
+          document.querySelectorAll('.term-tile').forEach(t => t.classList.remove('selected-term'));
+          if (selectedBankTerm === term) {
+            selectedBankTerm = null;
+          } else {
+            selectedBankTerm = term;
+            tile.classList.add('selected-term');
+          }
+        });
+
+        // HTML5 Drag Start
+        tile.addEventListener('dragstart', (e) => {
+          playSound('select');
+          e.dataTransfer.setData('text/plain', term);
+          selectedBankTerm = term;
+        });
+
+        bankContainer.appendChild(tile);
+      });
+    }
+
+    // Setup Dropzone Template: full expanded polynomial terms in slots (no auto ² outside)
+    function setupDropzone(identityKey) {
+      selectedIdentity = identityKey;
+      const step2 = document.getElementById('step2-container');
+      step2.classList.remove('opacity-40', 'pointer-events-none');
+
+      const dropArea = document.getElementById('dropzone-area');
+      dropArea.innerHTML = '';
+
+      let slotCount = 0;
+      let htmlString = '';
+
+      const slotCls = 'drop-slot rounded-xl border-2 border-dashed border-[#7BB5C0] bg-white px-3 py-1 flex items-center justify-center cursor-pointer hover:border-[#1A6B7A]';
+
+      if (identityKey === 'diff_sq') {
+        // □ − □  (full expanded terms, e.g. k² − 9)
+        slotCount = 2;
+        htmlString = `
+          <div class="${slotCls}" data-slot="0"></div>
+          <span class="text-[#0D5665] font-extrabold">−</span>
+          <div class="${slotCls}" data-slot="1"></div>
+        `;
+      } else if (identityKey === 'perf_sq_add') {
+        // □ + □ + □  (e.g. p² + 6p + 9)
+        slotCount = 3;
+        htmlString = `
+          <div class="${slotCls}" data-slot="0"></div>
+          <span class="text-[#0D5665] font-extrabold">+</span>
+          <div class="${slotCls}" data-slot="1"></div>
+          <span class="text-[#0D5665] font-extrabold">+</span>
+          <div class="${slotCls}" data-slot="2"></div>
+        `;
+      } else if (identityKey === 'perf_sq_sub') {
+        // □ − □ + □  (e.g. y² − 10y + 25)
+        slotCount = 3;
+        htmlString = `
+          <div class="${slotCls}" data-slot="0"></div>
+          <span class="text-[#0D5665] font-extrabold">−</span>
+          <div class="${slotCls}" data-slot="1"></div>
+          <span class="text-[#0D5665] font-extrabold">+</span>
+          <div class="${slotCls}" data-slot="2"></div>
+        `;
+      }
+
+      dropArea.innerHTML = htmlString;
+      currentSlots = new Array(slotCount).fill(null);
+
+      // Attach event listeners to newly created slots
+      const slotElems = dropArea.querySelectorAll('.drop-slot');
+      slotElems.forEach(slotEl => {
+        const slotIdx = parseInt(slotEl.dataset.slot);
+
+        // Click slot to place selected term OR clear slot
+        slotEl.addEventListener('click', () => {
+          playSound('select');
+          if (currentSlots[slotIdx]) {
+            // Clear slot
+            currentSlots[slotIdx] = null;
+            updateSlotUI(slotEl, null);
+          } else if (selectedBankTerm) {
+            // Place selected term
+            currentSlots[slotIdx] = selectedBankTerm;
+            updateSlotUI(slotEl, selectedBankTerm);
+          }
+        });
+
+        // HTML5 Drag & Drop listeners
+        slotEl.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          slotEl.classList.add('drag-over');
+        });
+
+        slotEl.addEventListener('dragleave', () => {
+          slotEl.classList.remove('drag-over');
+        });
+
+        slotEl.addEventListener('drop', (e) => {
+          e.preventDefault();
+          slotEl.classList.remove('drag-over');
+          const term = e.dataTransfer.getData('text/plain') || selectedBankTerm;
+          if (term) {
+            playSound('select');
+            currentSlots[slotIdx] = term;
+            updateSlotUI(slotEl, term);
+          }
+        });
+      });
+    }
+
+    // Update single slot element UI
+    function updateSlotUI(slotEl, term) {
+      if (term) {
+        slotEl.textContent = term;
+        slotEl.className = 'drop-slot rounded-xl border-2 border-[#0D5665] bg-[#E8F3F5] text-[#0A3A44] font-bold px-3 py-1 flex items-center justify-center cursor-pointer shadow-sm';
+      } else {
+        slotEl.textContent = '';
+        slotEl.className = 'drop-slot rounded-xl border-2 border-dashed border-[#7BB5C0] bg-white px-3 py-1 flex items-center justify-center cursor-pointer hover:border-[#1A6B7A]';
+      }
+    }
+
+    // Answer Checking Logic with RAPID CLICK PROTECTION
+    function checkAnswer() {
+      if (isProcessing) return;
+      
+      const q = activeQuestions[currentQuestionIndex];
+      const toast = document.getElementById('feedback-toast');
+
+      // Check Step 1: Identity Selection
+      if (!selectedIdentity) {
+        playSound('error');
+        showToast(t('toast_select_identity'), 'error');
+        shakeCard();
+        return;
+      }
+
+      // Check Step 2: Slot completion
+      if (currentSlots.includes(null) || currentSlots.length === 0) {
+        playSound('error');
+        showToast(t('toast_fill_slots'), 'error');
+        shakeCard();
+        return;
+      }
+
+      // LOCK ACTION to prevent double submits / question skipping
+      isProcessing = true;
+      const checkBtn = document.getElementById('check-btn');
+      checkBtn.disabled = true;
+      checkBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      totalAttempts++;
+
+      // Validate Identity & Slots
+      const isIdentityCorrect = (selectedIdentity === q.expectedIdentity);
+      
+      // Check slot content array matching
+      let isSlotsCorrect = true;
+      if (currentSlots.length !== q.expectedSlots.length) {
+        isSlotsCorrect = false;
+      } else {
+        for (let i = 0; i < currentSlots.length; i++) {
+          if (currentSlots[i] !== q.expectedSlots[i]) {
+            isSlotsCorrect = false;
+            break;
+          }
+        }
+      }
+
+      if (isIdentityCorrect && isSlotsCorrect) {
+        // CORRECT ANSWER!
+        playSound('correct');
+        score += 10;
+        correctCount++;
+        currentStreak++;
+        if (currentStreak > maxStreak) maxStreak = currentStreak;
+        updateStatsUI();
+
+        if (correctCount >= 10) {
+          const congratsEl = document.getElementById('hkdse-congrats');
+          if (congratsEl) congratsEl.classList.remove('hidden');
+        }
+
+        showToast(t('toast_success'), 'success');
+
+        // Wait 1.4 seconds before advancing, guaranteeing no double skips
+        setTimeout(() => {
+          currentQuestionIndex++;
+          renderQuestion();
+        }, 1400);
+
+      } else {
+        // INCORRECT ANSWER
+        playSound('error');
+        currentStreak = 0;
+        updateStatsUI();
+
+        if (!isIdentityCorrect) {
+          showToast(t('toast_wrong_identity'), 'error');
+        } else {
+          showToast(t('toast_wrong_slots'), 'error');
+        }
+
+        shakeCard();
+
+        // Unlock after short delay so student can retry
+        setTimeout(() => {
+          isProcessing = false;
+          checkBtn.disabled = false;
+          checkBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }, 600);
+      }
+    }
+
+    // Helper to display feedback messages
+    function showToast(message, type) {
+      const toast = document.getElementById('feedback-toast');
+      toast.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'border-emerald-300', 'bg-red-100', 'text-red-800', 'border-red-300', 'bg-amber-100', 'text-amber-800', 'border-amber-300');
+      
+      if (type === 'success') {
+        toast.classList.add('bg-emerald-100', 'text-emerald-800', 'border', 'border-emerald-300');
+      } else if (type === 'error') {
+        toast.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-300');
+      } else {
+        toast.classList.add('bg-amber-100', 'text-amber-800', 'border', 'border-amber-300');
+      }
+      toast.textContent = message;
+    }
+
+    // Card shake animation on mistake
+    function shakeCard() {
+      const card = document.getElementById('question-card');
+      card.classList.add('animate-shake');
+      setTimeout(() => {
+        card.classList.remove('animate-shake');
+      }, 450);
+    }
+
+    // Update Top Header Stats UI
+    function updateStatsUI() {
+      document.getElementById('score-count').textContent = score;
+      document.getElementById('streak-count').textContent = currentStreak;
+    }
+
+    // Victory Screen & Canvas Confetti
+    function showVictoryScreen() {
+      playSound('correct');
+      
+      const modal = document.getElementById('victory-modal');
+      document.getElementById('final-score').textContent = score;
+      document.getElementById('final-streak').textContent = maxStreak;
+      
+      const accuracy = totalAttempts > 0 ? Math.round((activeQuestions.length / totalAttempts) * 100) : 100;
+      document.getElementById('final-accuracy').textContent = `${accuracy}%`;
+
+      applyLang();
+
+      modal.classList.remove('hidden');
+      launchConfetti();
+    }
+
+    // Lightweight HTML5 Canvas Confetti Effect
+    function launchConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const colors = ['#0D5665', '#10b981', '#14b8a6', '#f59e0b', '#3b82f6', '#8b5cf6'];
+
+      for (let i = 0; i < 120; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          r: Math.random() * 6 + 4,
+          d: Math.random() * 10 + 10,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          tilt: Math.floor(Math.random() * 10) - 10,
+          tiltAngleIncremental: Math.random() * 0.07 + 0.05,
+          tiltAngle: 0
+        });
+      }
+
+      let animationFrame;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p, i) => {
+          p.tiltAngle += p.tiltAngleIncremental;
+          p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+          p.tilt = Math.sin(p.tiltAngle) * 15;
+
+          ctx.beginPath();
+          ctx.lineWidth = p.r;
+          ctx.strokeStyle = p.color;
+          ctx.moveTo(p.x + p.tilt + p.r, p.y);
+          ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+          ctx.stroke();
+
+          if (p.y > canvas.height) {
+            particles[i] = {
+              x: Math.random() * canvas.width,
+              y: -10,
+              r: p.r,
+              d: p.d,
+              color: p.color,
+              tilt: p.tilt,
+              tiltAngleIncremental: p.tiltAngleIncremental,
+              tiltAngle: p.tiltAngle
+            };
+          }
+        });
+        animationFrame = requestAnimationFrame(draw);
+      }
+
+      draw();
+      setTimeout(() => {
+        cancelAnimationFrame(animationFrame);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }, 6000);
+    }
+
+    // Global Event Listeners Setup
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSavedLang();
+
+      // Identity Buttons (Step 1)
+      document.querySelectorAll('.identity-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          playSound('select');
+          const identityKey = btn.dataset.identity;
+
+          document.querySelectorAll('.identity-btn').forEach(b => {
+            b.classList.remove('border-[#0D5665]', 'bg-[#E8F3F5]', 'ring-2', 'ring-[#7BB5C0]');
+            b.classList.add('border-slate-200', 'bg-white');
+          });
+
+          btn.classList.remove('border-slate-200', 'bg-white');
+          btn.classList.add('border-[#0D5665]', 'bg-[#E8F3F5]', 'ring-2', 'ring-[#7BB5C0]');
+
+          setupDropzone(identityKey);
+        });
+      });
+
+      // Check Answer Button
+      document.getElementById('check-btn').addEventListener('click', checkAnswer);
+
+      // Clear Slots Button
+      document.getElementById('btn-clear-slots').addEventListener('click', () => {
+        playSound('select');
+        if (selectedIdentity) {
+          setupDropzone(selectedIdentity);
+        }
+      });
+
+      // Hint Button
+      document.getElementById('btn-hint').addEventListener('click', () => {
+        playSound('select');
+        const q = activeQuestions[currentQuestionIndex];
+        const hintText = questionHint(q);
+        if (q && hintText) {
+          showToast(t('hint_prefix') + hintText, 'hint');
+        }
+      });
+
+      // Restart Quiz Buttons
+      document.getElementById('btn-restart').addEventListener('click', initSession);
+      document.getElementById('btn-modal-restart').addEventListener('click', () => {
+        document.getElementById('victory-modal').classList.add('hidden');
+        initSession();
+      });
+
+      // Language toggle
+      document.getElementById('btn-lang-toggle').addEventListener('click', () => {
+        playSound('select');
+        toggleLang();
+      });
+
+      // Difficulty selector (程度1 / 程度2)
+      document.querySelectorAll('.diff-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          playSound('select');
+          setDifficulty(btn.dataset.diff);
+        });
+      });
+
+      // Apply language first, then start session (default 程度1)
+      selectedDifficulty = 1;
+      applyLang();
+      initSession();
+
+      // Preview helper: ?preview=congrats shows the 10-correct banner without playing
+      if (new URLSearchParams(location.search).get('preview') === 'congrats') {
+        const el = document.getElementById('hkdse-congrats');
+        if (el) el.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

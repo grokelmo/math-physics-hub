@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>物理計數機技巧練習</title>
+<style>
+:root{
+  --bg:#f0f4f8;--card:#ffffff;--primary:#1a5f7a;--primary-dark:#0d3d4f;
+  --accent:#57c5b6;--accent-soft:#e8f7f5;--ok:#2d9a6a;--ok-bg:#e6f7ef;
+  --bad:#c0392b;--bad-bg:#fdecea;--hint:#5b6b7a;--border:#d0dbe6;
+  --slot:#f7fafc;
+  --shadow:0 2px 10px rgba(26,95,122,.08);--radius:12px;
+  --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--font);
+  background:linear-gradient(160deg,#e8f1f5 0%,#f5f0e8 100%);
+  color:#1a2a33;min-height:100vh;min-height:100dvh;line-height:1.4;
+  -webkit-tap-highlight-color:transparent;
+}
+.wrap{max-width:720px;margin:0 auto;padding:10px 12px calc(88px + var(--safe-bottom))}
+header{text-align:center;margin-bottom:8px;padding:6px 4px 2px}
+header h1{font-size:1.35rem;color:var(--primary-dark);font-weight:700;letter-spacing:.04em}
+.sub{font-size:.78rem;color:var(--hint);margin-top:4px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:10px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);padding:12px;margin-bottom:10px}
+.lang-pair{display:flex;gap:6px}
+.lang-btn,.btn{
+  border:1px solid var(--border);background:#fff;color:var(--primary-dark);
+  border-radius:10px;padding:8px 12px;font:inherit;font-weight:600;cursor:pointer;min-height:42px;
+}
+.lang-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.q-box{
+  background:linear-gradient(135deg,#f7fbfd,#eef6f4);border:1px dashed var(--border);
+  border-radius:10px;padding:16px 14px;min-height:180px;
+}
+.q-tag{font-size:.75rem;color:#8a9aa8;margin-bottom:8px}
+.q-line1{
+  font-size:1.12rem;color:var(--primary-dark);font-weight:700;line-height:1.95;
+  margin-bottom:14px;display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px;
+}
+.q-line2{
+  font-size:1.08rem;color:#243842;font-weight:600;line-height:2;min-height:96px;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Noto Sans TC",sans-serif;
+  word-break:break-word;padding:16px 12px;background:rgba(255,255,255,.75);
+  border-radius:8px;border:1px solid #d8e6ee;
+  display:flex;flex-wrap:wrap;align-items:center;gap:4px 2px;
+}
+.frac{
+  display:inline-flex;flex-direction:column;align-items:center;
+  vertical-align:middle;margin:0 .12em;line-height:1.15;
+}
+.frac .num{
+  padding:0 .28em .08em;border-bottom:1.5px solid currentColor;text-align:center;
+  white-space:nowrap;
+}
+.frac .den{
+  padding:.08em .28em 0;text-align:center;white-space:nowrap;
+}
+.frac .frac{font-size:.92em;margin:0 .04em}
+.sqrt{
+  display:inline-flex;align-items:stretch;vertical-align:middle;
+  margin:0 .08em;line-height:1.15;
+}
+.sqrt-sym{
+  display:flex;align-items:flex-start;justify-content:flex-end;
+  font-size:1.95em;font-weight:600;line-height:.92;
+  padding:0;margin:0 -.22em 0 0;align-self:stretch;
+  letter-spacing:-.08em;
+  transform:scaleY(1.18);transform-origin:right top;
+}
+.sqrt-body{
+  border-top:2.25px solid currentColor;
+  padding:.14em .34em .1em .02em;
+  margin-left:0;
+  display:inline-flex;align-items:center;flex-wrap:wrap;gap:2px;
+  box-sizing:border-box;
+  position:relative;
+}
+.sqrt-body::before{
+  content:"";position:absolute;left:-.18em;top:0;width:.22em;height:2.25px;
+  background:currentColor;
+}
+.q-ask{font-size:.9rem;color:var(--hint);margin-top:10px}
+.answer-display{
+  width:100%;min-height:60px;border:2px solid var(--border);border-radius:10px;
+  background:var(--slot);padding:12px 14px;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:1.4rem;font-weight:700;color:var(--primary-dark);text-align:right;outline:none;
+}
+.answer-display:focus{border-color:var(--accent);background:#fff}
+.unit-hint{font-size:.75rem;color:var(--hint);text-align:right;margin-top:4px}
+.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.kbtn{
+  min-height:46px;border:1px solid var(--border);border-radius:10px;background:#fff;
+  color:var(--primary-dark);font:inherit;font-size:1.05rem;font-weight:700;cursor:pointer;
+}
+.kbtn:active{transform:scale(.97);background:var(--accent-soft)}
+.kbtn.fn{background:#eef2f5;color:var(--hint);font-size:.82rem}
+.kbtn.ee{font-size:.78rem;letter-spacing:-.02em}
+.kbtn.wide{grid-column:span 2}
+.actions{
+  display:flex;gap:8px;margin-top:10px;position:sticky;bottom:calc(8px + var(--safe-bottom));
+  z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  padding:8px;border-radius:12px;border:1px solid var(--border);box-shadow:0 -2px 12px rgba(26,95,122,.1);
+}
+.btn{flex:1;min-height:48px;border:none;border-radius:10px;padding:12px 10px;font-size:.95rem;font-weight:700;transition:transform .1s,background .15s,opacity .15s}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover:not(:disabled){background:var(--primary-dark)}
+.btn-secondary{background:#fff;color:var(--primary);border:2px solid var(--primary)}
+.btn-ghost{background:#eef2f5;color:var(--hint);flex:.7}
+.feedback{display:none;border-radius:10px;padding:10px 12px;margin-top:10px;animation:fadeIn .25s ease}
+.feedback.show{display:block}
+.feedback.ok{background:var(--ok-bg);border:1px solid #a8dfc0;color:#1e6b45}
+.feedback.bad{background:var(--bad-bg);border:1px solid #f0b8b2;color:#8b2e24}
+.feedback .fb-title{font-weight:700;font-size:1rem;margin-bottom:4px}
+.feedback .fb-body{font-size:.85rem;line-height:1.5}
+.feedback .fb-ans{
+  margin-top:6px;padding:6px 8px;background:rgba(255,255,255,.7);border-radius:8px;
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1rem;font-weight:600;text-align:center;
+}
+.feedback .fb-sol{margin-top:6px;font-size:.8rem;opacity:.95;white-space:pre-wrap}
+.btn-new-glow{
+  background:linear-gradient(135deg,#1a5f7a,#57c5b6)!important;color:#fff!important;
+  border:none!important;box-shadow:0 0 0 3px rgba(87,197,182,.35),0 6px 18px rgba(26,95,122,.28);
+  animation:newPulse 1.1s ease-in-out infinite;font-size:1.05rem!important;flex:1.35!important;
+}
+@keyframes newPulse{
+  0%,100%{transform:scale(1);box-shadow:0 0 0 3px rgba(87,197,182,.35),0 6px 18px rgba(26,95,122,.28)}
+  50%{transform:scale(1.04);box-shadow:0 0 0 6px rgba(87,197,182,.2),0 8px 22px rgba(26,95,122,.35)}
+}
+.celebrate-layer{
+  pointer-events:none;position:fixed;inset:0;z-index:9999;overflow:hidden;
+}
+.celebrate-burst{
+  position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);
+  font-size:2.4rem;font-weight:800;color:var(--ok);
+  text-shadow:0 2px 12px rgba(45,154,106,.35);
+  animation:burstPop .9s ease-out forwards;
+  white-space:nowrap;
+}
+@keyframes burstPop{
+  0%{opacity:0;transform:translate(-50%,-40%) scale(.6)}
+  25%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}
+  70%{opacity:1;transform:translate(-50%,-55%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-70%) scale(.95)}
+}
+.confetti{
+  position:absolute;width:8px;height:12px;border-radius:2px;top:-12px;
+  animation:confettiFall linear forwards;
+}
+@keyframes confettiFall{
+  0%{transform:translateY(0) rotate(0deg);opacity:1}
+  100%{transform:translateY(105vh) rotate(720deg);opacity:0}
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.stats{display:flex;justify-content:space-around;text-align:center;gap:6px}
+.stat .n{font-size:1.25rem;font-weight:700;color:var(--primary-dark)}
+.stat .l{font-size:.68rem;color:var(--hint)}
+@media (max-width:600px){
+  .wrap{padding:8px 10px calc(92px + var(--safe-bottom))}
+  .card{padding:10px;margin-bottom:8px}
+  header h1{font-size:1.15rem}
+  .actions{position:fixed;left:10px;right:10px;bottom:calc(6px + var(--safe-bottom));margin-top:0}
+  .kbtn{min-height:44px}
+}
+@media (max-width:400px){
+  .wrap{padding:6px 8px calc(90px + var(--safe-bottom))}
+  header h1{font-size:1.05rem}
+  .kbtn{min-height:42px;font-size:.95rem}
+  .btn{min-height:46px;font-size:.9rem;padding:10px 6px}
+}
+@media (min-width:601px){
+  .wrap{padding:16px 14px 32px}
+  .card{padding:14px 16px;margin-bottom:12px}
+  header{margin-bottom:14px;padding:12px 8px 4px}
+  header h1{font-size:1.5rem}
+  .actions{position:sticky;bottom:12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="title">物理計數機技巧練習</h1>
+    <div class="sub" id="subtitle">HKDSE · 公式已代入 · 用計數機求數值</div>
+  </header>
+
+  <div class="toolbar">
+    <div class="lang-pair">
+      <button type="button" class="lang-btn active" id="btnZh" data-lang="zh">繁中</button>
+      <button type="button" class="lang-btn" id="btnEn" data-lang="en">EN</button>
+    </div>
+  </div>
+
+  <section class="card">
+    <div class="q-box">
+      <div class="q-tag" id="qTag"></div>
+      <div class="q-line1" id="qLine1">—</div>
+      <div class="q-line2" id="qLine2">—</div>
+      <div class="q-ask" id="qAsk"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <input type="text" class="answer-display" id="answerInput" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="answer">
+    <div class="unit-hint" id="unitHint"></div>
+    <div class="keypad" id="keypad">
+      <button type="button" class="kbtn" data-k="7">7</button>
+      <button type="button" class="kbtn" data-k="8">8</button>
+      <button type="button" class="kbtn" data-k="9">9</button>
+      <button type="button" class="kbtn fn" data-k="BS">⌫</button>
+      <button type="button" class="kbtn" data-k="4">4</button>
+      <button type="button" class="kbtn" data-k="5">5</button>
+      <button type="button" class="kbtn" data-k="6">6</button>
+      <button type="button" class="kbtn fn" data-k="C">C</button>
+      <button type="button" class="kbtn" data-k="1">1</button>
+      <button type="button" class="kbtn" data-k="2">2</button>
+      <button type="button" class="kbtn" data-k="3">3</button>
+      <button type="button" class="kbtn fn" data-k="-">−</button>
+      <button type="button" class="kbtn" data-k="0">0</button>
+      <button type="button" class="kbtn" data-k=".">.</button>
+      <button type="button" class="kbtn ee wide" data-k="EE">×10^</button>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn btn-ghost" id="btnClear">清除</button>
+      <button type="button" class="btn btn-secondary" id="btnNew">新題</button>
+      <button type="button" class="btn btn-primary" id="btnSubmit">提交</button>
+    </div>
+    <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+  </section>
+
+  <section class="card">
+    <div class="stats">
+      <div class="stat"><div class="n" id="statTried">0</div><div class="l" id="lblTried">作答</div></div>
+      <div class="stat"><div class="n" id="statCorrect">0</div><div class="l" id="lblCorrect">答對</div></div>
+      <div class="stat"><div class="n" id="statStreak">0</div><div class="l" id="lblStreak">連對</div></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var G = 6.67e-11, g = 9.81, Rgas = 8.31, cLight = 3.00e8, MU0 = 4 * Math.PI * 1e-7, LN2 = Math.LN2;
+
+  var UI = {
+    zh: {
+      title: "物理計數機技巧練習",
+      subtitle: "HKDSE · 公式已代入 · 用計數機求數值",
+      ask: "請用計數機計算上式最終數值（單位見下方）。接受 3 位有效數字。",
+      clear: "清除", newQ: "新題", submit: "提交",
+      tried: "作答", correct: "答對", streak: "連對",
+      ok: "正確！", bad: "未正確",
+      ansLabel: "正確答案", noteLabel: "提示",
+      unitPrefix: "單位："
+    },
+    en: {
+      title: "Physics Calculator Skills",
+      subtitle: "HKDSE · Expression given · Compute the value",
+      ask: "Use your calculator on the expression above. 3 s.f. accepted.",
+      clear: "Clear", newQ: "New", submit: "Submit",
+      tried: "Tried", correct: "Correct", streak: "Streak",
+      ok: "Correct!", bad: "Not quite",
+      ansLabel: "Answer", noteLabel: "Note",
+      unitPrefix: "Unit: "
+    }
+  };
+
+  function randInt(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function randStep(min, max, step) {
+    var n = Math.round((max - min) / step);
+    return +(min + randInt(0, n) * step).toFixed(10);
+  }
+  function randSf(min, max, sf) {
+    var x = min + Math.random() * (max - min);
+    return roundSf(x, sf);
+  }
+  function shuffle(a) {
+    var x = a.slice();
+    for (var i = x.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = x[i]; x[i] = x[j]; x[j] = t;
+    }
+    return x;
+  }
+  function roundSf(n, sf) {
+    if (!isFinite(n) || n === 0) return 0;
+    var d = Math.ceil(Math.log10(Math.abs(n)));
+    var p = Math.pow(10, sf - d);
+    return Math.round(n * p) / p;
+  }
+  function fmtSci(n) {
+    if (!isFinite(n)) return String(n);
+    var a = Math.abs(n);
+    if (a !== 0 && (a >= 1e4 || a < 1e-2)) {
+      var exp = Math.floor(Math.log10(a));
+      var m = n / Math.pow(10, exp);
+      return roundSf(m, 3).toPrecision(3).replace(/\.?0+$/, "").replace(/\.$/, "") + "×10^" + exp;
+    }
+    var s = roundSf(n, 3);
+    var t = Number(s.toPrecision(3));
+    return String(t);
+  }
+  function fmtDisp(n) {
+    if (!isFinite(n)) return String(n);
+    var a = Math.abs(n);
+    if (a !== 0 && (a >= 1e4 || a < 1e-2)) return fmtSci(n);
+    var s = String(n);
+    if (s.indexOf("e") >= 0 || s.indexOf("E") >= 0) return fmtSci(n);
+    if (s.indexOf(".") >= 0) s = s.replace(/(\.\d*?[1-9])0+$/, "$1").replace(/\.0+$/, "").replace(/\.$/, "");
+    return s;
+  }
+  function parseAnswer(raw) {
+    if (!raw) return NaN;
+    var s = String(raw).trim().replace(/\s+/g, "").replace(/×/g, "x").replace(/−/g, "-").replace(/X/g, "x");
+    s = s.replace(/x10\^?/i, "e").replace(/EE/i, "e").replace(/\*\*10\^?/i, "e");
+    if (/e$/i.test(s) || /e[+\-]?$/i.test(s)) return NaN;
+    return Number(s);
+  }
+  function answersMatch(user, correct) {
+    if (!isFinite(user) || !isFinite(correct)) return false;
+    if (correct === 0) return Math.abs(user) < 1e-12;
+    var rel = Math.abs(user - correct) / Math.abs(correct);
+    if (rel <= 0.005) return true;
+    var u3 = roundSf(user, 3), c3 = roundSf(correct, 3);
+    if (u3 === c3) return true;
+    var ue = Number(user.toPrecision(3)), ce = Number(correct.toPrecision(3));
+    return ue === ce;
+  }
+  function sciParen(n) {
+    var s = fmtSci(n);
+    if (s.indexOf("×10^") >= 0 || s.indexOf("-") === 0) return "(" + s + ")";
+    return s;
+  }
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+  function frac(numHtml, denHtml) {
+    return '<span class="frac"><span class="num">' + numHtml + '</span><span class="den">' + denHtml + '</span></span>';
+  }
+  function sqrt(innerHtml) {
+    return '<span class="sqrt"><span class="sqrt-sym" aria-hidden="true">√</span><span class="sqrt-body">' + innerHtml + '</span></span>';
+  }
+
+  /* Mode B templates: formula line + fully substituted expression + numerical answer */
+  var TEMPLATES = [
+    {
+      id: "CS1",
+      formulaZh: "(b) 根據 " + frac("GMm", "r²") + " = mrω²",
+      formulaEn: "(b) Based on " + frac("GMm", "r²") + " = mrω²",
+      build: function () {
+        var r = randSf(1.40e11, 1.55e11, 3);
+        var omega = randSf(1.90e-7, 2.10e-7, 3);
+        var ans = (r * r * r * omega * omega) / G;
+        var num = esc(sciParen(r)) + "³ × " + esc(sciParen(omega)) + "²";
+        var den = esc(fmtSci(G));
+        return {
+          exprZh: "M = " + frac("r³ω²", "G") + " = " + frac(num, den),
+          exprEn: "M = " + frac("r³ω²", "G") + " = " + frac(num, den),
+          answer: ans,
+          unitZh: "kg", unitEn: "kg",
+          noteZh: "先算 r³，再乘 ω²，最後除以 G。注意 ×10^ 指數加減。",
+          noteEn: "Compute r³, then ×ω², then ÷G. Watch the ×10^ exponents."
+        };
+      }
+    },
+    {
+      id: "CS2",
+      formulaZh: "(a) 根據 PE = mgh",
+      formulaEn: "(a) Based on PE = mgh",
+      build: function () {
+        var m = randStep(0.5, 8, 0.5);
+        var h = randStep(2, 40, 1);
+        var ans = m * g * h;
+        return {
+          exprZh: "PE = mgh = " + esc(fmtDisp(m)) + " × " + esc(fmtDisp(g)) + " × " + esc(fmtDisp(h)),
+          exprEn: "PE = mgh = " + esc(fmtDisp(m)) + " × " + esc(fmtDisp(g)) + " × " + esc(fmtDisp(h)),
+          answer: ans, unitZh: "J", unitEn: "J",
+          noteZh: "g = 9.81 m s⁻²（試卷數據）。",
+          noteEn: "Use g = 9.81 m s⁻² from the data list."
+        };
+      }
+    },
+    {
+      id: "CS3",
+      formulaZh: "(a) 根據 PE = mgh",
+      formulaEn: "(a) Based on PE = mgh",
+      build: function () {
+        var m = randStep(1, 6, 0.5);
+        var E = randStep(200, 2000, 50);
+        var ans = E / (m * g);
+        return {
+          exprZh: "h = " + frac("PE", "mg") + " = " + frac(esc(fmtDisp(E)), esc(fmtDisp(m)) + " × " + esc(fmtDisp(g))),
+          exprEn: "h = " + frac("PE", "mg") + " = " + frac(esc(fmtDisp(E)), esc(fmtDisp(m)) + " × " + esc(fmtDisp(g))),
+          answer: ans, unitZh: "m", unitEn: "m",
+          noteZh: "先算分母 mg，再除。",
+          noteEn: "Evaluate mg first, then divide."
+        };
+      }
+    },
+    {
+      id: "CS4",
+      formulaZh: "(a) 根據 KE = ½mv²",
+      formulaEn: "(a) Based on KE = ½mv²",
+      build: function () {
+        var m = randStep(0.2, 5, 0.2);
+        var v = randStep(4, 30, 1);
+        var ans = 0.5 * m * v * v;
+        return {
+          exprZh: "KE = ½mv² = 0.5 × " + esc(fmtDisp(m)) + " × " + esc(fmtDisp(v)) + "²",
+          exprEn: "KE = ½mv² = 0.5 × " + esc(fmtDisp(m)) + " × " + esc(fmtDisp(v)) + "²",
+          answer: ans, unitZh: "J", unitEn: "J",
+          noteZh: "先平方 v，再乘 ½m。",
+          noteEn: "Square v first, then multiply by ½m."
+        };
+      }
+    },
+    {
+      id: "CS5",
+      formulaZh: "(a) 根據 KE = ½mv²",
+      formulaEn: "(a) Based on KE = ½mv²",
+      build: function () {
+        var m = randStep(0.5, 4, 0.5);
+        var E = randStep(50, 800, 25);
+        var ans = Math.sqrt(2 * E / m);
+        return {
+          exprZh: "v = " + sqrt(frac("2KE", "m")) + " = " + sqrt(frac("2 × " + esc(fmtDisp(E)), esc(fmtDisp(m)))),
+          exprEn: "v = " + sqrt(frac("2KE", "m")) + " = " + sqrt(frac("2 × " + esc(fmtDisp(E)), esc(fmtDisp(m)))),
+          answer: ans, unitZh: "m s⁻¹", unitEn: "m s⁻¹",
+          noteZh: "先算括號內，再開方。",
+          noteEn: "Evaluate inside the square root first."
+        };
+      }
+    },
+    {
+      id: "CS6",
+      formulaZh: "(a) 根據 E = mcΔT",
+      formulaEn: "(a) Based on E = mcΔT",
+      build: function () {
+        var m = randStep(0.2, 3, 0.1);
+        var c = randStep(2000, 4200, 100);
+        var dT = randStep(5, 60, 1);
+        var ans = m * c * dT;
+        return {
+          exprZh: "E = mcΔT = " + esc(fmtDisp(m)) + " × " + esc(fmtDisp(c)) + " × " + esc(fmtDisp(dT)),
+          exprEn: "E = mcΔT = " + esc(fmtDisp(m)) + " × " + esc(fmtDisp(c)) + " × " + esc(fmtDisp(dT)),
+          answer: ans, unitZh: "J", unitEn: "J",
+          noteZh: "比熱容量單位 J kg⁻¹ °C⁻¹。",
+          noteEn: "c in J kg⁻¹ °C⁻¹."
+        };
+      }
+    },
+    {
+      id: "CS7",
+      formulaZh: "(a) 根據 pV = nRT",
+      formulaEn: "(a) Based on pV = nRT",
+      build: function () {
+        var n = randStep(0.5, 4, 0.5);
+        var T = randStep(250, 400, 5);
+        var V = randSf(0.01, 0.08, 2);
+        var ans = (n * Rgas * T) / V;
+        var num = esc(fmtDisp(n)) + " × " + esc(fmtDisp(Rgas)) + " × " + esc(fmtDisp(T));
+        return {
+          exprZh: "p = " + frac("nRT", "V") + " = " + frac(num, esc(fmtDisp(V))),
+          exprEn: "p = " + frac("nRT", "V") + " = " + frac(num, esc(fmtDisp(V))),
+          answer: ans, unitZh: "Pa", unitEn: "Pa",
+          noteZh: "R = 8.31 J mol⁻¹ K⁻¹。答案約為 10⁵ 數量級。",
+          noteEn: "R = 8.31 J mol⁻¹ K⁻¹. Answer ~10⁵ order."
+        };
+      }
+    },
+    {
+      id: "CS8",
+      formulaZh: "(a) 根據 F = " + frac("Gm₁m₂", "r²"),
+      formulaEn: "(a) Based on F = " + frac("Gm₁m₂", "r²"),
+      build: function () {
+        var m1 = randSf(5.0e24, 6.5e24, 2);
+        var m2 = randSf(1000, 5000, 2);
+        var r = randSf(6.4e6, 7.0e6, 2);
+        var ans = (G * m1 * m2) / (r * r);
+        var num = esc(fmtSci(G)) + " × " + esc(sciParen(m1)) + " × " + esc(sciParen(m2));
+        return {
+          exprZh: "F = " + frac("Gm₁m₂", "r²") + " = " + frac(num, esc(sciParen(r)) + "²"),
+          exprEn: "F = " + frac("Gm₁m₂", "r²") + " = " + frac(num, esc(sciParen(r)) + "²"),
+          answer: ans, unitZh: "N", unitEn: "N",
+          noteZh: "先算 r²，再處理 ×10^ 指數。",
+          noteEn: "Square r first; manage ×10^ carefully."
+        };
+      }
+    },
+    {
+      id: "CS9",
+      formulaZh: "(a) 根據 a = " + frac("v²", "r"),
+      formulaEn: "(a) Based on a = " + frac("v²", "r"),
+      build: function () {
+        var v = randStep(5, 40, 1);
+        var r = randStep(2, 50, 1);
+        var ans = (v * v) / r;
+        return {
+          exprZh: "a = " + frac("v²", "r") + " = " + frac(esc(fmtDisp(v)) + "²", esc(fmtDisp(r))),
+          exprEn: "a = " + frac("v²", "r") + " = " + frac(esc(fmtDisp(v)) + "²", esc(fmtDisp(r))),
+          answer: ans, unitZh: "m s⁻²", unitEn: "m s⁻²",
+          noteZh: "向心加速度：先平方再除。",
+          noteEn: "Centripetal a: square then divide."
+        };
+      }
+    },
+    {
+      id: "CS10",
+      formulaZh: "(a) 根據 P = I²R",
+      formulaEn: "(a) Based on P = I²R",
+      build: function () {
+        var I = randStep(0.5, 8, 0.5);
+        var R = randStep(2, 50, 1);
+        var ans = I * I * R;
+        return {
+          exprZh: "P = I²R = " + esc(fmtDisp(I)) + "² × " + esc(fmtDisp(R)),
+          exprEn: "P = I²R = " + esc(fmtDisp(I)) + "² × " + esc(fmtDisp(R)),
+          answer: ans, unitZh: "W", unitEn: "W",
+          noteZh: "亦可驗算：P = IV（若已知 V）。",
+          noteEn: "Cross-check with P = IV if V is known."
+        };
+      }
+    },
+    {
+      id: "CS11",
+      formulaZh: "(a) 根據 E = " + frac("V", "d"),
+      formulaEn: "(a) Based on E = " + frac("V", "d"),
+      build: function () {
+        var V = randStep(50, 500, 10);
+        var d = randSf(0.002, 0.05, 2);
+        var ans = V / d;
+        return {
+          exprZh: "E = " + frac("V", "d") + " = " + frac(esc(fmtDisp(V)), esc(fmtDisp(d))),
+          exprEn: "E = " + frac("V", "d") + " = " + frac(esc(fmtDisp(V)), esc(fmtDisp(d))),
+          answer: ans, unitZh: "V m⁻¹", unitEn: "V m⁻¹",
+          noteZh: "平行板電場（數值）。",
+          noteEn: "Uniform field between parallel plates."
+        };
+      }
+    },
+    {
+      id: "CS12",
+      formulaZh: "(a) 根據 ΔE = Δmc²",
+      formulaEn: "(a) Based on ΔE = Δmc²",
+      build: function () {
+        var dm = randSf(1.0e-28, 5.0e-28, 2);
+        var ans = dm * cLight * cLight;
+        return {
+          exprZh: "ΔE = Δmc² = " + esc(sciParen(dm)) + " × (" + esc(fmtSci(cLight)) + ")²",
+          exprEn: "ΔE = Δmc² = " + esc(sciParen(dm)) + " × (" + esc(fmtSci(cLight)) + ")²",
+          answer: ans, unitZh: "J", unitEn: "J",
+          noteZh: "c = 3.00×10⁸ m s⁻¹。先算 c²。",
+          noteEn: "c = 3.00×10⁸ m s⁻¹. Square c first."
+        };
+      }
+    },
+    {
+      id: "CS13",
+      formulaZh: "(a) 根據 t½ = " + frac("ln2", "k"),
+      formulaEn: "(a) Based on t½ = " + frac("ln2", "k"),
+      build: function () {
+        var tHalf = randSf(100, 1e6, 2);
+        var ans = LN2 / tHalf;
+        return {
+          exprZh: "k = " + frac("ln2", "t½") + " = " + frac(esc(fmtDisp(LN2)), esc(fmtSci(tHalf))),
+          exprEn: "k = " + frac("ln2", "t½") + " = " + frac(esc(fmtDisp(LN2)), esc(fmtSci(tHalf))),
+          answer: ans, unitZh: "s⁻¹", unitEn: "s⁻¹",
+          noteZh: "ln2 ≈ 0.693。",
+          noteEn: "ln2 ≈ 0.693."
+        };
+      }
+    },
+    {
+      id: "CS14",
+      formulaZh: "(a) 根據 B = " + frac("μ₀I", "2πr"),
+      formulaEn: "(a) Based on B = " + frac("μ₀I", "2πr"),
+      build: function () {
+        var I = randStep(1, 20, 1);
+        var r = randSf(0.02, 0.5, 2);
+        var ans = (MU0 * I) / (2 * Math.PI * r);
+        return {
+          exprZh: "B = " + frac("μ₀I", "2πr") + " = " + frac("(" + esc(fmtSci(MU0)) + " × " + esc(fmtDisp(I)) + ")", "2π × " + esc(fmtDisp(r))),
+          exprEn: "B = " + frac("μ₀I", "2πr") + " = " + frac("(" + esc(fmtSci(MU0)) + " × " + esc(fmtDisp(I)) + ")", "2π × " + esc(fmtDisp(r))),
+          answer: ans, unitZh: "T", unitEn: "T",
+          noteZh: "μ₀ = 4π×10⁻⁷ H m⁻¹。",
+          noteEn: "μ₀ = 4π×10⁻⁷ H m⁻¹."
+        };
+      }
+    },
+    {
+      id: "CS15",
+      formulaZh: "(a) 根據 " + frac("Vs", "Vp") + " ≈ " + frac("Ns", "Np"),
+      formulaEn: "(a) Based on " + frac("Vs", "Vp") + " ≈ " + frac("Ns", "Np"),
+      build: function () {
+        var Vp = randStep(100, 240, 10);
+        var Np = randStep(200, 800, 50);
+        var Ns = randStep(40, 400, 20);
+        var ans = Vp * Ns / Np;
+        return {
+          exprZh: "Vs = Vp × " + frac("Ns", "Np") + " = " + esc(fmtDisp(Vp)) + " × " + frac(esc(fmtDisp(Ns)), esc(fmtDisp(Np))),
+          exprEn: "Vs = Vp × " + frac("Ns", "Np") + " = " + esc(fmtDisp(Vp)) + " × " + frac(esc(fmtDisp(Ns)), esc(fmtDisp(Np))),
+          answer: ans, unitZh: "V", unitEn: "V",
+          noteZh: "理想變壓器近似。",
+          noteEn: "Ideal transformer approximation."
+        };
+      }
+    },
+    {
+      id: "CS16",
+      formulaZh: "(a) 根據 " + frac("1", "u") + " + " + frac("1", "v") + " = " + frac("1", "f"),
+      formulaEn: "(a) Based on " + frac("1", "u") + " + " + frac("1", "v") + " = " + frac("1", "f"),
+      build: function () {
+        var f = randStep(0.1, 0.4, 0.05);
+        var u = randStep(0.5, 1.5, 0.1);
+        var ans = 1 / (1 / f - 1 / u);
+        var denSym = frac("1", "f") + " − " + frac("1", "u");
+        var denNum = frac("1", esc(fmtDisp(f))) + " − " + frac("1", esc(fmtDisp(u)));
+        return {
+          exprZh: "v = " + frac("1", denSym) + " = " + frac("1", denNum),
+          exprEn: "v = " + frac("1", denSym) + " = " + frac("1", denNum),
+          answer: ans, unitZh: "m", unitEn: "m",
+          noteZh: "物距 u > f（實像情況）。",
+          noteEn: "Object distance u > f (real image case)."
+        };
+      }
+    },
+    {
+      id: "CS17",
+      formulaZh: "(a) 根據 F = BIl sinθ（θ = 90°）",
+      formulaEn: "(a) Based on F = BIl sinθ (θ = 90°)",
+      build: function () {
+        var B = randSf(0.05, 0.8, 2);
+        var I = randStep(1, 15, 1);
+        var L = randStep(0.1, 1.0, 0.05);
+        var ans = B * I * L;
+        return {
+          exprZh: "F = BIl = " + esc(fmtDisp(B)) + " × " + esc(fmtDisp(I)) + " × " + esc(fmtDisp(L)),
+          exprEn: "F = BIl = " + esc(fmtDisp(B)) + " × " + esc(fmtDisp(I)) + " × " + esc(fmtDisp(L)),
+          answer: ans, unitZh: "N", unitEn: "N",
+          noteZh: "sin90° = 1。",
+          noteEn: "sin90° = 1."
+        };
+      }
+    }
+  ];
+
+  var state = {
+    lang: "zh",
+    current: null,
+    answerRaw: "",
+    submitted: false,
+    tried: 0,
+    correct: 0,
+    streak: 0,
+    queue: [],
+    recentIds: []
+  };
+
+  var el = {
+    title: document.getElementById("title"),
+    subtitle: document.getElementById("subtitle"),
+    qTag: document.getElementById("qTag"),
+    qLine1: document.getElementById("qLine1"),
+    qLine2: document.getElementById("qLine2"),
+    qAsk: document.getElementById("qAsk"),
+    answerInput: document.getElementById("answerInput"),
+    unitHint: document.getElementById("unitHint"),
+    feedback: document.getElementById("feedback"),
+    btnClear: document.getElementById("btnClear"),
+    btnNew: document.getElementById("btnNew"),
+    btnSubmit: document.getElementById("btnSubmit"),
+    btnZh: document.getElementById("btnZh"),
+    btnEn: document.getElementById("btnEn"),
+    statTried: document.getElementById("statTried"),
+    statCorrect: document.getElementById("statCorrect"),
+    statStreak: document.getElementById("statStreak"),
+    lblTried: document.getElementById("lblTried"),
+    lblCorrect: document.getElementById("lblCorrect"),
+    lblStreak: document.getElementById("lblStreak")
+  };
+
+  function refillQueue() {
+    var ids = TEMPLATES.map(function (t) { return t.id; });
+    state.queue = shuffle(ids);
+  }
+
+  function pickTemplate() {
+    if (!state.queue.length) refillQueue();
+    var id = state.queue.shift();
+    for (var i = 0; i < TEMPLATES.length; i++) {
+      if (TEMPLATES[i].id === id) return TEMPLATES[i];
+    }
+    return TEMPLATES[0];
+  }
+
+  function buildQuestion() {
+    var tpl = pickTemplate();
+    var built = null;
+    for (var attempt = 0; attempt < 12; attempt++) {
+      built = tpl.build();
+      if (built && isFinite(built.answer) && Math.abs(built.answer) > 0 &&
+          built.exprZh && built.exprEn) break;
+      built = null;
+    }
+    if (!built) {
+      tpl = TEMPLATES[0];
+      built = tpl.build();
+    }
+    return { tpl: tpl, built: built };
+  }
+
+  function renderStats() {
+    el.statTried.textContent = String(state.tried);
+    el.statCorrect.textContent = String(state.correct);
+    el.statStreak.textContent = String(state.streak);
+  }
+
+  function renderUI() {
+    var u = UI[state.lang];
+    el.title.textContent = u.title;
+    el.subtitle.textContent = u.subtitle;
+    el.qAsk.textContent = u.ask;
+    el.btnClear.textContent = u.clear;
+    el.btnNew.textContent = u.newQ;
+    el.btnSubmit.textContent = u.submit;
+    el.lblTried.textContent = u.tried;
+    el.lblCorrect.textContent = u.correct;
+    el.lblStreak.textContent = u.streak;
+    el.btnZh.classList.toggle("active", state.lang === "zh");
+    el.btnEn.classList.toggle("active", state.lang === "en");
+  }
+
+  function renderQuestion() {
+    if (!state.current) return;
+    var tpl = state.current.tpl;
+    var b = state.current.built;
+    var zh = state.lang === "zh";
+    el.qTag.textContent = tpl.id + " · Mode B";
+    el.qLine1.innerHTML = zh ? tpl.formulaZh : tpl.formulaEn;
+    el.qLine2.innerHTML = zh ? b.exprZh : b.exprEn;
+    el.unitHint.textContent = UI[state.lang].unitPrefix + (zh ? b.unitZh : b.unitEn);
+  }
+
+  function nextQuestion() {
+    state.current = buildQuestion();
+    state.answerRaw = "";
+    state.submitted = false;
+    el.answerInput.value = "";
+    el.answerInput.disabled = false;
+    el.btnSubmit.disabled = false;
+    setNewEmphasis(false);
+    el.feedback.className = "feedback";
+    el.feedback.innerHTML = "";
+    renderUI();
+    renderQuestion();
+    renderStats();
+  }
+
+  function setAnswer(s) {
+    state.answerRaw = s;
+    el.answerInput.value = s;
+  }
+
+  function appendKey(k) {
+    if (state.submitted) return;
+    var cur = state.answerRaw || "";
+    if (k === "BS") { setAnswer(cur.slice(0, -1)); return; }
+    if (k === "C") { setAnswer(""); return; }
+    if (k === "EE") {
+      if (/e/i.test(cur) || /×10\^/.test(cur)) return;
+      if (!cur || cur === "-" || cur === ".") return;
+      setAnswer(cur + "×10^");
+      return;
+    }
+    if (k === "-") {
+      if (cur.indexOf("×10^") >= 0) {
+        var parts = cur.split("×10^");
+        if (parts[1] === "") setAnswer(parts[0] + "×10^-");
+        return;
+      }
+      if (cur === "") setAnswer("-");
+      return;
+    }
+    if (k === ".") {
+      if (cur.indexOf("×10^") >= 0) {
+        var p2 = cur.split("×10^")[1] || "";
+        if (p2.indexOf(".") >= 0) return;
+        setAnswer(cur + ".");
+        return;
+      }
+      if (cur.indexOf(".") >= 0) return;
+      setAnswer((cur || "0") + ".");
+      return;
+    }
+    setAnswer(cur + k);
+  }
+
+  function submit() {
+    if (!state.current || state.submitted) return;
+    var built = state.current.built;
+    var user = parseAnswer(state.answerRaw || el.answerInput.value);
+    var ok = answersMatch(user, built.answer);
+    state.submitted = true;
+    state.tried += 1;
+    if (ok) { state.correct += 1; state.streak += 1; }
+    else state.streak = 0;
+    var u = UI[state.lang];
+    var unit = state.lang === "zh" ? built.unitZh : built.unitEn;
+    var note = state.lang === "zh" ? built.noteZh : built.noteEn;
+    el.feedback.className = "feedback show " + (ok ? "ok" : "bad");
+    el.feedback.innerHTML =
+      "<div class='fb-title'>" + (ok ? u.ok : u.bad) + "</div>" +
+      "<div class='fb-body'>" + u.ansLabel + "</div>" +
+      "<div class='fb-ans'>" + fmtSci(built.answer) + " " + unit + "</div>" +
+      "<div class='fb-sol'><strong>" + u.noteLabel + "</strong>\n" + note + "</div>";
+    el.answerInput.disabled = true;
+    el.btnSubmit.disabled = true;
+    setNewEmphasis(true);
+    if (ok) celebrateCorrect();
+    renderStats();
+  }
+
+  function setNewEmphasis(on) {
+    if (on) {
+      el.btnNew.classList.add("btn-new-glow");
+      el.btnNew.classList.remove("btn-secondary");
+    } else {
+      el.btnNew.classList.remove("btn-new-glow");
+      if (!el.btnNew.classList.contains("btn-secondary")) el.btnNew.classList.add("btn-secondary");
+    }
+  }
+
+  function celebrateCorrect() {
+    var layer = document.createElement("div");
+    layer.className = "celebrate-layer";
+    var msgsZh = ["做得好！", "太棒了！", "繼續加油！", "正確！👍"];
+    var msgsEn = ["Well done!", "Great!", "Keep going!", "Correct! 👍"];
+    var msgs = state.lang === "zh" ? msgsZh : msgsEn;
+    var burst = document.createElement("div");
+    burst.className = "celebrate-burst";
+    burst.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+    layer.appendChild(burst);
+    var colors = ["#57c5b6", "#1a5f7a", "#2d9a6a", "#f4a261", "#e9c46a", "#e76f51"];
+    for (var i = 0; i < 28; i++) {
+      var c = document.createElement("span");
+      c.className = "confetti";
+      c.style.left = (Math.random() * 100) + "%";
+      c.style.background = colors[i % colors.length];
+      c.style.animationDuration = (1.4 + Math.random() * 1.4) + "s";
+      c.style.animationDelay = (Math.random() * 0.35) + "s";
+      c.style.transform = "rotate(" + (Math.random() * 360) + "deg)";
+      layer.appendChild(c);
+    }
+    document.body.appendChild(layer);
+    setTimeout(function () {
+      if (layer.parentNode) layer.parentNode.removeChild(layer);
+    }, 2800);
+  }
+
+  document.getElementById("keypad").addEventListener("click", function (e) {
+    var t = e.target.closest("[data-k]");
+    if (!t) return;
+    appendKey(t.getAttribute("data-k"));
+  });
+  el.answerInput.addEventListener("input", function () {
+    if (state.submitted) return;
+    state.answerRaw = el.answerInput.value;
+  });
+  el.btnClear.addEventListener("click", function () {
+    if (state.submitted) return;
+    setAnswer("");
+    el.answerInput.focus();
+  });
+  el.btnNew.addEventListener("click", function () { nextQuestion(); });
+  el.btnSubmit.addEventListener("click", submit);
+  el.btnZh.addEventListener("click", function () {
+    state.lang = "zh";
+    renderUI();
+    renderQuestion();
+    if (state.submitted && state.current) {
+      var built = state.current.built;
+      var u = UI.zh;
+      el.feedback.innerHTML =
+        "<div class='fb-title'>" + (el.feedback.classList.contains("ok") ? u.ok : u.bad) + "</div>" +
+        "<div class='fb-body'>" + u.ansLabel + "</div>" +
+        "<div class='fb-ans'>" + fmtSci(built.answer) + " " + built.unitZh + "</div>" +
+        "<div class='fb-sol'><strong>" + u.noteLabel + "</strong>\n" + built.noteZh + "</div>";
+    }
+  });
+  el.btnEn.addEventListener("click", function () {
+    state.lang = "en";
+    renderUI();
+    renderQuestion();
+    if (state.submitted && state.current) {
+      var built = state.current.built;
+      var u = UI.en;
+      el.feedback.innerHTML =
+        "<div class='fb-title'>" + (el.feedback.classList.contains("ok") ? u.ok : u.bad) + "</div>" +
+        "<div class='fb-body'>" + u.ansLabel + "</div>" +
+        "<div class='fb-ans'>" + fmtSci(built.answer) + " " + built.unitEn + "</div>" +
+        "<div class='fb-sol'><strong>" + u.noteLabel + "</strong>\n" + built.noteEn + "</div>";
+    }
+  });
+  el.answerInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { e.preventDefault(); submit(); }
+  });
+
+  // expose for smoke tests
+  window.__CALC_SKILLS__ = {
+    TEMPLATES: TEMPLATES,
+    fmtSci: fmtSci,
+    esc: esc,
+    frac: frac,
+    parseAnswer: parseAnswer,
+    answersMatch: answersMatch,
+    buildAll: function (n) {
+      var out = [];
+      for (var i = 0; i < TEMPLATES.length; i++) {
+        var tpl = TEMPLATES[i];
+        for (var k = 0; k < n; k++) {
+          var b = tpl.build();
+          out.push({ id: tpl.id, built: b, formulaZh: tpl.formulaZh, formulaEn: tpl.formulaEn });
+        }
+      }
+      return out;
+    }
+  };
+
+  refillQueue();
+  nextQuestion();
+})();
+</script>
+</body>
+</html>

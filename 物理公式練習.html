@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>物理公式練習</title>
+<style>
+:root{
+  --bg:#f0f4f8;--card:#ffffff;--primary:#1a5f7a;--primary-dark:#0d3d4f;
+  --accent:#57c5b6;--accent-soft:#e8f7f5;--ok:#2d9a6a;--ok-bg:#e6f7ef;
+  --bad:#c0392b;--bad-bg:#fdecea;--hint:#5b6b7a;--border:#d0dbe6;
+  --slot:#f7fafc;
+  --shadow:0 2px 10px rgba(26,95,122,.08);--radius:12px;
+  --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--font);
+  background:linear-gradient(160deg,#e8f1f5 0%,#f5f0e8 100%);
+  color:#1a2a33;min-height:100vh;min-height:100dvh;line-height:1.4;
+  -webkit-tap-highlight-color:transparent;
+}
+.wrap{max-width:720px;margin:0 auto;padding:10px 12px calc(88px + var(--safe-bottom))}
+header{text-align:center;margin-bottom:8px;padding:6px 4px 2px}
+header h1{font-size:1.35rem;color:var(--primary-dark);font-weight:700;letter-spacing:.04em}
+.sub{font-size:.78rem;color:var(--hint);margin-top:4px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:10px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);padding:12px;margin-bottom:10px}
+.lang-pair{display:flex;gap:6px}.toolbar .lang-pair + .lang-pair{margin-left:2px}
+.lang-btn,.btn{
+  border:1px solid var(--border);background:#fff;color:var(--primary-dark);
+  border-radius:10px;padding:8px 12px;font:inherit;font-weight:600;cursor:pointer;min-height:42px;
+}
+.lang-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.q-box{
+  background:linear-gradient(135deg,#f7fbfd,#eef6f4);border:1px dashed var(--border);
+  border-radius:10px;padding:16px 14px;min-height:96px;
+}
+.q-tag{font-size:.7rem;color:#8a9aa8;margin-bottom:4px}
+.q-text{font-size:1.1rem;color:var(--primary-dark);font-weight:600;line-height:1.7;word-break:break-word}
+.q-ask{font-size:.82rem;color:var(--hint);margin-top:8px}
+.hint-box{
+  display:none;margin-top:8px;padding:8px 10px;border-radius:8px;
+  background:var(--accent-soft);border:1px solid #b8ddd6;font-size:.82rem;color:var(--primary-dark);
+}
+.hint-box.show{display:block}
+.hint-box .hint-k{font-weight:700;color:var(--hint);margin-right:.25em}
+.hint-box .hint-f{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-weight:700}
+.hint-box .hint-prompt{font-weight:700;color:var(--hint);display:block;margin-bottom:6px;font-size:.78rem}
+.formula-opts{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.fopt{
+  display:block;width:100%;text-align:left;border:1.5px solid #9bc9c0;background:#fff;
+  border-radius:8px;padding:8px 10px;font:inherit;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:.92rem;font-weight:700;color:var(--primary-dark);cursor:pointer;min-height:40px;
+  transition:background .15s,border-color .15s,opacity .15s;
+}
+.fopt:hover:not(:disabled){background:#f0faf8;border-color:var(--accent)}
+.fopt:disabled{cursor:default;opacity:.95}
+.fopt.ok,.fopt.selected.ok{background:var(--ok-bg);border-color:#2d9a6a;color:#1e6b45}
+.fopt.bad{background:var(--bad-bg);border-color:#e0a39c;color:#8b2e24;text-decoration:line-through;opacity:.75}
+.fopt.locked{pointer-events:none}
+.hint-confirm{margin-top:8px;font-size:.8rem;color:var(--primary-dark)}
+.hint-confirm .hint-f{font-weight:700}
+.frac{
+  display:inline-flex;flex-direction:column;align-items:center;
+  vertical-align:middle;margin:0 .12em;line-height:1.15;
+}
+.frac .num{
+  padding:0 .28em .08em;border-bottom:1.5px solid currentColor;text-align:center;
+  white-space:nowrap;
+}
+.frac .den{
+  padding:.08em .28em 0;text-align:center;white-space:nowrap;
+}
+.frac .frac{font-size:.92em;margin:0 .04em}
+.sqrt{
+  display:inline-flex;align-items:stretch;vertical-align:middle;
+  margin:0 .08em;line-height:1.15;
+}
+.sqrt-sym{
+  display:flex;align-items:flex-start;justify-content:flex-end;
+  font-size:1.95em;font-weight:600;line-height:.92;
+  padding:0;margin:0 -.22em 0 0;align-self:stretch;
+  letter-spacing:-.08em;
+  transform:scaleY(1.18);transform-origin:right top;
+}
+.sqrt-body{
+  border-top:2.25px solid currentColor;
+  padding:.14em .34em .1em .02em;
+  margin-left:0;
+  display:inline-flex;align-items:center;flex-wrap:wrap;gap:2px;
+}
+.fopt .frac,.hint-f .frac,.fb-sol .frac{font-family:inherit}
+.fopt{line-height:1.55}
+
+.lang-btn.hint-used{opacity:.85;border-style:dashed}
+.answer-display{
+  width:100%;min-height:68px;border:2px solid var(--border);border-radius:10px;
+  background:var(--slot);padding:12px 14px;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:1.4rem;font-weight:700;color:var(--primary-dark);text-align:right;outline:none;
+}
+.answer-display:focus{border-color:var(--accent);background:#fff}
+.unit-hint{font-size:.75rem;color:var(--hint);text-align:right;margin-top:4px}
+.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.kbtn{
+  min-height:46px;border:1px solid var(--border);border-radius:10px;background:#fff;
+  color:var(--primary-dark);font:inherit;font-size:1.05rem;font-weight:700;cursor:pointer;
+}
+.kbtn:active{transform:scale(.97);background:var(--accent-soft)}
+.kbtn.fn{background:#eef2f5;color:var(--hint);font-size:.82rem}
+.kbtn.ee{font-size:.78rem;letter-spacing:-.02em}
+.kbtn.wide{grid-column:span 2}
+.actions{
+  display:flex;gap:8px;margin-top:10px;position:sticky;bottom:calc(8px + var(--safe-bottom));
+  z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  padding:8px;border-radius:12px;border:1px solid var(--border);box-shadow:0 -2px 12px rgba(26,95,122,.1);
+}
+.btn{flex:1;min-height:48px;border:none;border-radius:10px;padding:12px 10px;font-size:.95rem;font-weight:700;transition:transform .1s,background .15s,opacity .15s}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover:not(:disabled){background:var(--primary-dark)}
+.btn-secondary{background:#fff;color:var(--primary);border:2px solid var(--primary)}
+.btn-ghost{background:#eef2f5;color:var(--hint);flex:.7}
+.feedback{display:none;border-radius:10px;padding:10px 12px;margin-top:10px;animation:fadeIn .25s ease}
+.feedback.show{display:block}
+.feedback.ok{background:var(--ok-bg);border:1px solid #a8dfc0;color:#1e6b45}
+.feedback.bad{background:var(--bad-bg);border:1px solid #f0b8b2;color:#8b2e24}
+.feedback .fb-title{font-weight:700;font-size:1rem;margin-bottom:4px}
+.feedback .fb-body{font-size:.85rem;line-height:1.5}
+.feedback .fb-ans{
+  margin-top:6px;padding:6px 8px;background:rgba(255,255,255,.7);border-radius:8px;
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1rem;font-weight:600;text-align:center;
+}
+.feedback .fb-sol{margin-top:6px;font-size:.8rem;opacity:.95;line-height:1.65}
+.btn-new-glow{
+  background:linear-gradient(135deg,#1a5f7a,#57c5b6)!important;color:#fff!important;
+  border:none!important;box-shadow:0 0 0 3px rgba(87,197,182,.35),0 6px 18px rgba(26,95,122,.28);
+  animation:newPulse 1.1s ease-in-out infinite;font-size:1.05rem!important;flex:1.35!important;
+}
+@keyframes newPulse{
+  0%,100%{transform:scale(1);box-shadow:0 0 0 3px rgba(87,197,182,.35),0 6px 18px rgba(26,95,122,.28)}
+  50%{transform:scale(1.04);box-shadow:0 0 0 6px rgba(87,197,182,.2),0 8px 22px rgba(26,95,122,.35)}
+}
+.celebrate-layer{
+  pointer-events:none;position:fixed;inset:0;z-index:9999;overflow:hidden;
+}
+.celebrate-burst{
+  position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);
+  font-size:2.4rem;font-weight:800;color:var(--ok);
+  text-shadow:0 2px 12px rgba(45,154,106,.35);
+  animation:burstPop .9s ease-out forwards;
+  white-space:nowrap;
+}
+@keyframes burstPop{
+  0%{opacity:0;transform:translate(-50%,-40%) scale(.6)}
+  25%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}
+  70%{opacity:1;transform:translate(-50%,-55%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-70%) scale(.95)}
+}
+.confetti{
+  position:absolute;width:8px;height:12px;border-radius:2px;top:-12px;
+  animation:confettiFall linear forwards;
+}
+@keyframes confettiFall{
+  0%{transform:translateY(0) rotate(0deg);opacity:1}
+  100%{transform:translateY(105vh) rotate(720deg);opacity:0}
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.stats{display:flex;justify-content:space-around;text-align:center;gap:6px}
+.stat .n{font-size:1.25rem;font-weight:700;color:var(--primary-dark)}
+.stat .l{font-size:.68rem;color:var(--hint)}
+.sup{font-size:.65em;vertical-align:super;line-height:0}
+@media (max-width:600px){
+  .wrap{padding:8px 10px calc(92px + var(--safe-bottom))}
+  .card{padding:10px;margin-bottom:8px}
+  header h1{font-size:1.15rem}
+  .actions{position:fixed;left:10px;right:10px;bottom:calc(6px + var(--safe-bottom));margin-top:0}
+  .kbtn{min-height:44px}
+}
+@media (max-width:400px){
+  .wrap{padding:6px 8px calc(90px + var(--safe-bottom))}
+  header h1{font-size:1.05rem}
+  .kbtn{min-height:42px;font-size:.95rem}
+  .btn{min-height:46px;font-size:.9rem;padding:10px 6px}
+}
+@media (min-width:601px){
+  .wrap{padding:16px 14px 32px}
+  .card{padding:14px 16px;margin-bottom:12px}
+  header{margin-bottom:14px;padding:12px 8px 4px}
+  header h1{font-size:1.5rem}
+  .actions{position:sticky;bottom:12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="title">物理公式練習</h1>
+    <div class="sub" id="subtitle">HKDSE · 代入公式計算</div>
+  </header>
+
+  <div class="toolbar">
+    <div class="lang-pair">
+      <button type="button" class="lang-btn active" id="btnZh" data-lang="zh">繁中</button>
+      <button type="button" class="lang-btn" id="btnEn" data-lang="en">EN</button>
+      <button type="button" class="lang-btn" id="btnHint">提示</button>
+    </div>
+    <div class="lang-pair" id="levelPair">
+      <button type="button" class="lang-btn active" id="btnL1" data-level="1">程度1</button>
+      <button type="button" class="lang-btn" id="btnL2" data-level="2">程度2</button>
+      <button type="button" class="lang-btn" id="btnL3" data-level="3">程度3</button>
+    </div>
+  </div>
+
+  <section class="card">
+    <div class="q-box">
+      <div class="q-tag" id="qTag"></div>
+      <div class="q-text" id="qText">—</div>
+      <div class="q-ask" id="qAsk"></div>
+      <div class="hint-box" id="hintBox" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <input type="text" class="answer-display" id="answerInput" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="answer">
+    <div class="unit-hint" id="unitHint"></div>
+    <div class="keypad" id="keypad">
+      <button type="button" class="kbtn" data-k="7">7</button>
+      <button type="button" class="kbtn" data-k="8">8</button>
+      <button type="button" class="kbtn" data-k="9">9</button>
+      <button type="button" class="kbtn fn" data-k="BS">⌫</button>
+      <button type="button" class="kbtn" data-k="4">4</button>
+      <button type="button" class="kbtn" data-k="5">5</button>
+      <button type="button" class="kbtn" data-k="6">6</button>
+      <button type="button" class="kbtn fn" data-k="C">C</button>
+      <button type="button" class="kbtn" data-k="1">1</button>
+      <button type="button" class="kbtn" data-k="2">2</button>
+      <button type="button" class="kbtn" data-k="3">3</button>
+      <button type="button" class="kbtn fn" data-k="-">−</button>
+      <button type="button" class="kbtn" data-k="0">0</button>
+      <button type="button" class="kbtn" data-k=".">.</button>
+      <button type="button" class="kbtn ee wide" data-k="EE">×10^</button>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn btn-ghost" id="btnClear">清除</button>
+      <button type="button" class="btn btn-secondary" id="btnNew">新題</button>
+      <button type="button" class="btn btn-primary" id="btnSubmit">提交</button>
+    </div>
+    <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+  </section>
+
+  <section class="card">
+    <div class="stats">
+      <div class="stat"><div class="n" id="statTried">0</div><div class="l" id="lblTried">作答</div></div>
+      <div class="stat"><div class="n" id="statCorrect">0</div><div class="l" id="lblCorrect">答對</div></div>
+      <div class="stat"><div class="n" id="statStreak">0</div><div class="l" id="lblStreak">連對</div></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var G = 6.67e-11, g = 9.81, Rgas = 8.31, cLight = 3.00e8, MU0 = 4 * Math.PI * 1e-7, LN2 = Math.LN2;
+
+  var UI = {
+    zh: {
+      title: "物理公式練習",
+      subtitle: "HKDSE · 代入公式計算",
+      ask: "請代入正確公式，計算數值答案（單位已標示）。",
+      clear: "清除", newQ: "新題", submit: "提交",
+      tried: "作答", correct: "答對", streak: "連對",
+      ok: "正確！", bad: "未正確",
+      ansLabel: "正確答案", solLabel: "解題",
+      unitPrefix: "單位：",
+      hint: "提示",
+      hintLabel: "選擇正確公式：",
+      hintConfirm: "應用公式：",
+      hintShown: "已顯示提示",
+      formulaPickOk: "✓ 正確公式",
+      practiceTag: "練習題",
+      level1: "程度1",
+      level2: "程度2",
+      level3: "程度3",
+      levelPrefix: "程度"
+    },
+    en: {
+      title: "Formula Practice",
+      subtitle: "HKDSE · Substitute into formulae",
+      ask: "Use the correct formula and enter the numerical answer (unit shown).",
+      clear: "Clear", newQ: "New", submit: "Submit",
+      tried: "Tried", correct: "Correct", streak: "Streak",
+      ok: "Correct!", bad: "Not quite",
+      ansLabel: "Answer", solLabel: "Solution",
+      unitPrefix: "Unit: ",
+      hint: "Hint",
+      hintLabel: "Choose the correct formula:",
+      hintConfirm: "Use formula:",
+      hintShown: "Hint shown",
+      formulaPickOk: "✓ Correct formula",
+      practiceTag: "Practice",
+      level1: "Level 1",
+      level2: "Level 2",
+      level3: "Level 3",
+      levelPrefix: "Level"
+    }
+  };
+
+function randInt(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function randStep(min, max, step) {
+    var n = Math.round((max - min) / step);
+    return +(min + randInt(0, n) * step).toFixed(10);
+  }
+  function randDec(min, max, dp) {
+    var x = min + Math.random() * (max - min);
+    var p = Math.pow(10, dp);
+    return Math.round(x * p) / p;
+  }
+  function randSf(min, max, sf) {
+    var x = min + Math.random() * (max - min);
+    return roundSf(x, sf);
+  }
+  function shuffle(a) {
+    var x = a.slice();
+    for (var i = x.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = x[i]; x[i] = x[j]; x[j] = t;
+    }
+    return x;
+  }
+  function roundSf(n, sf) {
+    if (!isFinite(n) || n === 0) return 0;
+    var d = Math.ceil(Math.log10(Math.abs(n)));
+    var p = Math.pow(10, sf - d);
+    return Math.round(n * p) / p;
+  }
+  function fmtSci(n) {
+    if (!isFinite(n)) return String(n);
+    var a = Math.abs(n);
+    if (a !== 0 && (a >= 1e4 || a < 1e-2)) {
+      var exp = Math.floor(Math.log10(a));
+      var m = n / Math.pow(10, exp);
+      return roundSf(m, 3).toPrecision(3).replace(/\.?0+$/, "").replace(/\.$/, "") + "×10^" + exp;
+    }
+    var s = roundSf(n, 3);
+    var t = Number(s.toPrecision(3));
+    return String(t);
+  }
+  function fmtDisp(n) {
+    if (!isFinite(n)) return String(n);
+    var a = Math.abs(n);
+    if (a !== 0 && (a >= 1e4 || a < 1e-2)) return fmtSci(n);
+    var s = String(n);
+    if (s.indexOf("e") >= 0 || s.indexOf("E") >= 0) return fmtSci(n);
+    if (s.indexOf(".") >= 0) s = s.replace(/(\.\d*?[1-9])0+$/, "$1").replace(/\.0+$/, "").replace(/\.$/, "");
+    return s;
+  }
+  function parseAnswer(raw) {
+    if (!raw) return NaN;
+    var s = String(raw).trim().replace(/\s+/g, "").replace(/×/g, "x").replace(/−/g, "-").replace(/X/g, "x");
+    s = s.replace(/x10\^?/i, "e").replace(/EE/i, "e").replace(/\*\*10\^?/i, "e");
+    if (/e$/i.test(s) || /e[+\-]?$/i.test(s)) return NaN;
+    var v = Number(s);
+    return v;
+  }
+  function answersMatch(user, correct) {
+    if (!isFinite(user) || !isFinite(correct)) return false;
+    if (correct === 0) return Math.abs(user) < 1e-12;
+    var rel = Math.abs(user - correct) / Math.abs(correct);
+    if (rel <= 0.005) return true;
+    var u3 = roundSf(user, 3), c3 = roundSf(correct, 3);
+    if (u3 === c3) return true;
+    var ue = Number(user.toPrecision(3)), ce = Number(correct.toPrecision(3));
+    return ue === ce;
+  }
+
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+  function frac(numHtml, denHtml) {
+    return '<span class="frac"><span class="num">' + numHtml + '</span><span class="den">' + denHtml + '</span></span>';
+  }
+  function sqrt(innerHtml) {
+    return '<span class="sqrt"><span class="sqrt-sym" aria-hidden="true">√</span><span class="sqrt-body">' + innerHtml + '</span></span>';
+  }
+
+  var PREF_R = [5, 10, 15, 20, 22, 33, 47, 50, 68, 100, 150, 200];
+
+  var ALL_FORMULAS = [
+    { id: "A1", display: "E = mcΔT" },
+    { id: "A2", display: "E = ℓΔm" },
+    { id: "A3", display: "pV = nRT" },
+    { id: "B3", display: "PE = mgh" },
+    { id: "B4", display: "KE = ½mv²" },
+    { id: "B5", display: "P = Fv" },
+    { id: "B6", display: "a = " + frac("v²", "r") },
+    { id: "B7", display: "F = " + frac("Gm₁m₂", "r²") },
+    { id: "K1", display: "v = u + at" },
+    { id: "K2", display: "s = ut + ½at²" },
+    { id: "K3", display: "v² = u² + 2as" },
+    { id: "D3", display: "E = " + frac("V", "d") },
+    { id: "D4", display: "R = " + frac("ρℓ", "A") },
+    { id: "D5", display: "R = R₁ + R₂" },
+    { id: "D6", display: frac("1", "R") + " = " + frac("1", "R₁") + " + " + frac("1", "R₂") },
+    { id: "D7", display: "P = IV = I²R" },
+    { id: "D9", display: "F = BIl sinθ" },
+    { id: "D10", display: "B = " + frac("μ₀I", "2πr") },
+    { id: "D11", display: "B = " + frac("μ₀NI", "ℓ") },
+    { id: "D13", display: frac("Vs", "Vp") + " ≈ " + frac("Ns", "Np") },
+    { id: "E2", display: "t½ = " + frac("ln2", "k") },
+    { id: "E3", display: "A = kN" },
+    { id: "E4", display: "ΔE = Δmc²" },
+    { id: "C1", display: "Δy = " + frac("λD", "a") },
+    { id: "C3", display: frac("1", "u") + " + " + frac("1", "v") + " = " + frac("1", "f") },
+    { id: "C0", display: "v = fλ" }
+  ];
+  var FORMULA_MAP = {};
+  ALL_FORMULAS.forEach(function (f) { FORMULA_MAP[f.id] = f; });
+
+  var TOPIC_GROUPS = {
+    thermal: ["A1", "A2", "A3"],
+    energy: ["B3", "B4", "B5"],
+    circular_grav: ["B6", "B7"],
+    kinematics: ["K1", "K2", "K3"],
+    electricity: ["D3", "D4", "D5", "D6", "D7", "D13"],
+    magnetic: ["D9", "D10", "D11"],
+    nuclear: ["E2", "E3", "E4"],
+    wave_optics: ["C1", "C3", "C0"]
+  };
+  var ID_TO_TOPIC = {};
+  Object.keys(TOPIC_GROUPS).forEach(function (t) {
+    TOPIC_GROUPS[t].forEach(function (id) { ID_TO_TOPIC[id] = t; });
+  });
+
+  function topicOf(formulaId) {
+    return ID_TO_TOPIC[formulaId] || null;
+  }
+
+  function poolForFormula(correctId) {
+    var topic = topicOf(correctId);
+    var pool = (topic && TOPIC_GROUPS[topic]) ? TOPIC_GROUPS[topic].slice() : [correctId];
+    if (pool.length < 3 && topic === "circular_grav") {
+      var energy = TOPIC_GROUPS.energy.slice();
+      shuffle(energy);
+      for (var i = 0; i < energy.length && pool.length < 3; i++) {
+        if (pool.indexOf(energy[i]) < 0) pool.push(energy[i]);
+      }
+    }
+    return pool;
+  }
+
+  function buildFormulaOptions(correctId) {
+    var pool = poolForFormula(correctId);
+    var others = pool.filter(function (id) { return id !== correctId; });
+    others = shuffle(others);
+    var pick = [correctId];
+    for (var i = 0; i < others.length && pick.length < 3; i++) pick.push(others[i]);
+    while (pick.length < 3) {
+      var fallback = ALL_FORMULAS[pick.length % ALL_FORMULAS.length].id;
+      if (pick.indexOf(fallback) < 0) pick.push(fallback);
+      else break;
+    }
+    return shuffle(pick).map(function (id) {
+      return FORMULA_MAP[id] || { id: id, display: id };
+    });
+  }
+
+  function correctFormulaIds(tpl) {
+    if (tpl.formulaIds && tpl.formulaIds.length) return tpl.formulaIds.slice();
+    return [tpl.formulaId];
+  }
+
+
+  var TEMPLATES = [
+    {
+      id: "A1a", formulaId: "A1",
+      level: 1,
+      name: { zh: "加熱和冷卻時的能量轉移", en: "Energy transfer during heating and cooling" },
+      build: function () {
+        var m = randStep(0.5, 5.0, 0.25), dT = randInt(5, 80), c = 4200;
+        var ans = m * c * dT;
+        return {
+          textZh: "已知水的比熱容量 c = 4200 J kg⁻¹ °C⁻¹。把 " + fmtDisp(m) + " kg 的水升溫 " + dT + " °C，需要多少能量？",
+          textEn: "The specific heat capacity of water is c = 4200 J kg⁻¹ °C⁻¹. How much energy is needed to raise the temperature of " + fmtDisp(m) + " kg of water by " + dT + " °C?",
+          answer: ans, unitZh: "J", unitEn: "J",
+          solutionZh: "E = mcΔT = (" + fmtDisp(m) + ")(4200)(" + dT + ") = " + fmtSci(ans) + " J",
+          solutionEn: "E = mcΔT = (" + fmtDisp(m) + ")(4200)(" + dT + ") = " + fmtSci(ans) + " J"
+        };
+      }
+    },
+    {
+      id: "A1b", formulaId: "A1",
+      level: 1,
+      name: { zh: "加熱和冷卻時的能量轉移", en: "Energy transfer during heating and cooling" },
+      build: function () {
+        var metals = [
+          { c: 900, zh: "鋁", en: "aluminium" },
+          { c: 385, zh: "銅", en: "copper" },
+          { c: 450, zh: "鐵", en: "iron" }
+        ];
+        var mat = pick(metals);
+        var m = randStep(0.25, 3.0, 0.25), dT = randInt(8, 60);
+        var ans = m * mat.c * dT;
+        return {
+          textZh: mat.zh + "的比熱容量 c = " + mat.c + " J kg⁻¹ °C⁻¹。質量 " + fmtDisp(m) + " kg 的" + mat.zh + "升溫 " + dT + " °C，吸收能量多少？",
+          textEn: "Specific heat capacity of " + mat.en + " is c = " + mat.c + " J kg⁻¹ °C⁻¹. Energy absorbed when " + fmtDisp(m) + " kg of " + mat.en + " is heated by " + dT + " °C?",
+          answer: ans, unitZh: "J", unitEn: "J",
+          solutionZh: "E = mcΔT = (" + fmtDisp(m) + ")(" + mat.c + ")(" + dT + ") = " + fmtSci(ans) + " J",
+          solutionEn: "E = mcΔT = (" + fmtDisp(m) + ")(" + mat.c + ")(" + dT + ") = " + fmtSci(ans) + " J"
+        };
+      }
+    },
+    {
+      id: "A2a", formulaId: "A2",
+      level: 1,
+      name: { zh: "物態變化時的能量轉移", en: "Energy transfer during change of state" },
+      build: function () {
+        var dm = randStep(0.10, 2.00, 0.05), L = 3.34e5;
+        var ans = L * dm;
+        return {
+          textZh: "冰的潛熱 ℓ = 3.34×10⁵ J kg⁻¹。熔化 " + fmtDisp(dm) + " kg 的冰（0 °C）需要多少能量？",
+          textEn: "Latent heat of fusion of ice ℓ = 3.34×10⁵ J kg⁻¹. Energy needed to melt " + fmtDisp(dm) + " kg of ice at 0 °C?",
+          answer: ans, unitZh: "J", unitEn: "J",
+          solutionZh: "E = ℓΔm = (3.34×10⁵)(" + fmtDisp(dm) + ") = " + fmtSci(ans) + " J",
+          solutionEn: "E = ℓΔm = (3.34×10⁵)(" + fmtDisp(dm) + ") = " + fmtSci(ans) + " J"
+        };
+      }
+    },
+    {
+      id: "A3a", formulaId: "A3",
+      level: 1,
+      name: { zh: "理想氣體物態方程", en: "Equation of state for an ideal gas" },
+      build: function () {
+        var n = randDec(0.5, 4.0, 1), T = randInt(273, 400), V = randDec(0.010, 0.080, 3);
+        var ans = (n * Rgas * T) / V;
+        // keep p roughly 0.5e5–5e5 Pa by adjusting V if needed
+        if (ans < 5e4) { V = randDec(0.010, 0.025, 3); ans = (n * Rgas * T) / V; }
+        if (ans > 5e5) { V = randDec(0.040, 0.080, 3); ans = (n * Rgas * T) / V; }
+        return {
+          textZh: "理想氣體：n = " + fmtDisp(n) + " mol，V = " + fmtDisp(V) + " m³，T = " + T + " K，R = 8.31 J mol⁻¹ K⁻¹。求壓強 p。",
+          textEn: "Ideal gas: n = " + fmtDisp(n) + " mol, V = " + fmtDisp(V) + " m³, T = " + T + " K, R = 8.31 J mol⁻¹ K⁻¹. Find pressure p.",
+          answer: ans, unitZh: "Pa", unitEn: "Pa",
+          solutionZh: "p = " + frac("nRT", "V") + " = " + frac("(" + esc(fmtDisp(n)) + ")(8.31)(" + T + ")", "(" + esc(fmtDisp(V)) + ")") + " = " + fmtSci(ans) + " Pa",
+          solutionEn: "p = " + frac("nRT", "V") + " = " + frac("(" + esc(fmtDisp(n)) + ")(8.31)(" + T + ")", "(" + esc(fmtDisp(V)) + ")") + " = " + fmtSci(ans) + " Pa"
+        };
+      }
+    },
+    {
+      id: "B3a", formulaId: "B3",
+      level: 1,
+      name: { zh: "重力勢能", en: "Gravitational potential energy" },
+      build: function () {
+        var m = randInt(1, 25), h = randDec(1.0, 20.0, 1);
+        var ans = m * g * h;
+        return {
+          textZh: "取 g = 9.81 m s⁻²。質量 " + m + " kg 的物體升高 " + fmtDisp(h) + " m，重力勢能增加多少？",
+          textEn: "Take g = 9.81 m s⁻². Increase in gravitational PE when a " + m + " kg mass is raised by " + fmtDisp(h) + " m?",
+          answer: ans, unitZh: "J", unitEn: "J",
+          solutionZh: "PE = mgh = (" + m + ")(9.81)(" + fmtDisp(h) + ") = " + fmtSci(ans) + " J",
+          solutionEn: "PE = mgh = (" + m + ")(9.81)(" + fmtDisp(h) + ") = " + fmtSci(ans) + " J"
+        };
+      }
+    },
+    {
+      id: "B4a", formulaId: "B4",
+      level: 1,
+      name: { zh: "動能", en: "Kinetic energy" },
+      build: function () {
+        var m = randDec(0.5, 20.0, 1), v = randDec(1.0, 30.0, 1);
+        var ans = 0.5 * m * v * v;
+        return {
+          textZh: "質量 " + fmtDisp(m) + " kg 的物體以速率 " + fmtDisp(v) + " m s⁻¹ 運動，動能是多少？",
+          textEn: "A " + fmtDisp(m) + " kg object moves at " + fmtDisp(v) + " m s⁻¹. What is its kinetic energy?",
+          answer: ans, unitZh: "J", unitEn: "J",
+          solutionZh: "KE = ½mv² = ½(" + fmtDisp(m) + ")(" + fmtDisp(v) + ")² = " + fmtSci(ans) + " J",
+          solutionEn: "KE = ½mv² = ½(" + fmtDisp(m) + ")(" + fmtDisp(v) + ")² = " + fmtSci(ans) + " J"
+        };
+      }
+    },
+    {
+      id: "B5a", formulaId: "B5",
+      level: 1,
+      name: { zh: "機械功率", en: "Mechanical power" },
+      build: function () {
+        var F = randInt(20, 500), v = randDec(0.5, 15.0, 1);
+        var ans = F * v;
+        return {
+          textZh: "一力 F = " + F + " N 沿運動方向作用，物體速率 v = " + fmtDisp(v) + " m s⁻¹。機械功率是多少？",
+          textEn: "A force F = " + F + " N acts along the motion; speed v = " + fmtDisp(v) + " m s⁻¹. Mechanical power?",
+          answer: ans, unitZh: "W", unitEn: "W",
+          solutionZh: "P = Fv = (" + F + ")(" + fmtDisp(v) + ") = " + fmtSci(ans) + " W",
+          solutionEn: "P = Fv = (" + F + ")(" + fmtDisp(v) + ") = " + fmtSci(ans) + " W"
+        };
+      }
+    },
+    {
+      id: "B6a", formulaId: "B6",
+      level: 1,
+      name: { zh: "向心加速度", en: "Centripetal acceleration" },
+      build: function () {
+        var v = randDec(2.0, 25.0, 1), r = randDec(0.5, 20.0, 1);
+        var ans = (v * v) / r;
+        return {
+          textZh: "物體以速率 " + fmtDisp(v) + " m s⁻¹ 沿半徑 " + fmtDisp(r) + " m 的圓周運動。向心加速度是多少？",
+          textEn: "An object moves at " + fmtDisp(v) + " m s⁻¹ in a circle of radius " + fmtDisp(r) + " m. Centripetal acceleration?",
+          answer: ans, unitZh: "m s⁻²", unitEn: "m s⁻²",
+          solutionZh: "a = " + frac("v²", "r") + " = " + frac("(" + esc(fmtDisp(v)) + ")²", "(" + esc(fmtDisp(r)) + ")") + " = " + fmtSci(ans) + " m s⁻²",
+          solutionEn: "a = " + frac("v²", "r") + " = " + frac("(" + esc(fmtDisp(v)) + ")²", "(" + esc(fmtDisp(r)) + ")") + " = " + fmtSci(ans) + " m s⁻²"
+        };
+      }
+    },
+    {
+      id: "B7a", formulaId: "B7",
+      level: 1,
+      name: { zh: "牛頓萬有引力定律", en: "Newton’s law of gravitation" },
+      build: function () {
+        var m1 = 6.0e24, m2 = randInt(50, 100), r = 6.4e6;
+        var ans = G * m1 * m2 / (r * r);
+        return {
+          textZh: "G = 6.67×10⁻¹¹ N m² kg⁻²。地球質量 M = 6.0×10²⁴ kg，半徑 r = 6.4×10⁶ m。質量 m = " + m2 + " kg 在地面所受引力約多少？（近似當點質量）",
+          textEn: "G = 6.67×10⁻¹¹ N m² kg⁻². Earth mass M = 6.0×10²⁴ kg, radius r = 6.4×10⁶ m. Approximate gravitational force on m = " + m2 + " kg at the surface?",
+          answer: ans, unitZh: "N", unitEn: "N",
+          solutionZh: "F = " + frac("Gm₁m₂", "r²") + " = " + frac("(6.67×10⁻¹¹)(6.0×10²⁴)(" + m2 + ")", "(6.4×10⁶)²") + " = " + fmtSci(ans) + " N",
+          solutionEn: "F = " + frac("Gm₁m₂", "r²") + " = " + frac("(6.67×10⁻¹¹)(6.0×10²⁴)(" + m2 + ")", "(6.4×10⁶)²") + " = " + fmtSci(ans) + " N"
+        };
+      }
+    },
+    {
+      id: "K1a", formulaId: "K1",
+      level: 1,
+      name: { zh: "勻加速運動", en: "Uniformly accelerated motion" },
+      build: function () {
+        var u = randInt(0, 15), a = randDec(0.5, 8.0, 1), t = randDec(1.0, 12.0, 1);
+        var ans = u + a * t;
+        return {
+          textZh: "初速 u = " + u + " m s⁻¹，加速度 a = " + fmtDisp(a) + " m s⁻²，經時間 t = " + fmtDisp(t) + " s 後的末速 v 是多少？",
+          textEn: "u = " + u + " m s⁻¹, a = " + fmtDisp(a) + " m s⁻², after t = " + fmtDisp(t) + " s, find final velocity v.",
+          answer: ans, unitZh: "m s⁻¹", unitEn: "m s⁻¹",
+          solutionZh: "v = u + at = " + u + " + (" + fmtDisp(a) + ")(" + fmtDisp(t) + ") = " + fmtSci(ans) + " m s⁻¹",
+          solutionEn: "v = u + at = " + u + " + (" + fmtDisp(a) + ")(" + fmtDisp(t) + ") = " + fmtSci(ans) + " m s⁻¹"
+        };
+      }
+    },
+    {
+      id: "K2a", formulaId: "K2",
+      level: 1,
+      name: { zh: "勻加速運動", en: "Uniformly accelerated motion" },
+      build: function () {
+        var u = randInt(0, 12), a = randDec(0.5, 6.0, 1), t = randDec(1.0, 10.0, 1);
+        var ans = u * t + 0.5 * a * t * t;
+        return {
+          textZh: "u = " + u + " m s⁻¹，a = " + fmtDisp(a) + " m s⁻²，t = " + fmtDisp(t) + " s。位移 s 是多少？",
+          textEn: "u = " + u + " m s⁻¹, a = " + fmtDisp(a) + " m s⁻², t = " + fmtDisp(t) + " s. Find displacement s.",
+          answer: ans, unitZh: "m", unitEn: "m",
+          solutionZh: "s = ut + ½at² = (" + u + ")(" + fmtDisp(t) + ") + ½(" + fmtDisp(a) + ")(" + fmtDisp(t) + ")² = " + fmtSci(ans) + " m",
+          solutionEn: "s = ut + ½at² = (" + u + ")(" + fmtDisp(t) + ") + ½(" + fmtDisp(a) + ")(" + fmtDisp(t) + ")² = " + fmtSci(ans) + " m"
+        };
+      }
+    },
+    {
+      id: "K3a", formulaId: "K3",
+      level: 1,
+      name: { zh: "勻加速運動", en: "Uniformly accelerated motion" },
+      build: function () {
+        var u = randInt(0, 12), a = randDec(1.0, 6.0, 1), s = randDec(2.0, 40.0, 1);
+        var inside = u * u + 2 * a * s;
+        if (inside < 0) { a = Math.abs(a); inside = u * u + 2 * a * s; }
+        var ans = Math.sqrt(inside);
+        return {
+          textZh: "u = " + u + " m s⁻¹，a = " + fmtDisp(a) + " m s⁻²，位移 s = " + fmtDisp(s) + " m。求末速 v（取正值）。",
+          textEn: "u = " + u + " m s⁻¹, a = " + fmtDisp(a) + " m s⁻², s = " + fmtDisp(s) + " m. Find final speed v (positive).",
+          answer: ans, unitZh: "m s⁻¹", unitEn: "m s⁻¹",
+          solutionZh: "v² = u² + 2as ⇒ v = √(" + u + "² + 2(" + fmtDisp(a) + ")(" + fmtDisp(s) + ")) = " + fmtSci(ans) + " m s⁻¹",
+          solutionEn: "v² = u² + 2as ⇒ v = √(" + u + "² + 2(" + fmtDisp(a) + ")(" + fmtDisp(s) + ")) = " + fmtSci(ans) + " m s⁻¹"
+        };
+      }
+    },
+    {
+      id: "D3a", formulaId: "D3",
+      level: 1,
+      name: { zh: "平行板間的電場", en: "Electric field between parallel plates" },
+      build: function () {
+        var V = randInt(50, 2000), d = randDec(0.01, 0.20, 2);
+        var ans = V / d;
+        return {
+          textZh: "平行板電勢差 V = " + V + " V，板距 d = " + fmtDisp(d) + " m。電場強度 E（數值）是多少？",
+          textEn: "Parallel plates: potential difference V = " + V + " V, separation d = " + fmtDisp(d) + " m. Field strength E (magnitude)?",
+          answer: ans, unitZh: "V m⁻¹", unitEn: "V m⁻¹",
+          solutionZh: "E = " + frac("V", "d") + " = " + frac(String(V), "(" + esc(fmtDisp(d)) + ")") + " = " + fmtSci(ans) + " V m⁻¹",
+          solutionEn: "E = " + frac("V", "d") + " = " + frac(String(V), "(" + esc(fmtDisp(d)) + ")") + " = " + fmtSci(ans) + " V m⁻¹"
+        };
+      }
+    },
+    {
+      id: "D4a", formulaId: "D4",
+      level: 1,
+      name: { zh: "電阻和電阻率", en: "Resistance and resistivity" },
+      build: function () {
+        var rho = randSf(1e-8, 1e-7, 2);
+        var L = randDec(0.5, 10.0, 1);
+        var A = randSf(0.5e-6, 5e-6, 2);
+        var ans = rho * L / A;
+        return {
+          textZh: "電阻率 ρ = " + fmtSci(rho) + " Ω m，長度 ℓ = " + fmtDisp(L) + " m，截面積 A = " + fmtSci(A) + " m²。電阻 R 是多少？",
+          textEn: "Resistivity ρ = " + fmtSci(rho) + " Ω m, length ℓ = " + fmtDisp(L) + " m, cross-section A = " + fmtSci(A) + " m². Find R.",
+          answer: ans, unitZh: "Ω", unitEn: "Ω",
+          solutionZh: "R = " + frac("ρℓ", "A") + " = " + frac("(" + esc(fmtSci(rho)) + ")(" + esc(fmtDisp(L)) + ")", "(" + esc(fmtSci(A)) + ")") + " = " + fmtSci(ans) + " Ω",
+          solutionEn: "R = " + frac("ρℓ", "A") + " = " + frac("(" + esc(fmtSci(rho)) + ")(" + esc(fmtDisp(L)) + ")", "(" + esc(fmtSci(A)) + ")") + " = " + fmtSci(ans) + " Ω"
+        };
+      }
+    },
+    {
+      id: "D5a", formulaId: "D5",
+      level: 1,
+      name: { zh: "串聯電阻器", en: "Resistors in series" },
+      build: function () {
+        var r1 = pick(PREF_R), r2 = pick(PREF_R);
+        var ans = r1 + r2;
+        return {
+          textZh: "兩電阻器串聯：R₁ = " + r1 + " Ω，R₂ = " + r2 + " Ω。等效電阻是多少？",
+          textEn: "Two resistors in series: R₁ = " + r1 + " Ω, R₂ = " + r2 + " Ω. Equivalent resistance?",
+          answer: ans, unitZh: "Ω", unitEn: "Ω",
+          solutionZh: "R = R₁ + R₂ = " + r1 + " + " + r2 + " = " + fmtSci(ans) + " Ω",
+          solutionEn: "R = R₁ + R₂ = " + r1 + " + " + r2 + " = " + fmtSci(ans) + " Ω"
+        };
+      }
+    },
+    {
+      id: "D6a", formulaId: "D6",
+      level: 1,
+      name: { zh: "並聯電阻器", en: "Resistors in parallel" },
+      build: function () {
+        var r1 = pick(PREF_R), r2 = pick(PREF_R);
+        var ans = 1 / (1 / r1 + 1 / r2);
+        return {
+          textZh: "兩電阻器並聯：R₁ = " + r1 + " Ω，R₂ = " + r2 + " Ω。等效電阻是多少？",
+          textEn: "Two resistors in parallel: R₁ = " + r1 + " Ω, R₂ = " + r2 + " Ω. Equivalent resistance?",
+          answer: ans, unitZh: "Ω", unitEn: "Ω",
+          solutionZh: frac("1", "R") + " = " + frac("1", "R₁") + " + " + frac("1", "R₂") + " ⇒ R = " + fmtSci(ans) + " Ω",
+          solutionEn: frac("1", "R") + " = " + frac("1", "R₁") + " + " + frac("1", "R₂") + " ⇒ R = " + fmtSci(ans) + " Ω"
+        };
+      }
+    },
+    {
+      id: "D7a", formulaId: "D7",
+      level: 1,
+      name: { zh: "電路中的功率", en: "Power in a circuit" },
+      build: function () {
+        var I = randDec(0.1, 5.0, 1), R = randInt(1, 50);
+        var ans = I * I * R;
+        if (ans > 10000) { I = randDec(0.1, 2.0, 1); R = randInt(1, 20); ans = I * I * R; }
+        return {
+          textZh: "電流 I = " + fmtDisp(I) + " A 流過電阻 R = " + R + " Ω。功率是多少？",
+          textEn: "Current I = " + fmtDisp(I) + " A through resistance R = " + R + " Ω. Power?",
+          answer: ans, unitZh: "W", unitEn: "W",
+          solutionZh: "P = I²R = (" + fmtDisp(I) + ")²(" + R + ") = " + fmtSci(ans) + " W",
+          solutionEn: "P = I²R = (" + fmtDisp(I) + ")²(" + R + ") = " + fmtSci(ans) + " W"
+        };
+      }
+    },
+    {
+      id: "D7b", formulaId: "D7",
+      level: 1,
+      name: { zh: "電路中的功率", en: "Power in a circuit" },
+      build: function () {
+        var I = randDec(0.1, 5.0, 1), V = pick([3, 6, 9, 12, 24, 48, 110, 220, 240]);
+        var ans = I * V;
+        if (ans > 10000) { I = randDec(0.1, 2.0, 1); V = pick([3, 6, 12, 24]); ans = I * V; }
+        return {
+          textZh: "電流 I = " + fmtDisp(I) + " A，電勢差 V = " + V + " V。電路功率是多少？",
+          textEn: "I = " + fmtDisp(I) + " A, V = " + V + " V. Power in the circuit?",
+          answer: ans, unitZh: "W", unitEn: "W",
+          solutionZh: "P = IV = (" + fmtDisp(I) + ")(" + V + ") = " + fmtSci(ans) + " W",
+          solutionEn: "P = IV = (" + fmtDisp(I) + ")(" + V + ") = " + fmtSci(ans) + " W"
+        };
+      }
+    },
+    {
+      id: "D9a", formulaId: "D9",
+      level: 1,
+      name: { zh: "磁場對載流導體的作用力", en: "Force on a current-carrying conductor" },
+      build: function () {
+        var B = randDec(0.02, 0.50, 2), I = randInt(1, 20), L = randDec(0.05, 1.00, 2);
+        var ans = B * I * L;
+        return {
+          textZh: "均勻磁場 B = " + fmtDisp(B) + " T，導體長 ℓ = " + fmtDisp(L) + " m，電流 I = " + I + " A，且 B 與電流垂直（sinθ = 1）。作用力大小是多少？",
+          textEn: "Uniform B = " + fmtDisp(B) + " T, length ℓ = " + fmtDisp(L) + " m, I = " + I + " A, B ⊥ current (sinθ = 1). Force magnitude?",
+          answer: ans, unitZh: "N", unitEn: "N",
+          solutionZh: "F = BIl sinθ = (" + fmtDisp(B) + ")(" + I + ")(" + fmtDisp(L) + ")(1) = " + fmtSci(ans) + " N",
+          solutionEn: "F = BIl sinθ = (" + fmtDisp(B) + ")(" + I + ")(" + fmtDisp(L) + ")(1) = " + fmtSci(ans) + " N"
+        };
+      }
+    },
+    {
+      id: "D10a", formulaId: "D10",
+      level: 1,
+      name: { zh: "長直導線所產生的磁場", en: "Magnetic field due to a long straight wire" },
+      build: function () {
+        var I = randDec(0.5, 20.0, 1), r = randDec(0.02, 0.50, 2);
+        var ans = MU0 * I / (2 * Math.PI * r);
+        return {
+          textZh: "μ₀ = 4π×10⁻⁷ H m⁻¹。長直導線電流 I = " + fmtDisp(I) + " A，距導線 r = " + fmtDisp(r) + " m 處磁場 B 是多少？",
+          textEn: "μ₀ = 4π×10⁻⁷ H m⁻¹. Long straight wire carries I = " + fmtDisp(I) + " A. B at distance r = " + fmtDisp(r) + " m?",
+          answer: ans, unitZh: "T", unitEn: "T",
+          solutionZh: "B = " + frac("μ₀I", "2πr") + " = " + frac("(4π×10⁻⁷)(" + esc(fmtDisp(I)) + ")", "2π·" + esc(fmtDisp(r))) + " = " + fmtSci(ans) + " T",
+          solutionEn: "B = " + frac("μ₀I", "2πr") + " = " + frac("(4π×10⁻⁷)(" + esc(fmtDisp(I)) + ")", "2π·" + esc(fmtDisp(r))) + " = " + fmtSci(ans) + " T"
+        };
+      }
+    },
+    {
+      id: "D11a", formulaId: "D11",
+      level: 1,
+      name: { zh: "螺線管中的磁場", en: "Magnetic field inside a long solenoid" },
+      build: function () {
+        var N = randInt(200, 2500), I = randDec(0.2, 5.0, 1), L = randDec(0.10, 1.00, 2);
+        var ans = MU0 * N * I / L;
+        return {
+          textZh: "μ₀ = 4π×10⁻⁷ H m⁻¹。長螺線管匝數 N = " + N + "，長度 ℓ = " + fmtDisp(L) + " m，電流 I = " + fmtDisp(I) + " A。管內磁場 B 是多少？",
+          textEn: "μ₀ = 4π×10⁻⁷ H m⁻¹. Long solenoid: N = " + N + ", length ℓ = " + fmtDisp(L) + " m, I = " + fmtDisp(I) + " A. Field B inside?",
+          answer: ans, unitZh: "T", unitEn: "T",
+          solutionZh: "B = " + frac("μ₀NI", "ℓ") + " = " + frac("(4π×10⁻⁷)(" + N + ")(" + esc(fmtDisp(I)) + ")", "(" + esc(fmtDisp(L)) + ")") + " = " + fmtSci(ans) + " T",
+          solutionEn: "B = " + frac("μ₀NI", "ℓ") + " = " + frac("(4π×10⁻⁷)(" + N + ")(" + esc(fmtDisp(I)) + ")", "(" + esc(fmtDisp(L)) + ")") + " = " + fmtSci(ans) + " T"
+        };
+      }
+    },
+    {
+      id: "D13a", formulaId: "D13",
+      level: 1,
+      name: { zh: "變壓器", en: "Transformer" },
+      build: function () {
+        var Vp = pick([110, 220]);
+        var Np = pick([100, 200, 250, 500, 1000]);
+        var ratios = [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10];
+        var ratio = pick(ratios);
+        var Ns = Math.round(Np * ratio);
+        if (Ns < 10) Ns = 10;
+        var ans = Vp * Ns / Np;
+        if (ans < 6) { Ns = Math.round(Np * 6 / Vp); ans = Vp * Ns / Np; }
+        if (ans > 2400) { Ns = Math.round(Np * 2400 / Vp); ans = Vp * Ns / Np; }
+        return {
+          textZh: "理想變壓器：原線圈 Vp = " + Vp + " V，Np = " + Np + " 匝，副線圈 Ns = " + Ns + " 匝。副電壓 Vs 約多少？",
+          textEn: "Ideal transformer: Vp = " + Vp + " V, Np = " + Np + ", Ns = " + Ns + ". Approximate Vs?",
+          answer: ans, unitZh: "V", unitEn: "V",
+          solutionZh: frac("Vs", "Vp") + " ≈ " + frac("Ns", "Np") + " ⇒ Vs ≈ " + frac("(" + Vp + ")(" + Ns + ")", "(" + Np + ")") + " = " + fmtSci(ans) + " V",
+          solutionEn: frac("Vs", "Vp") + " ≈ " + frac("Ns", "Np") + " ⇒ Vs ≈ " + frac("(" + Vp + ")(" + Ns + ")", "(" + Np + ")") + " = " + fmtSci(ans) + " V"
+        };
+      }
+    },
+    {
+      id: "E2a", formulaId: "E2",
+      level: 1,
+      name: { zh: "半衰期和衰變常數", en: "Half-life and decay constant" },
+      build: function () {
+        // t½ from ~5 s to a few hours → k = ln2/t½
+        var tHalfTarget = pick([
+          randInt(5, 120),           // seconds–minutes
+          randInt(120, 3600),        // up to 1 h
+          randInt(3600, 7200)        // up to 2 h
+        ]);
+        var k = roundSf(LN2 / tHalfTarget, 3);
+        var ans = LN2 / k;
+        return {
+          textZh: "衰變常數 k = " + fmtSci(k) + " s⁻¹。求半衰期 t½（單位：s）。",
+          textEn: "Decay constant k = " + fmtSci(k) + " s⁻¹. Find the half-life t½ (unit: s).",
+          answer: ans, unitZh: "s", unitEn: "s",
+          solutionZh: "t½ = " + frac("ln2", "k") + " = " + frac("0.693", "(" + esc(fmtSci(k)) + ")") + " = " + fmtSci(ans) + " s",
+          solutionEn: "t½ = " + frac("ln2", "k") + " = " + frac("0.693", "(" + esc(fmtSci(k)) + ")") + " = " + fmtSci(ans) + " s"
+        };
+      }
+    },
+    {
+      id: "E3a", formulaId: "E3",
+      level: 1,
+      name: { zh: "放射強度", en: "Activity and undecayed nuclei" },
+      build: function () {
+        var N = randSf(1e6, 1e12, 2);
+        var k = randSf(1e-6, 0.05, 2);
+        var ans = k * N;
+        return {
+          textZh: "衰變常數 k = " + fmtSci(k) + " s⁻¹，未衰變原子核數目 N = " + fmtSci(N) + "。放射強度 A 是多少？",
+          textEn: "Decay constant k = " + fmtSci(k) + " s⁻¹, number of undecayed nuclei N = " + fmtSci(N) + ". Activity A?",
+          answer: ans, unitZh: "Bq", unitEn: "Bq",
+          solutionZh: "A = kN = (" + fmtSci(k) + ")(" + fmtSci(N) + ") = " + fmtSci(ans) + " Bq",
+          solutionEn: "A = kN = (" + fmtSci(k) + ")(" + fmtSci(N) + ") = " + fmtSci(ans) + " Bq"
+        };
+      }
+    },
+    {
+      id: "E4a", formulaId: "E4",
+      level: 1,
+      name: { zh: "質能關係式", en: "Mass-energy relationship" },
+      build: function () {
+        var dm = randSf(1.0e-28, 5.0e-28, 2);
+        var ans = dm * cLight * cLight;
+        return {
+          textZh: "c = 3.00×10⁸ m s⁻¹。質量虧損 Δm = " + fmtSci(dm) + " kg，釋放能量 ΔE 是多少？",
+          textEn: "c = 3.00×10⁸ m s⁻¹. Mass defect Δm = " + fmtSci(dm) + " kg. Energy released ΔE?",
+          answer: ans, unitZh: "J", unitEn: "J",
+          solutionZh: "ΔE = Δmc² = (" + fmtSci(dm) + ")(3.00×10⁸)² = " + fmtSci(ans) + " J",
+          solutionEn: "ΔE = Δmc² = (" + fmtSci(dm) + ")(3.00×10⁸)² = " + fmtSci(ans) + " J"
+        };
+      }
+    },
+    {
+      id: "C1a", formulaId: "C1",
+      level: 1,
+      name: { zh: "雙縫條紋間距", en: "Fringe separation in double-slit interference" },
+      build: function () {
+        var lambda = randSf(4.0e-7, 7.0e-7, 2);
+        var D = randDec(0.5, 3.0, 1);
+        var aMm = randDec(0.2, 2.0, 1);
+        var a = aMm * 1e-3;
+        var ans = lambda * D / a;
+        return {
+          textZh: "雙縫實驗：波長 λ = " + fmtSci(lambda) + " m，屏距 D = " + fmtDisp(D) + " m，縫距 a = " + fmtDisp(aMm) + "×10⁻³ m。條紋間距 Δy 是多少？",
+          textEn: "Double-slit: λ = " + fmtSci(lambda) + " m, D = " + fmtDisp(D) + " m, slit separation a = " + fmtDisp(aMm) + "×10⁻³ m. Fringe spacing Δy?",
+          answer: ans, unitZh: "m", unitEn: "m",
+          solutionZh: "Δy = " + frac("λD", "a") + " = " + frac("(" + esc(fmtSci(lambda)) + ")(" + esc(fmtDisp(D)) + ")", "(" + esc(fmtSci(a)) + ")") + " = " + fmtSci(ans) + " m",
+          solutionEn: "Δy = " + frac("λD", "a") + " = " + frac("(" + esc(fmtSci(lambda)) + ")(" + esc(fmtDisp(D)) + ")", "(" + esc(fmtSci(a)) + ")") + " = " + fmtSci(ans) + " m"
+        };
+      }
+    },
+    {
+      id: "C3a", formulaId: "C3",
+      level: 1,
+      name: { zh: "單塊透鏡方程", en: "Equation for a single lens" },
+      build: function () {
+        var f = randDec(0.05, 0.25, 2);
+        var u = randDec(f + 0.02, f + 0.40, 2);
+        if (u <= f) u = +(f + 0.05).toFixed(2);
+        var ans = 1 / (1 / f - 1 / u);
+        return {
+          textZh: "薄透鏡焦距 f = " + fmtDisp(f) + " m，物距 u = " + fmtDisp(u) + " m（實物，取正）。像距 v 是多少？",
+          textEn: "Thin lens f = " + fmtDisp(f) + " m, object distance u = " + fmtDisp(u) + " m (real object, positive). Image distance v?",
+          answer: ans, unitZh: "m", unitEn: "m",
+          solutionZh: frac("1", "u") + " + " + frac("1", "v") + " = " + frac("1", "f") + " ⇒ " + frac("1", "v") + " = " + frac("1", "f") + " − " + frac("1", "u") + " ⇒ v = " + fmtSci(ans) + " m",
+          solutionEn: frac("1", "u") + " + " + frac("1", "v") + " = " + frac("1", "f") + " ⇒ " + frac("1", "v") + " = " + frac("1", "f") + " − " + frac("1", "u") + " ⇒ v = " + fmtSci(ans) + " m"
+        };
+      }
+    },
+    // ===== Level 2: unit conversion required =====
+    {
+      id: "A1L2a", formulaId: "A1", level: 2,
+      name: { zh: "加熱和冷卻時的能量轉移", en: "Energy transfer during heating and cooling" },
+      build: function () {
+        var m_g = randInt(200, 2500), dT = randInt(10, 60), c = 4200;
+        var m = m_g / 1000;
+        var ans = m * c * dT;
+        return {
+          textZh: "已知水的比熱容量 c = 4200 J kg⁻¹ °C⁻¹。把 " + m_g + " g 的水升溫 " + dT + " °C，需要多少能量？",
+          textEn: "The specific heat capacity of water is c = 4200 J kg⁻¹ °C⁻¹. How much energy is needed to raise the temperature of " + m_g + " g of water by " + dT + " °C?",
+          answer: ans, unitZh: "J", unitEn: "J",
+          solutionZh: "m = " + m_g + " g = " + fmtDisp(m) + " kg\nE = mcΔT = (" + fmtDisp(m) + ")(4200)(" + dT + ") = " + fmtSci(ans) + " J",
+          solutionEn: "m = " + m_g + " g = " + fmtDisp(m) + " kg\nE = mcΔT = (" + fmtDisp(m) + ")(4200)(" + dT + ") = " + fmtSci(ans) + " J"
+        };
+      }
+    },
+    {
+      id: "A2L2a", formulaId: "A2", level: 2,
+      name: { zh: "物態變化時的能量轉移", en: "Energy transfer during change of state" },
+      build: function () {
+        var dm_g = randInt(50, 800), L = 3.34e5;
+        var dm = dm_g / 1000;
+        var ans = L * dm;
+        return {
+          textZh: "冰的潛熱 ℓ = 3.34×10⁵ J kg⁻¹。熔化 " + dm_g + " g 的冰（0 °C）需要多少能量？",
+          textEn: "Latent heat of fusion of ice ℓ = 3.34×10⁵ J kg⁻¹. Energy needed to melt " + dm_g + " g of ice at 0 °C?",
+          answer: ans, unitZh: "J", unitEn: "J",
+          solutionZh: "Δm = " + dm_g + " g = " + fmtDisp(dm) + " kg\nE = ℓΔm = (3.34×10⁵)(" + fmtDisp(dm) + ") = " + fmtSci(ans) + " J",
+          solutionEn: "Δm = " + dm_g + " g = " + fmtDisp(dm) + " kg\nE = ℓΔm = (3.34×10⁵)(" + fmtDisp(dm) + ") = " + fmtSci(ans) + " J"
+        };
+      }
+    },
+    {
+      id: "A3L2a", formulaId: "A3", level: 2,
+      name: { zh: "理想氣體物態方程", en: "Equation of state for an ideal gas" },
+      build: function () {
+        var n = randDec(0.5, 3.0, 1), T = randInt(280, 360);
+        var V_L = randDec(5.0, 40.0, 1);
+        var V = V_L / 1000; // L → m³
+        var ans = (n * Rgas * T) / V;
+        return {
+          textZh: "理想氣體：n = " + fmtDisp(n) + " mol，V = " + fmtDisp(V_L) + " L，T = " + T + " K，R = 8.31 J mol⁻¹ K⁻¹。求壓強 p。",
+          textEn: "Ideal gas: n = " + fmtDisp(n) + " mol, V = " + fmtDisp(V_L) + " L, T = " + T + " K, R = 8.31 J mol⁻¹ K⁻¹. Find pressure p.",
+          answer: ans, unitZh: "Pa", unitEn: "Pa",
+          solutionZh: "V = " + fmtDisp(V_L) + " L = " + fmtSci(V) + " m³\np = " + frac("nRT", "V") + " = " + frac("(" + esc(fmtDisp(n)) + ")(8.31)(" + T + ")", "(" + esc(fmtSci(V)) + ")") + " = " + fmtSci(ans) + " Pa",
+          solutionEn: "V = " + fmtDisp(V_L) + " L = " + fmtSci(V) + " m³\np = " + frac("nRT", "V") + " = " + frac("(" + esc(fmtDisp(n)) + ")(8.31)(" + T + ")", "(" + esc(fmtSci(V)) + ")") + " = " + fmtSci(ans) + " Pa"
+        };
+      }
+    },
+    {
+      id: "B3L2a", formulaId: "B3", level: 2,
+      name: { zh: "重力勢能", en: "Gravitational potential energy" },
+      build: function () {
+        var m = randInt(1, 20), h_cm = randInt(50, 350);
+        var h = h_cm / 100;
+        var ans = m * g * h;
+        return {
+          textZh: "取 g = 9.81 m s⁻²。質量 " + m + " kg 的物體升高 " + h_cm + " cm，重力勢能增加多少？",
+          textEn: "Take g = 9.81 m s⁻². Increase in gravitational PE when a " + m + " kg mass is raised by " + h_cm + " cm?",
+          answer: ans, unitZh: "J", unitEn: "J",
+          solutionZh: "h = " + h_cm + " cm = " + fmtDisp(h) + " m\nPE = mgh = (" + m + ")(9.81)(" + fmtDisp(h) + ") = " + fmtSci(ans) + " J",
+          solutionEn: "h = " + h_cm + " cm = " + fmtDisp(h) + " m\nPE = mgh = (" + m + ")(9.81)(" + fmtDisp(h) + ") = " + fmtSci(ans) + " J"
+        };
+      }
+    },
+    {
+      id: "B4L2a", formulaId: "B4", level: 2,
+      name: { zh: "動能", en: "Kinetic energy" },
+      build: function () {
+        var m_g = randInt(100, 2000), v = randDec(2.0, 20.0, 1);
+        var m = m_g / 1000;
+        var ans = 0.5 * m * v * v;
+        return {
+          textZh: "質量 " + m_g + " g 的物體以速率 " + fmtDisp(v) + " m s⁻¹ 運動，動能是多少？",
+          textEn: "A " + m_g + " g object moves at " + fmtDisp(v) + " m s⁻¹. What is its kinetic energy?",
+          answer: ans, unitZh: "J", unitEn: "J",
+          solutionZh: "m = " + m_g + " g = " + fmtDisp(m) + " kg\nKE = ½mv² = ½(" + fmtDisp(m) + ")(" + fmtDisp(v) + ")² = " + fmtSci(ans) + " J",
+          solutionEn: "m = " + m_g + " g = " + fmtDisp(m) + " kg\nKE = ½mv² = ½(" + fmtDisp(m) + ")(" + fmtDisp(v) + ")² = " + fmtSci(ans) + " J"
+        };
+      }
+    },
+    {
+      id: "B5L2a", formulaId: "B5", level: 2,
+      name: { zh: "機械功率", en: "Mechanical power" },
+      build: function () {
+        var F = randInt(50, 400), v_kmh = randInt(18, 72); // → m/s divisible by 5 often
+        var v = v_kmh / 3.6;
+        var ans = F * v;
+        return {
+          textZh: "一力 F = " + F + " N 沿運動方向作用，物體速率 v = " + v_kmh + " km h⁻¹。機械功率是多少？",
+          textEn: "A force F = " + F + " N acts along the motion; speed v = " + v_kmh + " km h⁻¹. Mechanical power?",
+          answer: ans, unitZh: "W", unitEn: "W",
+          solutionZh: "v = " + v_kmh + " km h⁻¹ = " + fmtDisp(roundSf(v, 3)) + " m s⁻¹\nP = Fv = (" + F + ")(" + fmtDisp(roundSf(v, 3)) + ") = " + fmtSci(ans) + " W",
+          solutionEn: "v = " + v_kmh + " km h⁻¹ = " + fmtDisp(roundSf(v, 3)) + " m s⁻¹\nP = Fv = (" + F + ")(" + fmtDisp(roundSf(v, 3)) + ") = " + fmtSci(ans) + " W"
+        };
+      }
+    },
+    {
+      id: "K1L2a", formulaId: "K1", level: 2,
+      name: { zh: "勻加速運動", en: "Uniformly accelerated motion" },
+      build: function () {
+        var u = randInt(0, 10), a = randDec(0.5, 4.0, 1), t_min = randDec(0.5, 3.0, 1);
+        var t = t_min * 60;
+        var ans = u + a * t;
+        return {
+          textZh: "初速 u = " + u + " m s⁻¹，加速度 a = " + fmtDisp(a) + " m s⁻²，經時間 t = " + fmtDisp(t_min) + " min 後的末速 v 是多少？",
+          textEn: "u = " + u + " m s⁻¹, a = " + fmtDisp(a) + " m s⁻², after t = " + fmtDisp(t_min) + " min, find final velocity v.",
+          answer: ans, unitZh: "m s⁻¹", unitEn: "m s⁻¹",
+          solutionZh: "t = " + fmtDisp(t_min) + " min = " + fmtDisp(t) + " s\nv = u + at = " + u + " + (" + fmtDisp(a) + ")(" + fmtDisp(t) + ") = " + fmtSci(ans) + " m s⁻¹",
+          solutionEn: "t = " + fmtDisp(t_min) + " min = " + fmtDisp(t) + " s\nv = u + at = " + u + " + (" + fmtDisp(a) + ")(" + fmtDisp(t) + ") = " + fmtSci(ans) + " m s⁻¹"
+        };
+      }
+    },
+    {
+      id: "D3L2a", formulaId: "D3", level: 2,
+      name: { zh: "平行板間的電場", en: "Electric field between parallel plates" },
+      build: function () {
+        var V = randInt(100, 1500), d_cm = randDec(1.0, 8.0, 1);
+        var d = d_cm / 100;
+        var ans = V / d;
+        return {
+          textZh: "平行板電勢差 V = " + V + " V，板距 d = " + fmtDisp(d_cm) + " cm。電場強度 E（數值）是多少？",
+          textEn: "Parallel plates: potential difference V = " + V + " V, separation d = " + fmtDisp(d_cm) + " cm. Field strength E (magnitude)?",
+          answer: ans, unitZh: "V m⁻¹", unitEn: "V m⁻¹",
+          solutionZh: "d = " + fmtDisp(d_cm) + " cm = " + fmtDisp(d) + " m\nE = " + frac("V", "d") + " = " + frac(String(V), "(" + esc(fmtDisp(d)) + ")") + " = " + fmtSci(ans) + " V m⁻¹",
+          solutionEn: "d = " + fmtDisp(d_cm) + " cm = " + fmtDisp(d) + " m\nE = " + frac("V", "d") + " = " + frac(String(V), "(" + esc(fmtDisp(d)) + ")") + " = " + fmtSci(ans) + " V m⁻¹"
+        };
+      }
+    },
+    {
+      id: "D7L2a", formulaId: "D7", level: 2,
+      name: { zh: "電路中的功率", en: "Power in a circuit" },
+      build: function () {
+        var I_mA = randInt(50, 800), R = randInt(10, 100);
+        var I = I_mA / 1000;
+        var ans = I * I * R;
+        return {
+          textZh: "電流 I = " + I_mA + " mA 流過電阻 R = " + R + " Ω。功率是多少？",
+          textEn: "Current I = " + I_mA + " mA through resistance R = " + R + " Ω. Power?",
+          answer: ans, unitZh: "W", unitEn: "W",
+          solutionZh: "I = " + I_mA + " mA = " + fmtSci(I) + " A\nP = I²R = (" + fmtSci(I) + ")²(" + R + ") = " + fmtSci(ans) + " W",
+          solutionEn: "I = " + I_mA + " mA = " + fmtSci(I) + " A\nP = I²R = (" + fmtSci(I) + ")²(" + R + ") = " + fmtSci(ans) + " W"
+        };
+      }
+    },
+    {
+      id: "D9L2a", formulaId: "D9", level: 2,
+      name: { zh: "磁場對載流導體的作用力", en: "Force on a current-carrying conductor" },
+      build: function () {
+        var B = randDec(0.05, 0.40, 2), I = randInt(2, 15), L_cm = randInt(10, 80);
+        var L = L_cm / 100;
+        var ans = B * I * L;
+        return {
+          textZh: "均勻磁場 B = " + fmtDisp(B) + " T，導體長 ℓ = " + L_cm + " cm，電流 I = " + I + " A，且 B 與電流垂直（sinθ = 1）。作用力大小是多少？",
+          textEn: "Uniform B = " + fmtDisp(B) + " T, length ℓ = " + L_cm + " cm, I = " + I + " A, B ⊥ current (sinθ = 1). Force magnitude?",
+          answer: ans, unitZh: "N", unitEn: "N",
+          solutionZh: "ℓ = " + L_cm + " cm = " + fmtDisp(L) + " m\nF = BIl sinθ = (" + fmtDisp(B) + ")(" + I + ")(" + fmtDisp(L) + ")(1) = " + fmtSci(ans) + " N",
+          solutionEn: "ℓ = " + L_cm + " cm = " + fmtDisp(L) + " m\nF = BIl sinθ = (" + fmtDisp(B) + ")(" + I + ")(" + fmtDisp(L) + ")(1) = " + fmtSci(ans) + " N"
+        };
+      }
+    },
+    {
+      id: "D10L2a", formulaId: "D10", level: 2,
+      name: { zh: "長直導線所產生的磁場", en: "Magnetic field due to a long straight wire" },
+      build: function () {
+        var I = randDec(1.0, 15.0, 1), r_cm = randDec(2.0, 20.0, 1);
+        var r = r_cm / 100;
+        var ans = MU0 * I / (2 * Math.PI * r);
+        return {
+          textZh: "μ₀ = 4π×10⁻⁷ H m⁻¹。長直導線電流 I = " + fmtDisp(I) + " A，距導線 r = " + fmtDisp(r_cm) + " cm 處磁場 B 是多少？",
+          textEn: "μ₀ = 4π×10⁻⁷ H m⁻¹. Long straight wire carries I = " + fmtDisp(I) + " A. B at distance r = " + fmtDisp(r_cm) + " cm?",
+          answer: ans, unitZh: "T", unitEn: "T",
+          solutionZh: "r = " + fmtDisp(r_cm) + " cm = " + fmtDisp(r) + " m\nB = " + frac("μ₀I", "2πr") + " = " + frac("(4π×10⁻⁷)(" + esc(fmtDisp(I)) + ")", "2π·" + esc(fmtDisp(r))) + " = " + fmtSci(ans) + " T",
+          solutionEn: "r = " + fmtDisp(r_cm) + " cm = " + fmtDisp(r) + " m\nB = " + frac("μ₀I", "2πr") + " = " + frac("(4π×10⁻⁷)(" + esc(fmtDisp(I)) + ")", "2π·" + esc(fmtDisp(r))) + " = " + fmtSci(ans) + " T"
+        };
+      }
+    },
+    {
+      id: "C3L2a", formulaId: "C3", level: 2,
+      name: { zh: "單塊透鏡方程", en: "Equation for a single lens" },
+      build: function () {
+        var f_cm = randInt(8, 25);
+        var u_cm = randInt(f_cm + 5, f_cm + 40);
+        var f = f_cm / 100, u = u_cm / 100;
+        var ans = 1 / (1 / f - 1 / u);
+        return {
+          textZh: "薄透鏡焦距 f = " + f_cm + " cm，物距 u = " + u_cm + " cm（實物，取正）。像距 v 是多少？（答案以 m 表示）",
+          textEn: "Thin lens f = " + f_cm + " cm, object distance u = " + u_cm + " cm (real object, positive). Image distance v? (answer in m)",
+          answer: ans, unitZh: "m", unitEn: "m",
+          solutionZh: "f = " + f_cm + " cm = " + fmtDisp(f) + " m；u = " + u_cm + " cm = " + fmtDisp(u) + " m\n" + frac("1", "u") + " + " + frac("1", "v") + " = " + frac("1", "f") + " ⇒ v = " + fmtSci(ans) + " m",
+          solutionEn: "f = " + f_cm + " cm = " + fmtDisp(f) + " m; u = " + u_cm + " cm = " + fmtDisp(u) + " m\n" + frac("1", "u") + " + " + frac("1", "v") + " = " + frac("1", "f") + " ⇒ v = " + fmtSci(ans) + " m"
+        };
+      }
+    },
+    // ===== Level 3: two or more formulae =====
+    {
+      id: "L3_B3B4", formulaIds: ["B3", "B4"], formulaId: "B3", level: 3,
+      name: { zh: "勢能與動能轉換", en: "PE–KE conversion" },
+      build: function () {
+        var h = randDec(2.0, 25.0, 1);
+        // mgh = ½mv² ⇒ v = √(2gh)
+        var ans = Math.sqrt(2 * g * h);
+        return {
+          textZh: "取 g = 9.81 m s⁻²。一物體由靜止從高度 " + fmtDisp(h) + " m 自由落下（忽略空氣阻力）。到達地面時速率是多少？",
+          textEn: "Take g = 9.81 m s⁻². An object is released from rest at height " + fmtDisp(h) + " m (neglect air resistance). Speed on reaching the ground?",
+          answer: ans, unitZh: "m s⁻¹", unitEn: "m s⁻¹",
+          solutionZh: "PE = mgh；KE = ½mv²\nmgh = ½mv² ⇒ v = √(2gh) = √(2×9.81×" + fmtDisp(h) + ") = " + fmtSci(ans) + " m s⁻¹",
+          solutionEn: "PE = mgh; KE = ½mv²\nmgh = ½mv² ⇒ v = √(2gh) = √(2×9.81×" + fmtDisp(h) + ") = " + fmtSci(ans) + " m s⁻¹"
+        };
+      }
+    },
+    {
+      id: "L3_B3B5", formulaIds: ["B3", "B5"], formulaId: "B3", level: 3,
+      name: { zh: "重力與機械功率", en: "Gravity and mechanical power" },
+      build: function () {
+        var m = randInt(20, 80), v = randDec(0.5, 3.0, 1);
+        // Lift at constant speed: F = mg, P = Fv
+        var F = m * g;
+        var ans = F * v;
+        return {
+          textZh: "取 g = 9.81 m s⁻²。以恆定速率 " + fmtDisp(v) + " m s⁻¹ 把質量 " + m + " kg 的物體鉛直向上提起。所需機械功率是多少？",
+          textEn: "Take g = 9.81 m s⁻². A " + m + " kg mass is lifted vertically at constant speed " + fmtDisp(v) + " m s⁻¹. Mechanical power required?",
+          answer: ans, unitZh: "W", unitEn: "W",
+          solutionZh: "F = mg = (" + m + ")(9.81)（平衡重力）\nP = Fv = (" + fmtSci(F) + ")(" + fmtDisp(v) + ") = " + fmtSci(ans) + " W",
+          solutionEn: "F = mg = (" + m + ")(9.81) (balance weight)\nP = Fv = (" + fmtSci(F) + ")(" + fmtDisp(v) + ") = " + fmtSci(ans) + " W"
+        };
+      }
+    },
+    {
+      id: "L3_A1A2", formulaIds: ["A1", "A2"], formulaId: "A1", level: 3,
+      name: { zh: "加熱並熔化", en: "Heating then melting" },
+      build: function () {
+        var m = randStep(0.20, 1.50, 0.05);
+        var T0 = randInt(-20, -5); // ice below 0
+        var c_ice = 2100, L = 3.34e5;
+        var dT = 0 - T0;
+        var E1 = m * c_ice * dT;
+        var E2 = L * m;
+        var ans = E1 + E2;
+        return {
+          textZh: "冰的比熱容量 c = 2100 J kg⁻¹ °C⁻¹，熔化潛熱 ℓ = 3.34×10⁵ J kg⁻¹。質量 " + fmtDisp(m) + " kg、初溫 " + T0 + " °C 的冰，變成 0 °C 的水需要多少能量？",
+          textEn: "Specific heat capacity of ice c = 2100 J kg⁻¹ °C⁻¹, latent heat of fusion ℓ = 3.34×10⁵ J kg⁻¹. Energy to turn " + fmtDisp(m) + " kg of ice at " + T0 + " °C into water at 0 °C?",
+          answer: ans, unitZh: "J", unitEn: "J",
+          solutionZh: "E₁ = mcΔT = (" + fmtDisp(m) + ")(2100)(" + dT + ") = " + fmtSci(E1) + " J\nE₂ = ℓΔm = (3.34×10⁵)(" + fmtDisp(m) + ") = " + fmtSci(E2) + " J\n總能量 = E₁ + E₂ = " + fmtSci(ans) + " J",
+          solutionEn: "E₁ = mcΔT = (" + fmtDisp(m) + ")(2100)(" + dT + ") = " + fmtSci(E1) + " J\nE₂ = ℓΔm = (3.34×10⁵)(" + fmtDisp(m) + ") = " + fmtSci(E2) + " J\nTotal = E₁ + E₂ = " + fmtSci(ans) + " J"
+        };
+      }
+    },
+    {
+      id: "L3_E2E3", formulaIds: ["E2", "E3"], formulaId: "E2", level: 3,
+      name: { zh: "半衰期與放射強度", en: "Half-life and activity" },
+      build: function () {
+        var tHalf = pick([60, 120, 300, 600, 1800, 3600]);
+        var N = randSf(1e8, 5e10, 2);
+        var k = LN2 / tHalf;
+        var ans = k * N;
+        return {
+          textZh: "某放射性核素的半衰期 t½ = " + tHalf + " s，未衰變原子核數目 N = " + fmtSci(N) + "。放射強度 A 是多少？",
+          textEn: "A radionuclide has half-life t½ = " + tHalf + " s and number of undecayed nuclei N = " + fmtSci(N) + ". Activity A?",
+          answer: ans, unitZh: "Bq", unitEn: "Bq",
+          solutionZh: "k = " + frac("ln2", "t½") + " = " + frac("0.693", String(tHalf)) + " = " + fmtSci(k) + " s⁻¹\nA = kN = (" + fmtSci(k) + ")(" + fmtSci(N) + ") = " + fmtSci(ans) + " Bq",
+          solutionEn: "k = " + frac("ln2", "t½") + " = " + frac("0.693", String(tHalf)) + " = " + fmtSci(k) + " s⁻¹\nA = kN = (" + fmtSci(k) + ")(" + fmtSci(N) + ") = " + fmtSci(ans) + " Bq"
+        };
+      }
+    },
+    {
+      id: "L3_D13D7", formulaIds: ["D13", "D7"], formulaId: "D13", level: 3,
+      name: { zh: "變壓器與功率", en: "Transformer and power" },
+      build: function () {
+        var Vp = pick([110, 220]);
+        var Np = pick([200, 400, 500, 1000]);
+        var Ns = pick([50, 100, 200, 250]);
+        var Ip = randDec(0.5, 4.0, 1);
+        var Vs = Vp * Ns / Np;
+        var Pp = Vp * Ip;
+        var ans = Pp / Vs; // Is from power equality
+        return {
+          textZh: "理想變壓器：原線圈 Vp = " + Vp + " V，Np = " + Np + " 匝，電流 Ip = " + fmtDisp(Ip) + " A；副線圈 Ns = " + Ns + " 匝。副線圈電流 Is 約多少？",
+          textEn: "Ideal transformer: Vp = " + Vp + " V, Np = " + Np + ", Ip = " + fmtDisp(Ip) + " A; Ns = " + Ns + ". Approximate secondary current Is?",
+          answer: ans, unitZh: "A", unitEn: "A",
+          solutionZh: frac("Vs", "Vp") + " ≈ " + frac("Ns", "Np") + " ⇒ Vs ≈ " + frac("(" + Vp + ")(" + Ns + ")", "(" + Np + ")") + " = " + fmtSci(Vs) + " V\n理想：Vp Ip = Vs Is；P = IV ⇒ Is = " + frac("Vp Ip", "Vs") + " = " + frac("(" + Vp + ")(" + esc(fmtDisp(Ip)) + ")", "(" + esc(fmtSci(Vs)) + ")") + " = " + fmtSci(ans) + " A",
+          solutionEn: frac("Vs", "Vp") + " ≈ " + frac("Ns", "Np") + " ⇒ Vs ≈ " + frac("(" + Vp + ")(" + Ns + ")", "(" + Np + ")") + " = " + fmtSci(Vs) + " V\nIdeal: Vp Ip = Vs Is; P = IV ⇒ Is = " + frac("Vp Ip", "Vs") + " = " + frac("(" + Vp + ")(" + esc(fmtDisp(Ip)) + ")", "(" + esc(fmtSci(Vs)) + ")") + " = " + fmtSci(ans) + " A"
+        };
+      }
+    },
+    {
+      id: "L3_D7D9", formulaIds: ["D7", "D9"], formulaId: "D7", level: 3,
+      name: { zh: "功率與磁場力", en: "Power and magnetic force" },
+      build: function () {
+        var V = pick([6, 12, 24]), P = pick([12, 24, 36, 48]);
+        var I = P / V;
+        var B = randDec(0.10, 0.50, 2), L = randDec(0.10, 0.50, 2);
+        var ans = B * I * L;
+        return {
+          textZh: "一導體接在電勢差 V = " + V + " V 的電源上，消耗功率 P = " + P + " W。導體長 ℓ = " + fmtDisp(L) + " m，置於垂直磁場 B = " + fmtDisp(B) + " T 中（sinθ = 1）。磁場作用力大小是多少？",
+          textEn: "A conductor across V = " + V + " V dissipates power P = " + P + " W. Length ℓ = " + fmtDisp(L) + " m in perpendicular field B = " + fmtDisp(B) + " T (sinθ = 1). Magnetic force magnitude?",
+          answer: ans, unitZh: "N", unitEn: "N",
+          solutionZh: "P = IV ⇒ I = " + frac("P", "V") + " = " + frac(String(P), String(V)) + " = " + fmtDisp(I) + " A\nF = BIl sinθ = (" + fmtDisp(B) + ")(" + fmtDisp(I) + ")(" + fmtDisp(L) + ")(1) = " + fmtSci(ans) + " N",
+          solutionEn: "P = IV ⇒ I = " + frac("P", "V") + " = " + frac(String(P), String(V)) + " = " + fmtDisp(I) + " A\nF = BIl sinθ = (" + fmtDisp(B) + ")(" + fmtDisp(I) + ")(" + fmtDisp(L) + ")(1) = " + fmtSci(ans) + " N"
+        };
+      }
+    },
+    {
+      id: "L3_K3B4", formulaIds: ["K3", "B4"], formulaId: "K3", level: 3,
+      name: { zh: "勻加速與動能", en: "Acceleration and kinetic energy" },
+      build: function () {
+        var u = 0, a = randDec(1.0, 5.0, 1), s = randDec(5.0, 40.0, 1);
+        var m = randDec(0.5, 8.0, 1);
+        var v = Math.sqrt(u * u + 2 * a * s);
+        var ans = 0.5 * m * v * v;
+        return {
+          textZh: "質量 " + fmtDisp(m) + " kg 的物體由靜止開始，以加速度 a = " + fmtDisp(a) + " m s⁻² 沿直線移動位移 s = " + fmtDisp(s) + " m。此時動能是多少？",
+          textEn: "A " + fmtDisp(m) + " kg object starts from rest with acceleration a = " + fmtDisp(a) + " m s⁻² over displacement s = " + fmtDisp(s) + " m. Kinetic energy then?",
+          answer: ans, unitZh: "J", unitEn: "J",
+          solutionZh: "v² = u² + 2as = 0 + 2(" + fmtDisp(a) + ")(" + fmtDisp(s) + ") ⇒ v = " + fmtSci(v) + " m s⁻¹\nKE = ½mv² = ½(" + fmtDisp(m) + ")(" + fmtSci(v) + ")² = " + fmtSci(ans) + " J",
+          solutionEn: "v² = u² + 2as = 0 + 2(" + fmtDisp(a) + ")(" + fmtDisp(s) + ") ⇒ v = " + fmtSci(v) + " m s⁻¹\nKE = ½mv² = ½(" + fmtDisp(m) + ")(" + fmtSci(v) + ")² = " + fmtSci(ans) + " J"
+        };
+      }
+    },
+    {
+      id: "L3_D5D7", formulaIds: ["D5", "D7"], formulaId: "D5", level: 3,
+      name: { zh: "串聯電阻與功率", en: "Series resistors and power" },
+      build: function () {
+        var r1 = pick(PREF_R), r2 = pick(PREF_R);
+        var I = randDec(0.2, 2.0, 1);
+        var R = r1 + r2;
+        var ans = I * I * R;
+        return {
+          textZh: "兩電阻器串聯：R₁ = " + r1 + " Ω，R₂ = " + r2 + " Ω，電流 I = " + fmtDisp(I) + " A。電路總功率是多少？",
+          textEn: "Two resistors in series: R₁ = " + r1 + " Ω, R₂ = " + r2 + " Ω, current I = " + fmtDisp(I) + " A. Total power in the circuit?",
+          answer: ans, unitZh: "W", unitEn: "W",
+          solutionZh: "R = R₁ + R₂ = " + r1 + " + " + r2 + " = " + R + " Ω\nP = I²R = (" + fmtDisp(I) + ")²(" + R + ") = " + fmtSci(ans) + " W",
+          solutionEn: "R = R₁ + R₂ = " + r1 + " + " + r2 + " = " + R + " Ω\nP = I²R = (" + fmtDisp(I) + ")²(" + R + ") = " + fmtSci(ans) + " W"
+        };
+      }
+    },
+    {
+      id: "L3_B4B5", formulaIds: ["B4", "B5"], formulaId: "B4", level: 3,
+      name: { zh: "動能與功率", en: "Kinetic energy and power" },
+      build: function () {
+        // Constant force accelerates from rest; after time... use F and v for P=Fv, and v from KE?
+        // Better: object of mass m moving at v; braking force F; instantaneous power of force = Fv; relate F via... 
+        // Simpler valid chain: given m,v → EK; given constant opposing force F, deceleration; but need B5.
+        // Use: car mass m at speed v; driving force F; find KE and mechanical power P=Fv (both asked? one answer)
+        // Ask for power: given m and v and F - that's only B5. Need two formulas.
+        // Ask: find speed from KE then P=Fv: given EK, m → v from EK=½mv², then P=Fv.
+        var m = randDec(2.0, 20.0, 1);
+        var EK = randInt(50, 500);
+        var F = randInt(20, 100);
+        var v = Math.sqrt(2 * EK / m);
+        var ans = F * v;
+        return {
+          textZh: "質量 " + fmtDisp(m) + " kg 的物體動能為 " + EK + " J。沿運動方向的力 F = " + F + " N。此時機械功率是多少？",
+          textEn: "A " + fmtDisp(m) + " kg object has kinetic energy " + EK + " J. A force F = " + F + " N acts along the motion. Mechanical power then?",
+          answer: ans, unitZh: "W", unitEn: "W",
+          solutionZh: "KE = ½mv² ⇒ v = " + sqrt(frac("2KE", "m")) + " = " + sqrt(frac("2×" + EK, esc(fmtDisp(m)))) + " = " + fmtSci(v) + " m s⁻¹\nP = Fv = (" + F + ")(" + fmtSci(v) + ") = " + fmtSci(ans) + " W",
+          solutionEn: "KE = ½mv² ⇒ v = " + sqrt(frac("2KE", "m")) + " = " + sqrt(frac("2×" + EK, esc(fmtDisp(m)))) + " = " + fmtSci(v) + " m s⁻¹\nP = Fv = (" + F + ")(" + fmtSci(v) + ") = " + fmtSci(ans) + " W"
+        };
+      }
+    }
+
+  ];
+
+
+    var state = {
+    lang: "zh",
+    level: 1,
+    tried: 0,
+    correct: 0,
+    streak: 0,
+    queue: [],
+    current: null,
+    submitted: false,
+    answerRaw: "",
+    hintShown: false,
+    recentFingerprints: []
+  };
+
+  var el = {
+    title: document.getElementById("title"),
+    subtitle: document.getElementById("subtitle"),
+    qTag: document.getElementById("qTag"),
+    qText: document.getElementById("qText"),
+    qAsk: document.getElementById("qAsk"),
+    hintBox: document.getElementById("hintBox"),
+    answerInput: document.getElementById("answerInput"),
+    unitHint: document.getElementById("unitHint"),
+    feedback: document.getElementById("feedback"),
+    btnClear: document.getElementById("btnClear"),
+    btnNew: document.getElementById("btnNew"),
+    btnSubmit: document.getElementById("btnSubmit"),
+    btnZh: document.getElementById("btnZh"),
+    btnEn: document.getElementById("btnEn"),
+    btnHint: document.getElementById("btnHint"),
+    btnL1: document.getElementById("btnL1"),
+    btnL2: document.getElementById("btnL2"),
+    btnL3: document.getElementById("btnL3"),
+    statTried: document.getElementById("statTried"),
+    statCorrect: document.getElementById("statCorrect"),
+    statStreak: document.getElementById("statStreak"),
+    lblTried: document.getElementById("lblTried"),
+    lblCorrect: document.getElementById("lblCorrect"),
+    lblStreak: document.getElementById("lblStreak")
+  };
+
+  function refillQueue() {
+    var idxs = [];
+    for (var i = 0; i < TEMPLATES.length; i++) {
+      if ((TEMPLATES[i].level || 1) === state.level) idxs.push(i);
+    }
+    state.queue = shuffle(idxs);
+  }
+
+  function nextQuestion() {
+    if (!state.queue.length) refillQueue();
+    var idx = state.queue.pop();
+    var tpl = TEMPLATES[idx];
+    var built = tpl.build();
+    var fp = tpl.id + "|" + roundSf(built.answer, 4);
+    var tries = 0;
+    while (state.recentFingerprints.indexOf(fp) >= 0 && tries < 2) {
+      built = tpl.build();
+      fp = tpl.id + "|" + roundSf(built.answer, 4);
+      tries++;
+    }
+    state.recentFingerprints.push(fp);
+    if (state.recentFingerprints.length > 15) state.recentFingerprints.shift();
+    state.current = {
+      tpl: tpl,
+      built: built,
+      formulaOptions: null,
+      formulaPickedId: null,
+      formulaPickCorrect: false,
+      formulaWrongIds: []
+    };
+    state.submitted = false;
+    state.answerRaw = "";
+    state.hintShown = false;
+    el.answerInput.value = "";
+    el.answerInput.disabled = false;
+    el.feedback.className = "feedback";
+    el.feedback.innerHTML = "";
+    el.btnSubmit.disabled = false;
+    setNewEmphasis(false);
+    el.hintBox.className = "hint-box";
+    el.hintBox.innerHTML = "";
+    renderAll();
+  }
+
+  function applyLangUI() {
+    var u = UI[state.lang];
+    el.title.textContent = u.title;
+    el.subtitle.textContent = u.subtitle;
+    el.qAsk.textContent = u.ask;
+    el.btnClear.textContent = u.clear;
+    el.btnNew.textContent = u.newQ;
+    el.btnSubmit.textContent = u.submit;
+    el.btnHint.textContent = state.hintShown ? u.hintShown : u.hint;
+    el.btnHint.classList.toggle("hint-used", state.hintShown);
+    el.lblTried.textContent = u.tried;
+    el.lblCorrect.textContent = u.correct;
+    el.lblStreak.textContent = u.streak;
+    el.btnZh.classList.toggle("active", state.lang === "zh");
+    el.btnEn.classList.toggle("active", state.lang === "en");
+    el.btnL1.textContent = u.level1;
+    el.btnL2.textContent = u.level2;
+    el.btnL3.textContent = u.level3;
+    el.btnL1.classList.toggle("active", state.level === 1);
+    el.btnL2.classList.toggle("active", state.level === 2);
+    el.btnL3.classList.toggle("active", state.level === 3);
+    document.documentElement.lang = state.lang === "zh" ? "zh-Hant" : "en";
+    updateHintPanel();
+  }
+
+  function ensureFormulaOptions() {
+    if (!state.current) return;
+    if (state.current.formulaOptions && state.current.formulaOptions.length) return;
+    var tpl = state.current.tpl;
+    state.current.formulaOptions = buildFormulaOptions(tpl.formulaId);
+  }
+
+  function updateHintPanel() {
+    var u = UI[state.lang];
+    if (!state.current || !state.hintShown) {
+      el.hintBox.className = "hint-box";
+      el.hintBox.innerHTML = "";
+      return;
+    }
+    ensureFormulaOptions();
+    var cur = state.current;
+    var tpl = cur.tpl;
+    var opts = cur.formulaOptions || [];
+    var correctSet = correctFormulaIds(tpl);
+    var locked = !!cur.formulaPickCorrect;
+    var html = "<span class='hint-prompt'>" + u.hintLabel + "</span><div class='formula-opts'>";
+    for (var i = 0; i < opts.length; i++) {
+      var o = opts[i];
+      var cls = "fopt";
+      var isCorrectOpt = correctSet.indexOf(o.id) >= 0;
+      var wasWrong = cur.formulaWrongIds.indexOf(o.id) >= 0;
+      if (locked && isCorrectOpt) cls += " ok selected";
+      else if (wasWrong) cls += " bad";
+      if (locked) cls += " locked";
+      var dis = locked || wasWrong ? " disabled" : "";
+      html += "<button type='button' class='" + cls + "' data-fid='" + o.id + "'" + dis + ">" + o.display + "</button>";
+    }
+    html += "</div>";
+    if (locked) {
+      var displays = [];
+      for (var j = 0; j < correctSet.length; j++) {
+        var ff = FORMULA_MAP[correctSet[j]];
+        if (ff) displays.push(ff.display);
+      }
+      var name = tpl.name[state.lang];
+      html += "<div class='hint-confirm'><span class='hint-k'>" + u.hintConfirm + "</span>" +
+        "<span class='hint-f'>" + displays.join("；") + "</span> — " + name +
+        " <span class='hint-k'>" + u.formulaPickOk + "</span></div>";
+    }
+    el.hintBox.className = "hint-box show";
+    el.hintBox.innerHTML = html;
+  }
+
+  function onFormulaPick(fid) {
+    if (!state.current || !state.hintShown || state.current.formulaPickCorrect) return;
+    var cur = state.current;
+    var correctSet = correctFormulaIds(cur.tpl);
+    if (correctSet.indexOf(fid) >= 0) {
+      cur.formulaPickedId = fid;
+      cur.formulaPickCorrect = true;
+    } else {
+      if (cur.formulaWrongIds.indexOf(fid) < 0) cur.formulaWrongIds.push(fid);
+      cur.formulaPickedId = fid;
+    }
+    updateHintPanel();
+  }
+
+  function showHint() {
+    if (!state.current) return;
+    state.hintShown = true;
+    ensureFormulaOptions();
+    var u = UI[state.lang];
+    el.btnHint.textContent = u.hintShown;
+    el.btnHint.classList.add("hint-used");
+    updateHintPanel();
+  }
+
+  function renderQuestion() {
+    if (!state.current) return;
+    var c = state.current;
+    var u = UI[state.lang];
+    var lvlLabel = state.lang === "zh" ? (u.levelPrefix + state.level) : (u.levelPrefix + " " + state.level);
+    var topic = c.tpl.name[state.lang];
+    el.qTag.textContent = lvlLabel + " · " + topic;
+    el.qText.textContent = state.lang === "zh" ? c.built.textZh : c.built.textEn;
+    var unit = state.lang === "zh" ? c.built.unitZh : c.built.unitEn;
+    el.unitHint.textContent = u.unitPrefix + unit;
+    updateHintPanel();
+  }
+
+  function renderStats() {
+    el.statTried.textContent = String(state.tried);
+    el.statCorrect.textContent = String(state.correct);
+    el.statStreak.textContent = String(state.streak);
+  }
+
+  function renderAll() {
+    applyLangUI();
+    renderQuestion();
+    renderStats();
+  }
+
+  function setAnswer(s) {
+    state.answerRaw = s;
+    el.answerInput.value = s;
+  }
+
+  function appendKey(k) {
+    if (state.submitted) return;
+    var cur = state.answerRaw || "";
+    if (k === "BS") {
+      setAnswer(cur.slice(0, -1));
+      return;
+    }
+    if (k === "C") {
+      setAnswer("");
+      return;
+    }
+    if (k === "EE") {
+      if (/e/i.test(cur) || /×10\^/.test(cur)) return;
+      if (!cur || cur === "-" || cur === ".") return;
+      setAnswer(cur + "×10^");
+      return;
+    }
+    if (k === "-") {
+      if (cur.indexOf("×10^") >= 0) {
+        var parts = cur.split("×10^");
+        if (parts[1] === "") setAnswer(parts[0] + "×10^-");
+        return;
+      }
+      if (cur === "") setAnswer("-");
+      return;
+    }
+    if (k === ".") {
+      if (cur.indexOf("×10^") >= 0) {
+        var p2 = cur.split("×10^")[1] || "";
+        if (p2.indexOf(".") >= 0) return;
+        setAnswer(cur + ".");
+        return;
+      }
+      if (cur.indexOf(".") >= 0) return;
+      setAnswer((cur || "0") + ".");
+      return;
+    }
+    setAnswer(cur + k);
+  }
+
+  function submit() {
+    if (!state.current || state.submitted) return;
+    var built = state.current.built;
+    var user = parseAnswer(state.answerRaw || el.answerInput.value);
+    var ok = answersMatch(user, built.answer);
+    state.submitted = true;
+    state.tried += 1;
+    if (ok) {
+      state.correct += 1;
+      state.streak += 1;
+    } else {
+      state.streak = 0;
+    }
+    var u = UI[state.lang];
+    var unit = state.lang === "zh" ? built.unitZh : built.unitEn;
+    var sol = state.lang === "zh" ? built.solutionZh : built.solutionEn;
+    el.feedback.className = "feedback show " + (ok ? "ok" : "bad");
+    el.feedback.innerHTML =
+      "<div class='fb-title'>" + (ok ? u.ok : u.bad) + "</div>" +
+      "<div class='fb-body'>" + u.ansLabel + "</div>" +
+      "<div class='fb-ans'>" + fmtSci(built.answer) + " " + unit + "</div>" +
+      "<div class='fb-sol'><strong>" + u.solLabel + "</strong><br>" + String(sol).replace(/\n/g, "<br>") + "</div>";
+    el.answerInput.disabled = true;
+    el.btnSubmit.disabled = true;
+    setNewEmphasis(true);
+    if (ok) celebrateCorrect();
+    renderQuestion();
+    renderStats();
+  }
+
+  function setNewEmphasis(on) {
+    if (on) {
+      el.btnNew.classList.add("btn-new-glow");
+      el.btnNew.classList.remove("btn-secondary");
+    } else {
+      el.btnNew.classList.remove("btn-new-glow");
+      if (!el.btnNew.classList.contains("btn-secondary")) el.btnNew.classList.add("btn-secondary");
+    }
+  }
+
+  function celebrateCorrect() {
+    var layer = document.createElement("div");
+    layer.className = "celebrate-layer";
+    var msgsZh = ["做得好！", "太棒了！", "繼續加油！", "正確！👍"];
+    var msgsEn = ["Well done!", "Great!", "Keep going!", "Correct! 👍"];
+    var msgs = state.lang === "zh" ? msgsZh : msgsEn;
+    var burst = document.createElement("div");
+    burst.className = "celebrate-burst";
+    burst.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+    layer.appendChild(burst);
+    var colors = ["#57c5b6", "#1a5f7a", "#2d9a6a", "#f4a261", "#e9c46a", "#e76f51"];
+    for (var i = 0; i < 28; i++) {
+      var c = document.createElement("span");
+      c.className = "confetti";
+      c.style.left = (Math.random() * 100) + "%";
+      c.style.background = colors[i % colors.length];
+      c.style.animationDuration = (1.4 + Math.random() * 1.4) + "s";
+      c.style.animationDelay = (Math.random() * 0.35) + "s";
+      c.style.transform = "rotate(" + (Math.random() * 360) + "deg)";
+      layer.appendChild(c);
+    }
+    document.body.appendChild(layer);
+    setTimeout(function () {
+      if (layer.parentNode) layer.parentNode.removeChild(layer);
+    }, 2800);
+  }
+
+  document.getElementById("keypad").addEventListener("click", function (e) {
+    var t = e.target.closest("[data-k]");
+    if (!t) return;
+    appendKey(t.getAttribute("data-k"));
+  });
+
+  el.answerInput.addEventListener("input", function () {
+    if (state.submitted) return;
+    state.answerRaw = el.answerInput.value;
+  });
+
+  el.btnClear.addEventListener("click", function () {
+    if (state.submitted) return;
+    setAnswer("");
+    el.answerInput.focus();
+  });
+  el.btnNew.addEventListener("click", function () { nextQuestion(); });
+  el.btnSubmit.addEventListener("click", submit);
+
+  el.btnHint.addEventListener("click", function () { showHint(); });
+
+  el.hintBox.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-fid]");
+    if (!t || t.disabled) return;
+    onFormulaPick(t.getAttribute("data-fid"));
+  });
+
+  el.btnZh.addEventListener("click", function () {
+    state.lang = "zh";
+    renderAll();
+  });
+  el.btnEn.addEventListener("click", function () {
+    state.lang = "en";
+    renderAll();
+  });
+
+  function setLevel(lv) {
+    if (state.level === lv) return;
+    state.level = lv;
+    state.queue = [];
+    state.recentFingerprints = [];
+    refillQueue();
+    nextQuestion();
+  }
+  el.btnL1.addEventListener("click", function () { setLevel(1); });
+  el.btnL2.addEventListener("click", function () { setLevel(2); });
+  el.btnL3.addEventListener("click", function () { setLevel(3); });
+
+  el.answerInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      submit();
+    }
+  });
+
+  refillQueue();
+  nextQuestion();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>指數定律</title>
+<style>
+  :root {
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --primary: #1a5f7a;
+    --primary-dark: #0d3d4f;
+    --accent: #57c5b6;
+    --accent-soft: #e8f7f5;
+    --ok: #2d9a6a;
+    --ok-bg: #e6f7ef;
+    --bad: #c0392b;
+    --bad-bg: #fdecea;
+    --hint: #5b6b7a;
+    --border: #d0dbe6;
+    --chip: #1a5f7a;
+    --chip-bg: #e3eef3;
+    --slot: #f7fafc;
+    --shadow: 0 2px 10px rgba(26, 95, 122, 0.08);
+    --radius: 12px;
+    --font: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Heiti TC", sans-serif;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: linear-gradient(160deg, #e8f1f5 0%, #f5f0e8 100%);
+    color: #1a2a33;
+    min-height: 100vh;
+    min-height: 100dvh;
+    line-height: 1.4;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 10px 12px calc(72px + var(--safe-bottom));
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 10px;
+    padding: 6px 4px 2px;
+  }
+
+  header h1 {
+    font-size: 1.25rem;
+    color: var(--primary-dark);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .card-levels { padding: 8px; }
+  .card-stats { padding: 10px 12px; }
+
+  /* Difficulty */
+  .level-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .level-btn {
+    flex: 1;
+    min-height: 44px;
+    border: 2px solid var(--border);
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s ease;
+    text-align: center;
+  }
+
+  .level-btn:hover { border-color: var(--accent); }
+
+  .level-btn.active {
+    border-color: var(--primary);
+    background: var(--accent-soft);
+    box-shadow: inset 0 0 0 1px var(--primary);
+  }
+
+  .level-btn .lv {
+    font-weight: 700;
+    color: var(--primary-dark);
+    font-size: 0.95rem;
+  }
+
+  /* Question */
+  .q-box {
+    background: linear-gradient(135deg, #f7fbfd, #eef6f4);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 12px 10px;
+    text-align: center;
+    min-height: 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    overflow-x: auto;
+  }
+
+  .q-prompt {
+    font-size: 0.78rem;
+    color: var(--hint);
+  }
+
+  .q-expr {
+    font-size: clamp(1.15rem, 5.5vw, 1.55rem);
+    font-weight: 600;
+    color: var(--primary-dark);
+    font-family: "Times New Roman", "Noto Serif TC", serif;
+    letter-spacing: 0.02em;
+    line-height: 1.45;
+    word-break: break-word;
+    max-width: 100%;
+  }
+
+  .q-expr .frac,
+  .feedback .frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 2px;
+  }
+
+  .q-expr .frac .num,
+  .q-expr .frac .den,
+  .feedback .frac .num,
+  .feedback .frac .den {
+    padding: 1px 6px;
+  }
+
+  .q-expr .frac .bar,
+  .feedback .frac .bar {
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    margin: 1px 0;
+  }
+
+  .q-meta {
+    font-size: 0.7rem;
+    color: #8a9aa8;
+  }
+
+  /* Answer builder */
+  .answer-canvas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 8px;
+    background: var(--slot);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    min-height: 100px;
+  }
+
+  .answer-canvas .frac-label {
+    font-size: 0.68rem;
+    color: #8a9aa8;
+    font-weight: 600;
+  }
+
+  .drop-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    min-height: 52px;
+    width: 100%;
+    padding: 8px;
+    border-radius: 10px;
+    border: 2px dashed #c5d4e0;
+    background: #fff;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .drop-row.drag-over {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .drop-row.empty::after {
+    content: attr(data-placeholder);
+    color: #aab8c4;
+    font-size: 0.8rem;
+  }
+
+  .frac-bar {
+    width: min(260px, 85%);
+    height: 3px;
+    background: var(--primary-dark);
+    border-radius: 2px;
+    margin: 2px 0;
+  }
+
+  /* Chips */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: var(--chip-bg);
+    color: var(--chip);
+    font-family: "Times New Roman", "Noto Serif TC", serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    border: 1.5px solid #b8d0dc;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .chip:active, .chip.dragging {
+    cursor: grabbing;
+    transform: scale(1.06);
+    box-shadow: 0 4px 14px rgba(26, 95, 122, 0.25);
+    opacity: 0.95;
+    z-index: 50;
+  }
+
+  .chip.in-slot {
+    background: #fff;
+    border-color: var(--primary);
+  }
+
+  .chip.selected {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+    background: #fff8e6;
+  }
+
+  .chip.one-chip {
+    font-family: var(--font);
+    font-size: 1rem;
+  }
+
+  .pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    min-height: 52px;
+    padding: 8px;
+    background: #fafbfc;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .pool-label {
+    width: 100%;
+    text-align: center;
+    font-size: 0.7rem;
+    color: #8a9aa8;
+  }
+
+  /* Sticky action bar (phone) */
+  .actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    position: sticky;
+    bottom: calc(8px + var(--safe-bottom));
+    z-index: 40;
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 8px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 -2px 12px rgba(26, 95, 122, 0.1);
+  }
+
+  .btn {
+    flex: 1;
+    min-height: 48px;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.15s, opacity 0.15s;
+  }
+
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+
+  .btn-secondary {
+    background: #fff;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+  }
+  .btn-secondary:hover:not(:disabled) { background: var(--accent-soft); }
+
+  .btn-ghost {
+    background: #eef2f5;
+    color: var(--hint);
+    flex: 0.7;
+  }
+
+  /* Feedback */
+  .feedback {
+    display: none;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-top: 10px;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .feedback.show { display: block; }
+
+  .feedback.ok {
+    background: var(--ok-bg);
+    border: 1px solid #a8dfc0;
+    color: #1e6b45;
+  }
+
+  .feedback.bad {
+    background: var(--bad-bg);
+    border: 1px solid #f0b8b2;
+    color: #8b2e24;
+  }
+
+  .feedback .fb-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 2px;
+  }
+
+  .feedback .fb-body {
+    font-size: 0.85rem;
+  }
+
+  .feedback .fb-ans {
+    margin-top: 6px;
+    padding: 6px 8px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 8px;
+    font-family: "Times New Roman", "Noto Serif TC", serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .feedback .fb-hint {
+    margin-top: 4px;
+    font-size: 0.78rem;
+    opacity: 0.9;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Stats */
+  .stats {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    gap: 6px;
+  }
+
+  .stat .n {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+  }
+
+  .stat .l {
+    font-size: 0.68rem;
+    color: var(--hint);
+  }
+
+  .drag-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+
+  .sup { font-size: 0.65em; vertical-align: super; line-height: 0; }
+
+  /* ---- Mobile ≤600px ---- */
+  @media (max-width: 600px) {
+    .wrap { padding: 8px 10px calc(76px + var(--safe-bottom)); }
+    .card { padding: 10px; margin-bottom: 8px; }
+    .card-levels { padding: 6px; }
+    header { margin-bottom: 6px; padding: 4px 0 0; }
+    header h1 { font-size: 1.15rem; }
+    .q-box { padding: 10px 8px; min-height: 64px; }
+    .q-expr { font-size: clamp(1.1rem, 6vw, 1.4rem); }
+    .q-meta { display: none; }
+    .drop-row { min-height: 56px; }
+    .chip { min-height: 46px; padding: 8px 12px; font-size: 1.12rem; }
+    .actions {
+      position: fixed;
+      left: 10px;
+      right: 10px;
+      bottom: calc(6px + var(--safe-bottom));
+      margin-top: 0;
+    }
+    .card-answer { padding-bottom: 4px; }
+  }
+
+  /* ---- Narrow ≤400px ---- */
+  @media (max-width: 400px) {
+    .wrap { padding: 6px 8px calc(74px + var(--safe-bottom)); }
+    .card { padding: 8px; border-radius: 10px; }
+    header h1 { font-size: 1.05rem; }
+    .level-btn { padding: 8px 4px; min-height: 42px; }
+    .level-btn .lv { font-size: 0.88rem; }
+    .q-prompt { font-size: 0.72rem; }
+    .q-expr { font-size: clamp(1.05rem, 5.8vw, 1.3rem); }
+    .chip { min-height: 44px; padding: 6px 10px; font-size: 1.05rem; gap: 0; }
+    .btn { min-height: 46px; font-size: 0.9rem; padding: 10px 6px; }
+    .pool { gap: 6px; padding: 6px; }
+    .drop-row { gap: 6px; padding: 6px; }
+  }
+
+  /* Desktop: sticky bar not fixed */
+  @media (min-width: 601px) {
+    .wrap { padding: 16px 14px 32px; }
+    .card { padding: 14px 16px; margin-bottom: 12px; }
+    header { margin-bottom: 14px; padding: 12px 8px 4px; }
+    header h1 { font-size: 1.5rem; }
+    .actions {
+      position: sticky;
+      bottom: 12px;
+    }
+    .q-meta { display: block; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>指數定律</h1>
+  </header>
+
+  <section class="card card-levels">
+    <div class="level-row">
+      <button type="button" class="level-btn active" data-level="1" id="btnL1">
+        <div class="lv">程度1</div>
+      </button>
+      <button type="button" class="level-btn" data-level="2" id="btnL2">
+        <div class="lv">程度2</div>
+      </button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="q-box">
+      <div class="q-prompt">化簡（正指數）：</div>
+      <div class="q-expr" id="questionExpr">—</div>
+      <div class="q-meta" id="questionMeta"></div>
+    </div>
+  </section>
+
+  <section class="card card-answer">
+    <div class="answer-canvas" id="answerCanvas">
+      <div class="frac-label">分子</div>
+      <div class="drop-row empty" id="numZone" data-placeholder="分子"></div>
+      <div class="frac-bar"></div>
+      <div class="frac-label">分母</div>
+      <div class="drop-row empty" id="denZone" data-placeholder="分母（可空）"></div>
+    </div>
+
+    <div class="pool" id="chipPool">
+      <div class="pool-label">籌碼</div>
+    </div>
+
+    <div class="actions" id="actionBar">
+      <button type="button" class="btn btn-ghost" id="btnClear">清除</button>
+      <button type="button" class="btn btn-secondary" id="btnNew">新題</button>
+      <button type="button" class="btn btn-primary" id="btnSubmit">提交</button>
+    </div>
+
+    <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+  </section>
+
+  <section class="card card-stats">
+    <div class="stats">
+      <div class="stat"><div class="n" id="statTried">0</div><div class="l">作答</div></div>
+      <div class="stat"><div class="n" id="statCorrect">0</div><div class="l">答對</div></div>
+      <div class="stat"><div class="n" id="statStreak">0</div><div class="l">連對</div></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Utilities ----------
+  function randInt(a, b) {
+    return a + Math.floor(Math.random() * (b - a + 1));
+  }
+
+  function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function gcd(a, b) {
+    a = Math.abs(a); b = Math.abs(b);
+    while (b) { var t = b; b = a % b; a = t; }
+    return a || 1;
+  }
+
+  /** Variable pairs for questions (never mix across a single question) */
+  var BASE_PAIRS = [
+    ["x", "y"],
+    ["m", "n"],
+    ["a", "b"]
+  ];
+
+  function pickBases() {
+    return pick(BASE_PAIRS).slice();
+  }
+
+  /** Superscript digits for chip labels */
+  var SUP = {
+    "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴",
+    "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹",
+    "-": "⁻"
+  };
+
+  function toSup(n) {
+    var s = String(n), out = "";
+    for (var i = 0; i < s.length; i++) out += SUP[s[i]] || s[i];
+    return out;
+  }
+
+  function powerLabel(base, exp) {
+    if (exp === 1) return base;
+    return base + toSup(exp);
+  }
+
+  function htmlPower(base, exp) {
+    if (exp === 1) return base;
+    return base + "<sup>" + exp + "</sup>";
+  }
+
+  /** Render a monomial fraction with positive indices (HTML) for bases b1, b2 */
+  function renderPositiveForm(e1, e2, b1, b2) {
+    var num = [], den = [];
+    if (e1 > 0) num.push(htmlPower(b1, e1));
+    if (e1 < 0) den.push(htmlPower(b1, -e1));
+    if (e2 > 0) num.push(htmlPower(b2, e2));
+    if (e2 < 0) den.push(htmlPower(b2, -e2));
+
+    if (num.length === 0 && den.length === 0) return "1";
+    if (den.length === 0) return num.join("");
+    if (num.length === 0) {
+      return '<span class="frac"><span class="num">1</span><span class="bar"></span><span class="den">' +
+        den.join("") + "</span></span>";
+    }
+    return '<span class="frac"><span class="num">' + num.join("") +
+      '</span><span class="bar"></span><span class="den">' + den.join("") + "</span></span>";
+  }
+
+  function renderPlainPositive(e1, e2, b1, b2) {
+    return renderPositiveForm(e1, e2, b1, b2);
+  }
+
+  // ---------- Question generators ----------
+  // Each returns { html, xe, ye, b1, b2, hint, meta }
+  // xe / ye = exponents of b1 / b2 (names kept for minimal churn)
+
+  function genLevel1(b1, b2) {
+    var t = pick([1, 2, 3, 4, 5, 6]);
+    var a, b, c, xe, ye, html, hint, meta;
+
+    if (t === 1) {
+      // (b1^a)^b
+      a = randInt(-4, 4); if (a === 0) a = 2;
+      b = randInt(2, 4);
+      xe = a * b; ye = 0;
+      html = "(" + htmlPower(b1, a) + ")<sup>" + b + "</sup>";
+      hint = "冪之冪：(" + b1 + "<sup>m</sup>)<sup>n</sup> = " + b1 + "<sup>mn</sup>";
+      meta = "冪之冪";
+    } else if (t === 2) {
+      // b1^a × b1^b
+      a = randInt(-5, 5); if (a === 0) a = 3;
+      b = randInt(-5, 5); if (b === 0 || b === -a) b = 2;
+      xe = a + b; ye = 0;
+      html = htmlPower(b1, a) + " × " + htmlPower(b1, b);
+      hint = "乘法則：" + b1 + "<sup>m</sup> × " + b1 + "<sup>n</sup> = " + b1 + "<sup>m+n</sup>";
+      meta = "同底相乘";
+    } else if (t === 3) {
+      // b1^a over b1^b as stacked fraction
+      a = randInt(-4, 6); if (a === 0) a = 5;
+      b = randInt(-3, 5); if (b === 0) b = 2;
+      xe = a - b; ye = 0;
+      html = '<span class="frac"><span class="num">' + htmlPower(b1, a) +
+        '</span><span class="bar"></span><span class="den">' + htmlPower(b1, b) +
+        "</span></span>";
+      hint = "除法則：寫成" +
+        '<span class="frac"><span class="num">' + b1 + '<sup>m</sup></span><span class="bar"></span><span class="den">' + b1 + '<sup>n</sup></span></span>' +
+        " = " + b1 + "<sup>m−n</sup>";
+      meta = "同底相除";
+    } else if (t === 4) {
+      // (b1^a b2^b)^c
+      a = randInt(-3, 3); if (a === 0) a = 2;
+      b = randInt(-3, 3); if (b === 0) b = -1;
+      c = randInt(2, 4);
+      xe = a * c; ye = b * c;
+      html = "(" + htmlPower(b1, a) + htmlPower(b2, b) + ")<sup>" + c + "</sup>";
+      hint = "冪之冪：(" + b1 + "<sup>m</sup> " + b2 + "<sup>n</sup>)<sup>p</sup> = " + b1 + "<sup>mp</sup> " + b2 + "<sup>np</sup>";
+      meta = "積的冪";
+    } else if (t === 5) {
+      // b1^a b2^b over b1^c b2^d
+      a = randInt(1, 5); b = randInt(-3, 4); if (b === 0) b = 2;
+      c = randInt(-2, 4); if (c === 0) c = 1;
+      var d = randInt(-3, 3); if (d === 0) d = -2;
+      xe = a - c; ye = b - d;
+      html = '<span class="frac"><span class="num">' + htmlPower(b1, a) + htmlPower(b2, b) +
+        '</span><span class="bar"></span><span class="den">' + htmlPower(b1, c) + htmlPower(b2, d) +
+        "</span></span>";
+      hint = "寫成分數後，將分子、分母同底的指數相減";
+      meta = "商的化簡";
+    } else {
+      // b1^(-a) b2^b → rewrite with positive indices
+      a = randInt(1, 4);
+      b = randInt(1, 4);
+      xe = -a; ye = b;
+      html = htmlPower(b1, -a) + htmlPower(b2, b);
+      hint = "負指數：" + b1 + "<sup>−m</sup> = " +
+        '<span class="frac"><span class="num">1</span><span class="bar"></span><span class="den">' + b1 + '<sup>m</sup></span></span>' +
+        "（m &gt; 0）";
+      meta = "負指數";
+    }
+
+    return { html: html, xe: xe, ye: ye, b1: b1, b2: b2, hint: hint, meta: meta };
+  }
+
+  function genLevel2(b1, b2) {
+    var t = pick([1, 2, 3, 4, 5, 6, 7, 8]);
+    var a, b, c, d, e, f, xe, ye, html, hint, meta;
+
+    if (t === 1) {
+      // b1^a b2^b / (b1^c b2)^e
+      a = randInt(8, 24);
+      b = randInt(4, 16);
+      c = randInt(2, 6);
+      e = randInt(2, 6);
+      xe = a - c * e;
+      ye = b - e;
+      html = '<span class="frac"><span class="num">' + htmlPower(b1, a) + htmlPower(b2, b) +
+        '</span><span class="bar"></span><span class="den">(' + htmlPower(b1, c) + b2 + ")<sup>" + e +
+        "</sup></span></span>";
+      hint = "先將分母的冪展開：(" + b1 + "<sup>c</sup> " + b2 + ")<sup>e</sup> = " + b1 + "<sup>ce</sup> " + b2 + "<sup>e</sup>，再同底相減。";
+      meta = "商×冪";
+    } else if (t === 2) {
+      // (b1 b2^b)^c / b2^d
+      b = randInt(-4, -1);
+      c = randInt(2, 4);
+      d = randInt(2, 5);
+      xe = c;
+      ye = b * c - d;
+      html = '<span class="frac"><span class="num">(' + b1 + htmlPower(b2, b) +
+        ')<sup>' + c + '</sup></span><span class="bar"></span><span class="den">' +
+        htmlPower(b2, d) + "</span></span>";
+      hint = "先展開分子的冪，再與分母同底指數相減。";
+      meta = "冪後除";
+    } else if (t === 3) {
+      // (b1^a b2^b)^c / (b1^d b2^e)
+      a = randInt(2, 8);
+      b = randInt(2, 8);
+      c = randInt(2, 4);
+      d = randInt(1, 6);
+      e = randInt(-6, 3); if (e === 0) e = -2;
+      xe = a * c - d;
+      ye = b * c - e;
+      html = '<span class="frac"><span class="num">(' + htmlPower(b1, a) + htmlPower(b2, b) +
+        ')<sup>' + c + '</sup></span><span class="bar"></span><span class="den">' +
+        htmlPower(b1, d) + htmlPower(b2, e) + "</span></span>";
+      hint = "先展開分子的冪，再寫成分數後同底指數相減。";
+      meta = "冪後除";
+    } else if (t === 4) {
+      // b1^a / (b1^b b2^c)^d
+      a = randInt(4, 12);
+      b = randInt(1, 4);
+      c = randInt(-8, -1);
+      d = randInt(2, 5);
+      xe = a - b * d;
+      ye = -c * d;
+      html = '<span class="frac"><span class="num">' + htmlPower(b1, a) +
+        '</span><span class="bar"></span><span class="den">(' + htmlPower(b1, b) + htmlPower(b2, c) +
+        ')<sup>' + d + "</sup></span></span>";
+      hint = "先將分母的冪展開，再同底相減；負指數改寫為分母正指數。";
+      meta = "分母冪";
+    } else if (t === 5) {
+      // (b1^a b2^b)^c / (b1^d)^e
+      a = randInt(2, 5);
+      b = randInt(-3, -1);
+      c = randInt(2, 4);
+      d = randInt(-4, -1);
+      e = randInt(2, 5);
+      xe = a * c - d * e;
+      ye = b * c;
+      html = '<span class="frac"><span class="num">(' + htmlPower(b1, a) + htmlPower(b2, b) +
+        ')<sup>' + c + '</sup></span><span class="bar"></span><span class="den">(' +
+        htmlPower(b1, d) + ')<sup>' + e + "</sup></span></span>";
+      hint = "分別展開分子、分母的冪，再合併同底。";
+      meta = "雙冪";
+    } else if (t === 6) {
+      // b1 b2^b / (b1^c b2^d)^e
+      b = randInt(3, 9);
+      c = randInt(-4, -1);
+      d = randInt(1, 4);
+      e = randInt(2, 5);
+      xe = 1 - c * e;
+      ye = b - d * e;
+      html = '<span class="frac"><span class="num">' + b1 + htmlPower(b2, b) +
+        '</span><span class="bar"></span><span class="den">(' + htmlPower(b1, c) + htmlPower(b2, d) +
+        ')<sup>' + e + "</sup></span></span>";
+      hint = "先將分母的冪展開，再與分子同底相減。";
+      meta = "商×冪";
+    } else if (t === 7) {
+      // (b1 b2^b)^c / b1^d
+      b = randInt(-4, -1);
+      c = randInt(2, 5);
+      d = randInt(-6, -1);
+      xe = c - d;
+      ye = b * c;
+      html = '<span class="frac"><span class="num">(' + b1 + htmlPower(b2, b) +
+        ')<sup>' + c + '</sup></span><span class="bar"></span><span class="den">' +
+        htmlPower(b1, d) + "</span></span>";
+      hint = "展開分子的冪後，與分母同底相減；負指數改為正指數分數。";
+      meta = "冪後除";
+    } else {
+      if (Math.random() < 0.5) {
+        a = randInt(2, 5);
+        b = randInt(-4, -1);
+        c = randInt(2, 4);
+        d = randInt(-6, -1);
+        e = randInt(2, 8);
+        xe = a * c - d;
+        ye = b * c - e;
+        html = '<span class="frac"><span class="num">(' + htmlPower(b1, a) + htmlPower(b2, b) +
+          ')<sup>' + c + '</sup></span><span class="bar"></span><span class="den">' +
+          htmlPower(b1, d) + htmlPower(b2, e) + "</span></span>";
+        hint = "先展開分子的冪，再與分母合併，最後以正指數表示。";
+        meta = "負指數";
+      } else {
+        // product: (b1 b2^b)(b1^c b2^d)^e
+        b = randInt(1, 4);
+        c = randInt(-3, -1);
+        d = randInt(1, 5);
+        e = randInt(2, 5);
+        xe = 1 + c * e;
+        ye = b + d * e;
+        html = "(" + b1 + htmlPower(b2, b) + ")(" + htmlPower(b1, c) + htmlPower(b2, d) +
+          ")<sup>" + e + "</sup>";
+        hint = "先展開第二個括號的冪，再與第一個因式同底相乘（指數相加）。";
+        meta = "積×冪";
+      }
+    }
+
+    if (Math.abs(xe) > 28 || Math.abs(ye) > 28 || (xe === 0 && ye === 0)) {
+      return genLevel2(b1, b2);
+    }
+
+    return { html: html, xe: xe, ye: ye, b1: b1, b2: b2, hint: hint, meta: meta };
+  }
+
+  // ---------- Chip generation ----------
+  function buildChipOptions(xe, ye, b1, b2) {
+    var need = [];
+    if (xe > 0) need.push({ base: b1, exp: xe });
+    if (xe < 0) need.push({ base: b1, exp: -xe });
+    if (ye > 0) need.push({ base: b2, exp: ye });
+    if (ye < 0) need.push({ base: b2, exp: -ye });
+    if (need.length === 0) need.push({ base: "1", exp: 1, isOne: true });
+
+    var opts = need.slice();
+    var bases = [b1, b2];
+    var tries = 0;
+    while (opts.length < 6 && tries < 40) {
+      tries++;
+      var base = pick(bases);
+      var exp = randInt(1, Math.max(8, Math.abs(xe) + 2, Math.abs(ye) + 2));
+      var dup = opts.some(function (o) { return o.base === base && o.exp === exp; });
+      if (!dup) opts.push({ base: base, exp: exp });
+    }
+
+    if (!need.some(function (o) { return o.isOne; }) && Math.random() < 0.35) {
+      opts.push({ base: "1", exp: 1, isOne: true });
+    }
+
+    for (var i = opts.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = opts[i]; opts[i] = opts[j]; opts[j] = tmp;
+    }
+    return opts;
+  }
+
+  // ---------- State ----------
+  var level = 1;
+  var current = null; // { xe, ye, b1, b2, hint, ... }
+  var submitted = false;
+  var stats = { tried: 0, correct: 0, streak: 0 };
+
+  var numZone = document.getElementById("numZone");
+  var denZone = document.getElementById("denZone");
+  var chipPool = document.getElementById("chipPool");
+  var feedback = document.getElementById("feedback");
+
+  // ---------- DOM chip helpers ----------
+  function createChip(opt) {
+    var el = document.createElement("div");
+    el.className = "chip" + (opt.isOne ? " one-chip" : "");
+    el.draggable = true;
+    el.dataset.base = opt.isOne ? "1" : opt.base;
+    el.dataset.exp = String(opt.isOne ? 0 : opt.exp);
+    el.dataset.isOne = opt.isOne ? "1" : "0";
+    el.textContent = opt.isOne ? "1" : powerLabel(opt.base, opt.exp);
+    el.setAttribute("aria-label", el.textContent);
+    bindChipDrag(el);
+    el.addEventListener("click", function (e) {
+      if (submitted) return;
+      if (el.classList.contains("dragging")) return;
+      e.stopPropagation();
+      if (selectedChip === el) {
+        el.classList.remove("selected");
+        selectedChip = null;
+        return;
+      }
+      if (selectedChip) selectedChip.classList.remove("selected");
+      selectedChip = el;
+      el.classList.add("selected");
+    });
+    return el;
+  }
+
+  function clearSelection() {
+    if (selectedChip) selectedChip.classList.remove("selected");
+    selectedChip = null;
+  }
+
+  function updateEmpty(zone) {
+    var has = zone.querySelector(".chip");
+    if (has) zone.classList.remove("empty");
+    else zone.classList.add("empty");
+  }
+
+  function clearZonesToPool() {
+    [numZone, denZone].forEach(function (z) {
+      Array.prototype.slice.call(z.querySelectorAll(".chip")).forEach(function (c) {
+        c.classList.remove("in-slot");
+        chipPool.appendChild(c);
+      });
+      updateEmpty(z);
+    });
+  }
+
+  // ---------- Drag and drop (mouse + touch) + tap-to-place ----------
+  var dragChip = null;
+  var touchGhost = null;
+  var selectedChip = null;
+  var touchMoved = false;
+
+  function bindChipDrag(el) {
+    el.addEventListener("dragstart", function (e) {
+      dragChip = el;
+      el.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      try { e.dataTransfer.setData("text/plain", el.textContent); } catch (err) {}
+    });
+    el.addEventListener("dragend", function () {
+      el.classList.remove("dragging");
+      dragChip = null;
+      [numZone, denZone, chipPool].forEach(function (z) { z.classList.remove("drag-over"); });
+    });
+
+    el.addEventListener("touchstart", function (e) {
+      if (submitted) return;
+      if (e.touches.length !== 1) return;
+      dragChip = el;
+      el.classList.add("dragging");
+      var t = e.touches[0];
+      touchGhost = el.cloneNode(true);
+      touchGhost.className = "chip drag-ghost";
+      touchGhost.style.left = t.clientX + "px";
+      touchGhost.style.top = t.clientY + "px";
+      document.body.appendChild(touchGhost);
+      e.preventDefault();
+    }, { passive: false });
+
+    el.addEventListener("touchmove", function (e) {
+      if (!dragChip || !touchGhost) return;
+      var t = e.touches[0];
+      touchGhost.style.left = t.clientX + "px";
+      touchGhost.style.top = t.clientY + "px";
+      var target = document.elementFromPoint(t.clientX, t.clientY);
+      [numZone, denZone, chipPool].forEach(function (z) { z.classList.remove("drag-over"); });
+      var zone = target && target.closest ? (target.closest("#numZone, #denZone, #chipPool") ||
+        (target.id === "numZone" || target.id === "denZone" || target.id === "chipPool" ? target : null)) : null;
+      if (zone) zone.classList.add("drag-over");
+      e.preventDefault();
+    }, { passive: false });
+
+    el.addEventListener("touchend", function (e) {
+      if (!dragChip) return;
+      var t = e.changedTouches[0];
+      var target = document.elementFromPoint(t.clientX, t.clientY);
+      var zone = null;
+      if (target) {
+        zone = target.closest("#numZone, #denZone, #chipPool");
+        if (!zone && (target.id === "numZone" || target.id === "denZone" || target.id === "chipPool")) zone = target;
+      }
+      if (zone) placeChip(dragChip, zone);
+      cleanupTouch();
+      e.preventDefault();
+    }, { passive: false });
+
+    el.addEventListener("touchcancel", cleanupTouch);
+  }
+
+  function cleanupTouch() {
+    if (dragChip) dragChip.classList.remove("dragging");
+    dragChip = null;
+    if (touchGhost) { touchGhost.remove(); touchGhost = null; }
+    [numZone, denZone, chipPool].forEach(function (z) { z.classList.remove("drag-over"); });
+  }
+
+  function placeChip(chip, zone) {
+    if (submitted) return;
+    if (zone === chipPool) {
+      chip.classList.remove("in-slot");
+      chipPool.appendChild(chip);
+    } else {
+      var base = chip.dataset.base;
+      if (base !== "1") {
+        Array.prototype.slice.call(zone.querySelectorAll(".chip")).forEach(function (c) {
+          if (c.dataset.base === base && c !== chip) {
+            c.classList.remove("in-slot");
+            chipPool.appendChild(c);
+          }
+        });
+      }
+      chip.classList.add("in-slot");
+      zone.appendChild(chip);
+    }
+    updateEmpty(numZone);
+    updateEmpty(denZone);
+    clearSelection();
+  }
+
+  function setupDropZone(zone) {
+    zone.addEventListener("dragover", function (e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      zone.classList.add("drag-over");
+    });
+    zone.addEventListener("dragleave", function () {
+      zone.classList.remove("drag-over");
+    });
+    zone.addEventListener("drop", function (e) {
+      e.preventDefault();
+      zone.classList.remove("drag-over");
+      if (dragChip) placeChip(dragChip, zone);
+    });
+    zone.addEventListener("click", function () {
+      if (submitted) return;
+      if (selectedChip) placeChip(selectedChip, zone);
+    });
+  }
+
+  setupDropZone(numZone);
+  setupDropZone(denZone);
+  setupDropZone(chipPool);
+
+  // ---------- Read student answer ----------
+  function readZoneExponents(zone) {
+    var e1 = 0, e2 = 0, hasOne = false, chips = 0;
+    var b1 = current.b1, b2 = current.b2;
+    Array.prototype.slice.call(zone.querySelectorAll(".chip")).forEach(function (c) {
+      chips++;
+      if (c.dataset.isOne === "1") { hasOne = true; return; }
+      var exp = parseInt(c.dataset.exp, 10);
+      if (c.dataset.base === b1) e1 += exp;
+      if (c.dataset.base === b2) e2 += exp;
+    });
+    return { xe: e1, ye: e2, hasOne: hasOne, chips: chips };
+  }
+
+  function getStudentAnswer() {
+    var n = readZoneExponents(numZone);
+    var d = readZoneExponents(denZone);
+
+    if (n.chips === 0 && d.chips === 0) return null;
+
+    var xe = n.xe - d.xe;
+    var ye = n.ye - d.ye;
+    return { xe: xe, ye: ye };
+  }
+
+  // ---------- New question / submit ----------
+  function newQuestion() {
+    submitted = false;
+    clearSelection();
+    feedback.className = "feedback";
+    feedback.innerHTML = "";
+    document.getElementById("btnSubmit").disabled = false;
+
+    var bases = pickBases();
+    var b1 = bases[0], b2 = bases[1];
+    current = level === 1 ? genLevel1(b1, b2) : genLevel2(b1, b2);
+    var guard = 0;
+    while (current.xe === 0 && current.ye === 0 && guard < 8) {
+      bases = pickBases();
+      b1 = bases[0]; b2 = bases[1];
+      current = level === 1 ? genLevel1(b1, b2) : genLevel2(b1, b2);
+      guard++;
+    }
+
+    document.getElementById("questionExpr").innerHTML = current.html;
+    document.getElementById("questionMeta").textContent = current.meta;
+
+    Array.prototype.slice.call(chipPool.querySelectorAll(".chip")).forEach(function (c) { c.remove(); });
+    clearZonesToPool();
+    [numZone, denZone].forEach(function (z) {
+      Array.prototype.slice.call(z.querySelectorAll(".chip")).forEach(function (c) { c.remove(); });
+      updateEmpty(z);
+    });
+
+    var opts = buildChipOptions(current.xe, current.ye, current.b1, current.b2);
+    opts.forEach(function (o) { chipPool.appendChild(createChip(o)); });
+  }
+
+  function submitAnswer() {
+    if (!current || submitted) return;
+    var ans = getStudentAnswer();
+    if (!ans) {
+      feedback.className = "feedback show bad";
+      feedback.innerHTML = '<div class="fb-title">未作答</div><div class="fb-body">請放入籌碼。</div>';
+      return;
+    }
+
+    submitted = true;
+    document.getElementById("btnSubmit").disabled = true;
+    stats.tried++;
+
+    var ok = ans.xe === current.xe && ans.ye === current.ye;
+    if (ok) {
+      stats.correct++;
+      stats.streak++;
+      feedback.className = "feedback show ok";
+      feedback.innerHTML =
+        '<div class="fb-title">✓ 正確</div>' +
+        '<div class="fb-ans">' + renderPositiveForm(current.xe, current.ye, current.b1, current.b2) + "</div>" +
+        '<div class="fb-hint">' + current.hint + "</div>";
+    } else {
+      stats.streak = 0;
+      feedback.className = "feedback show bad";
+      feedback.innerHTML =
+        '<div class="fb-title">✗ 錯</div>' +
+        '<div class="fb-body">你的：' +
+        renderPlainPositive(ans.xe, ans.ye, current.b1, current.b2) +
+        '</div>' +
+        '<div class="fb-ans">正解：' + renderPositiveForm(current.xe, current.ye, current.b1, current.b2) + "</div>" +
+        '<div class="fb-hint">' + current.hint + "</div>";
+    }
+    updateStats();
+  }
+
+  function updateStats() {
+    document.getElementById("statTried").textContent = stats.tried;
+    document.getElementById("statCorrect").textContent = stats.correct;
+    document.getElementById("statStreak").textContent = stats.streak;
+  }
+
+  // ---------- Events ----------
+  document.getElementById("btnL1").addEventListener("click", function () {
+    level = 1;
+    document.getElementById("btnL1").classList.add("active");
+    document.getElementById("btnL2").classList.remove("active");
+    newQuestion();
+  });
+  document.getElementById("btnL2").addEventListener("click", function () {
+    level = 2;
+    document.getElementById("btnL2").classList.add("active");
+    document.getElementById("btnL1").classList.remove("active");
+    newQuestion();
+  });
+  document.getElementById("btnNew").addEventListener("click", newQuestion);
+  document.getElementById("btnSubmit").addEventListener("click", submitAnswer);
+  document.getElementById("btnClear").addEventListener("click", function () {
+    if (submitted) return;
+    clearZonesToPool();
+    clearSelection();
+    feedback.className = "feedback";
+    feedback.innerHTML = "";
+  });
+
+  // Init
+  newQuestion();
+})();
+</script>
+</body>
+</html>
