@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>物理概念詞彙練習 · 曾sir</title>
+<title>物理概念詞彙練習</title>
 <meta name="robots" content="noindex" />
 <!-- 物理概念詞彙練習 · embedded KaTeX_Main fonts + offline math -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
@@ -196,7 +196,7 @@ main{max-width:980px;margin:0 auto;padding:20px 16px 48px}
   <div class="top">
     <div>
       <h1 id="title">物理概念詞彙練習</h1>
-      <div class="sub" id="subtitle">HKDSE Physics · 曾sir</div>
+      <div class="sub" id="subtitle">HKDSE Physics</div>
     </div>
     <button type="button" class="lang-toggle" id="langBtn" aria-label="Language">中 / EN</button>
   </div>
@@ -449,12 +449,12 @@ function natLabel(t, L){
   if (L==="zh" && t.type_note_zh) return t.type_note_zh;
   if (L!=="zh" && t.type_note_en) return t.type_note_en;
   if (t.type === "constant") return L==="zh" ? "常數" : "constant";
-  // 曾sir: 唔顯示標量／矢量
+  // 唔顯示標量／矢量
   return dash();
 }
 
 function byId(id){ return TERMS.find(t => t.id === id) || null; }
-/** 曾sir：動能／KE → Book2 力學；含「氣體分子」／molecular → Book1 */
+/** 動能／KE → Book2 力學；含「氣體分子」／molecular → Book1 */
 function preferKinetic(q, n){
   const raw = String(q || "");
   const low = raw.toLowerCase();
@@ -544,9 +544,9 @@ function renderTerm(t){
   const eq = formatEq(t.equation_tex);
   document.getElementById("p1-eq").innerHTML = (eq && eq !== "—") ? mathHTML(eq) : dash();
   document.getElementById("p2-eq").innerHTML = (eq && eq !== "—") ? mathHTML(eq) : dash();
-  // 曾sir: 英文邊唔出中文；單位可分中英
+  // 英文邊唔出中文；單位可分中英
   function unitText(side){
-    // 曾sir：永遠唔顯示「無因次／dimensionless／無量綱」→ 中「無」／英「none」
+    // 永遠唔顯示「無因次／dimensionless／無量綱」→ 中「無」／英「none」
     function sanitizeUnit(raw, en){
       if (raw == null) return "";
       let u = String(raw);
@@ -579,7 +579,7 @@ function renderTerm(t){
     if (k) k.style.display = empty ? "none" : "";
     if (v) v.style.display = empty ? "none" : "";
   });
-  // 曾sir: Part1 淨英文課題；Part2 淨中文課題
+  // Part1 淨英文課題；Part2 淨中文課題
   document.getElementById("p1-topic").textContent = (t.topic_en || "") + (t.book ? " · " + t.book + " Ch" + t.chapter : "");
   document.getElementById("p2-topic").textContent = (t.topic_zh || "") + (t.book ? " · " + t.book + " 第" + t.chapter + "章" : "");
 
@@ -824,7 +824,7 @@ function checkAnswers(){
 function applyLang(){
   const zh = lang === "zh";
   document.getElementById("title").textContent = zh ? "物理概念詞彙練習" : "Physics Concept Vocabulary";
-  document.getElementById("subtitle").textContent = zh ? "HKDSE Physics · 曾sir" : "HKDSE Physics · Sir Tsang";
+  document.getElementById("subtitle").textContent = "HKDSE Physics";
   document.getElementById("searchLabel").textContent = zh ? "輸入物理概念／詞彙（中或英）" : "Enter a physics concept / term (ZH or EN)";
   document.getElementById("q").placeholder = zh ? "例如：動能、電流、electric field…" : "e.g. kinetic energy, current, 電場…";
   const btnSC = document.getElementById("btnStudyCard");
@@ -883,7 +883,7 @@ document.getElementById("encourageModal").addEventListener("click", (e) => {
   if (e.target.id === "encourageModal") e.currentTarget.classList.remove("show");
 });
 
-// Demo seed for preview: momentum (曾sir gold UI) then KE / force
+// Demo seed for preview: momentum (gold UI) then KE / force
 (function seed(){
   applyLang();
   const prefer = TERMS.find(t => t.id === "momentum")
