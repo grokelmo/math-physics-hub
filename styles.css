@@ -11,6 +11,12 @@
   --t-wave:#0f7c8c; --t-wave-soft:#e1f4f6;
   --t-elec:#b7791f; --t-elec-soft:#fbf2df;
   --t-radio:#2f855a; --t-radio-soft:#e5f5ec;
+  --t-sim:#1767c2; --t-sim-soft:#e4effb;
+  --t-optics:#0891b2; --t-optics-soft:#e0f7fb;
+  --t-astro:#4338ca; --t-astro-soft:#eef2ff;
+  --t-atomic:#be185d; --t-atomic-soft:#fce7f3;
+  --t-energy:#b45309; --t-energy-soft:#ffedd5;
+  --t-medical:#0f766e; --t-medical-soft:#ccfbf1;
   --font-ui:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;
   --font-zh:"Noto Sans HK","PingFang HK","Microsoft JhengHei",sans-serif;
   color-scheme:light;
@@ -26,6 +32,12 @@
   --t-wave:#4fd0de; --t-wave-soft:#14343a;
   --t-elec:#f0c060; --t-elec-soft:#3a2f17;
   --t-radio:#6bd69b; --t-radio-soft:#16352a;
+  --t-sim:#5aa5f5; --t-sim-soft:#16304a;
+  --t-optics:#67e8f9; --t-optics-soft:#164e63;
+  --t-astro:#a5b4fc; --t-astro-soft:#312e81;
+  --t-atomic:#f9a8d4; --t-atomic-soft:#831843;
+  --t-energy:#fdba74; --t-energy-soft:#7c2d12;
+  --t-medical:#5eead4; --t-medical-soft:#134e4a;
   color-scheme:dark;
 }}
 *{box-sizing:border-box}
@@ -42,7 +54,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);f
 .topnav a{color:var(--ink);text-decoration:none;font-weight:600;padding:6px 2px;border-bottom:2px solid transparent}
 .topnav a:hover{color:var(--accent)}
 .topnav a[aria-current="page"]{color:var(--accent);border-bottom-color:var(--accent);pointer-events:none}
-.topnav .brand{font-family:var(--font-zh);margin-right:auto;color:var(--muted);font-weight:500;font-size:.82rem}
+.topnav a.brand{font-family:var(--font-zh);margin-right:8px;color:var(--muted);font-weight:500;font-size:.82rem;flex:0 1 auto;text-decoration:none;border-bottom:2px solid transparent}
+.topnav a.brand:hover{color:var(--accent)}
+.topnav a.brand[aria-current="page"]{color:var(--accent);border-bottom-color:var(--accent);pointer-events:none}
 
 /* hero */
 .hero{background:var(--surface);border-bottom:1px solid var(--line);position:relative;overflow:hidden}
@@ -112,8 +126,37 @@ footer .inner{padding-block:18px;display:flex;flex-wrap:wrap;gap:6px 18px;justif
 [data-topic="elec"]{--tc:var(--t-elec);--tcs:var(--t-elec-soft)}
 [data-topic="radio"]{--tc:var(--t-radio);--tcs:var(--t-radio-soft)}
 
+[data-topic="sim"]{--tc:var(--t-sim);--tcs:var(--t-sim-soft)}
+[data-topic="heat"]{--tc:var(--t-heat);--tcs:var(--t-heat-soft)}
+[data-topic="mech"]{--tc:var(--t-force);--tcs:var(--t-force-soft)}
+[data-topic="wave"]{--tc:var(--t-wave);--tcs:var(--t-wave-soft)}
+[data-topic="optics"]{--tc:var(--t-optics);--tcs:var(--t-optics-soft)}
+[data-topic="elec"]{--tc:var(--t-elec);--tcs:var(--t-elec-soft)}
+[data-topic="radio"]{--tc:var(--t-radio);--tcs:var(--t-radio-soft)}
+[data-topic="astro"]{--tc:var(--t-astro);--tcs:var(--t-astro-soft)}
+[data-topic="atomic"]{--tc:var(--t-atomic);--tcs:var(--t-atomic-soft)}
+[data-topic="energy"]{--tc:var(--t-energy);--tcs:var(--t-energy-soft)}
+[data-topic="medical"]{--tc:var(--t-medical);--tcs:var(--t-medical-soft)}
+
 @media (prefers-reduced-motion:no-preference){
   .deco .beam{stroke-dasharray:6 10;animation:flow 2.4s linear infinite}
   @keyframes flow{to{stroke-dashoffset:-32}}
 }
 @media (prefers-reduced-motion:reduce){.tile,.go{transition:none}}
+
+/* language switch */
+.lang-switch{display:inline-flex;align-items:center;gap:0;margin-left:auto;flex:none;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.lang-btn{font:inherit;font-size:.78rem;font-weight:600;min-height:34px;padding:4px 12px;border:0;background:transparent;color:var(--muted);cursor:pointer;touch-action:manipulation}
+.lang-btn + .lang-btn{border-left:1px solid var(--line)}
+.lang-btn[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.lang-btn:hover:not([aria-pressed="true"]){color:var(--accent);background:var(--accent-soft)}
+html[data-ui-lang="zh"] .ui-en{display:none !important}
+html[data-ui-lang="en"] .ui-zh{display:none !important}
+html[data-ui-lang="en"] h1{font-family:var(--font-ui)}
+html[data-ui-lang="en"] .title{font-family:var(--font-ui)}
+html[data-ui-lang="en"] .section-title{font-family:var(--font-ui)}
+html[data-ui-lang="en"] .brand{font-family:var(--font-ui)}
+.section{margin:0 0 22px}
+.section-title{margin:0 0 10px;font-size:1.05rem;font-weight:700;font-family:var(--font-zh)}
+.section .grid{margin-top:0}
+

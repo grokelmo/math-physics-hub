@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="zh-Hant" data-ui-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>物理模擬實驗室 | Physics Simulation Lab — HKDSE虛擬教室</title>
+<meta name="description" content="HKDSE 物理模擬實驗室：按課題分類的互動模擬與練習實驗室連結。">
+<script>(function(){try{var l=localStorage.getItem("hkdse-vc-ui-lang");document.documentElement.setAttribute("data-ui-lang",(l==="en"||l==="zh")?l:"zh");}catch(e){document.documentElement.setAttribute("data-ui-lang","zh");}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Noto+Sans+HK:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="topnav" aria-label="Main">
+  <div class="inner">
+    <a class="brand" href="index.html"><span class="ui-zh">HKDSE虛擬教室</span><span class="ui-en">HKDSE Virtual Classroom</span></a>
+    <a href="數學科.html"><span class="ui-zh">數學科</span><span class="ui-en">Maths</span></a>
+    <a href="物理科.html"><span class="ui-zh">物理科</span><span class="ui-en">Physics</span></a>
+    <a href="物理模擬實驗室.html" aria-current="page"><span class="ui-zh">物理模擬實驗室</span><span class="ui-en">Physics Simulation Lab</span></a>
+    <div class="lang-switch" role="group" aria-label="Language / 語言">
+      <button type="button" class="lang-btn" data-lang="zh" aria-pressed="true">中文</button>
+      <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <svg class="deco" viewBox="0 0 520 200" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".9">
+      <line x1="0" y1="160" x2="520" y2="160" stroke="var(--line)" stroke-width="1.5"/>
+      <path d="M250 40h40v28l28 70a22 22 0 0 1-20 30H242a22 22 0 0 1-20-30l28-70V40z" stroke="var(--t-sim)" stroke-width="2.2" fill="var(--t-sim-soft)" opacity=".9"/>
+      <path d="M250 40h40" stroke="var(--t-sim)" stroke-width="3"/>
+      <path d="M248 110h44" stroke="var(--t-sim)" stroke-width="1.6" opacity=".45"/>
+      <g stroke="var(--t-sim)" stroke-width="2" opacity=".4">
+        <polyline class="beam" points="360,50 420,90"/>
+        <polyline class="beam" points="370,140 440,110"/>
+      </g>
+      <circle cx="270" cy="128" r="4" fill="var(--t-sim)" opacity=".55"/>
+      <circle cx="286" cy="136" r="3" fill="var(--t-sim)" opacity=".4"/>
+    </g>
+  </svg>
+  <div class="inner">
+    <p class="crumb"><a href="index.html"><span class="ui-zh">首頁</span><span class="ui-en">Home</span></a> · <span class="ui-zh">物理模擬實驗室</span><span class="ui-en">Physics Simulation Lab</span></p>
+    <p class="eyebrow">Simulation · HKDSE Physics</p>
+    <h1><span class="ui-zh">物理模擬實驗室</span><span class="ui-en">Physics Simulation Lab</span></h1>
+    <p class="lead">
+      <span class="ui-zh">按 HKDSE 課題分類嘅互動模擬（外連公開站）。手機、平板、電腦都啱用。</span>
+      <span class="ui-en">Interactive simulations by HKDSE topic (opens the public lab site). Works on phone, tablet and computer.</span>
+    </p>
+  </div>
+</header>
+
+<main>
+  <div class="inner">
+    <div class="toolbar">
+      <div class="chips" id="chips" role="group" aria-label="Filter by topic"></div>
+    </div>
+    <p class="count" id="count"></p>
+    <div id="sections"></div>
+  </div>
+</main>
+
+<footer>
+  <div class="inner">
+    <span><span class="ui-zh">物理模擬實驗室 · HKDSE虛擬教室</span><span class="ui-en">Physics Simulation Lab · HKDSE Virtual Classroom</span></span>
+    <a href="index.html" style="color:var(--accent);text-decoration:none;font-weight:500"><span class="ui-zh">← 返回首頁</span><span class="ui-en">← Back to home</span></a>
+  </div>
+</footer>
+
+<script src="lang.js"></script>
+<script>
+const TOPICS = [
+  { id:"heat", zh:"熱學", en:"Heat" },
+  { id:"mech", zh:"力學", en:"Mechanics" },
+  { id:"wave", zh:"波動學", en:"Waves" },
+  { id:"optics", zh:"光學", en:"Optics" },
+  { id:"elec", zh:"電磁學", en:"Electromagnetism" },
+  { id:"radio", zh:"放射學", en:"Radioactivity" },
+  { id:"astro", zh:"天文學", en:"Astronomy" },
+  { id:"atomic", zh:"原子世界", en:"Atomic World" },
+  { id:"energy", zh:"能量與工程", en:"Energy & Engineering" },
+  { id:"medical", zh:"醫學物理", en:"Medical Physics" },
+  { id:"other", zh:"其他", en:"Other" }
+];
+
+const SIMS = [
+  {
+    file: "https://steventamkh.github.io/simulation/motion-graph-lab.html",
+    titleZh: "運動圖像練習室", titleEn: "Motion Graph Lab",
+    descZh: "在 s–t、v–t、a–t 圖之間轉換與練習",
+    descEn: "Convert and practise between s–t, v–t and a–t graphs",
+    topic: "mech", kindZh: "練習", kindEn: "Practice"
+  },
+  {
+    file: "https://steventamkh.github.io/simulation/lens-ray-diagram.html",
+    titleZh: "透鏡光線圖", titleEn: "Lens Ray Diagram",
+    descZh: "畫出凸／凹透鏡光線，定位像並用透鏡公式核對",
+    descEn: "Draw rays through lenses, locate the image, check with the lens formula",
+    topic: "optics", kindZh: "練習", kindEn: "Practice"
+  },
+  {
+    file: "https://steventamkh.github.io/simulation/plane-mirror-ray-diagram.html",
+    titleZh: "平面鏡光線圖", titleEn: "Plane Mirror Ray Diagram",
+    descZh: "探索平面鏡反射：觀察者能否看見像？",
+    descEn: "Explore reflection: can the observer see the image?",
+    topic: "optics", kindZh: "練習", kindEn: "Practice"
+  }
+];
+
+const HUB = {
+  file: "物理模擬實驗室.html",
+  titleZh: "物理模擬實驗室", titleEn: "Physics Simulation Lab",
+  descZh: "本頁按課題篩選模擬；更多模擬會陸續加入。",
+  descEn: "Filter simulations by topic on this page; more labs will be added.",
+  kindZh: "入口", kindEn: "Hub"
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const dual = (zh, en) => `<span class="ui-zh">${esc(zh)}</span><span class="ui-en">${esc(en)}</span>`;
+const arrow = `<svg class="go" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg>`;
+const uiLang = () => (window.HKDSE_UI_LANG ? window.HKDSE_UI_LANG.get() : (document.documentElement.getAttribute("data-ui-lang") || "zh"));
+
+let topic = "all";
+try {
+  const t = localStorage.getItem("hkdse-vc-sim-topic");
+  if (t && (t === "all" || TOPICS.some(x => x.id === t))) topic = t;
+} catch (e) {}
+
+function topicMeta(id) {
+  return TOPICS.find(t => t.id === id) || { id, zh: id, en: id };
+}
+
+function renderChips(){
+  const btn = (k, label, n) => `<button type="button" class="chip" data-k="${k}" aria-pressed="${topic===k}">${label}<span class="n">${n}</span></button>`;
+  let html = btn("all", dual("全部", "All"), SIMS.length);
+  TOPICS.forEach(t => {
+    html += btn(t.id, dual(t.zh, t.en), SIMS.filter(s => s.topic === t.id).length);
+  });
+  $("chips").innerHTML = html;
+}
+
+function tile(s, external){
+  const tm = topicMeta(s.topic || "mech");
+  const ext = external ? ' target="_blank" rel="noopener"' : "";
+  return `<a class="tile" href="${esc(s.file)}"${ext} data-topic="${esc(s.topic || "sim")}">
+    <span class="icon"><svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)"><path d="M20 12h16v10l10 24a8 8 0 0 1-7 12H17a8 8 0 0 1-7-12l10-24V12z" stroke="currentColor" stroke-width="2"/><path d="M20 12h16" stroke="currentColor" stroke-width="3"/></svg></span>
+    <span class="body">
+      <span class="title">${dual(s.titleZh, s.titleEn)}</span>
+      <span class="desc">${dual(s.descZh, s.descEn)}</span>
+      <span class="tags"><span class="tag">${dual(tm.zh, tm.en)}</span><span class="tag kind">${dual(s.kindZh, s.kindEn)}</span></span>
+    </span>
+    ${arrow}
+  </a>`;
+}
+
+function render(){
+  const lang = uiLang();
+  const list = topic === "all" ? SIMS.slice() : SIMS.filter(s => s.topic === topic);
+  $("count").textContent = lang === "en"
+    ? `Showing ${list.length} simulation(s)`
+    : `顯示 ${list.length} 個模擬`;
+
+  const byTopic = new Map();
+  TOPICS.forEach(t => byTopic.set(t.id, []));
+  list.forEach(s => {
+    if (!byTopic.has(s.topic)) byTopic.set(s.topic, []);
+    byTopic.get(s.topic).push(s);
+  });
+
+  const ids = topic === "all" ? TOPICS.map(t => t.id) : [topic];
+  let html = "";
+  ids.forEach(id => {
+    const meta = topicMeta(id);
+    const items = byTopic.get(id) || [];
+    html += `<section class="section" data-topic="${esc(id)}">`;
+    html += `<h2 class="section-title">${dual(meta.zh, meta.en)}</h2>`;
+    if (items.length) {
+      html += `<div class="grid">${items.map(s => tile(s, true)).join("")}</div>`;
+    } else {
+      html += `<div class="empty">${dual("即將推出", "Coming soon")}</div>`;
+    }
+    html += `</section>`;
+  });
+  $("sections").innerHTML = html;
+}
+
+$("chips").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  topic = b.dataset.k;
+  try { localStorage.setItem("hkdse-vc-sim-topic", topic); } catch (e) {}
+  [...$("chips").children].forEach(c => c.setAttribute("aria-pressed", String(c === b)));
+  render();
+});
+document.addEventListener("ui-lang-change", () => { renderChips(); render(); });
+renderChips(); render();
+</script>
+</body>
+</html>

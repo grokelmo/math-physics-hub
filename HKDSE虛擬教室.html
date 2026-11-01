@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" data-ui-lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>HKDSE虛擬教室 | HKDSE Virtual Classroom</title>
-<meta name="description" content="HKDSE 數學科與物理科互動練習工具 — HKDSE Virtual Classroom for maths and physics practice.">
+<meta name="description" content="HKDSE 數學科、物理科與物理模擬實驗室 — HKDSE Virtual Classroom for maths, physics and physics simulation lab.">
+<script>(function(){try{var l=localStorage.getItem("hkdse-vc-ui-lang");document.documentElement.setAttribute("data-ui-lang",(l==="en"||l==="zh")?l:"zh");}catch(e){document.documentElement.setAttribute("data-ui-lang","zh");}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Noto+Sans+HK:wght@400;500;600;700&display=swap">
@@ -12,25 +13,26 @@
 </head>
 <body>
 
-<nav class="topnav" aria-label="主導覽">
+<nav class="topnav" aria-label="Main">
   <div class="inner">
-    <span class="brand zh">HKDSE虛擬教室</span>
-    <a href="index.html" aria-current="page">首頁</a>
-    <a href="數學科.html">數學科</a>
-    <a href="物理科.html">物理科</a>
+    <a class="brand" href="index.html" aria-current="page"><span class="ui-zh">HKDSE虛擬教室</span><span class="ui-en">HKDSE Virtual Classroom</span></a>
+    <a href="數學科.html"><span class="ui-zh">數學科</span><span class="ui-en">Maths</span></a>
+    <a href="物理科.html"><span class="ui-zh">物理科</span><span class="ui-en">Physics</span></a>
+    <a href="物理模擬實驗室.html"><span class="ui-zh">物理模擬實驗室</span><span class="ui-en">Physics Simulation Lab</span></a>
+    <div class="lang-switch" role="group" aria-label="Language / 語言">
+      <button type="button" class="lang-btn" data-lang="zh" aria-pressed="true">中文</button>
+      <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+    </div>
   </div>
 </nav>
 
 <header class="hero">
-  <!-- subtle classroom / book motif -->
   <svg class="deco" viewBox="0 0 520 200" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
     <g fill="none" stroke-linecap="round" stroke-linejoin="round">
       <line x1="0" y1="160" x2="520" y2="160" stroke="var(--line)" stroke-width="1.5"/>
-      <!-- open book -->
       <path d="M180 55 Q240 40 260 55 L260 145 Q240 132 180 145 Z" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2" opacity=".85"/>
       <path d="M340 55 Q280 40 260 55 L260 145 Q280 132 340 145 Z" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2" opacity=".85"/>
       <line x1="260" y1="55" x2="260" y2="145" stroke="var(--accent)" stroke-width="2"/>
-      <!-- soft rays from book -->
       <g stroke="var(--ray)" stroke-width="2" opacity=".4">
         <polyline class="beam" points="260,48 240,18"/>
         <polyline class="beam" points="260,48 260,12"/>
@@ -41,10 +43,10 @@
   </svg>
   <div class="inner">
     <p class="eyebrow">HKDSE · Maths &amp; Physics</p>
-    <h1>HKDSE虛擬教室<span class="en">HKDSE Virtual Classroom</span></h1>
+    <h1><span class="ui-zh">HKDSE虛擬教室</span><span class="ui-en">HKDSE Virtual Classroom</span></h1>
     <p class="lead">
-      <span class="zh">揀一科開始，或直接打開下面嘅練習工具。手機、平板、電腦都啱用。</span>
-      Choose a subject or open a practice tool below. Works on phone, tablet and computer.
+      <span class="ui-zh">揀一科開始，或直接打開下面嘅練習工具。手機、平板、電腦都啱用。</span>
+      <span class="ui-en">Choose a subject or open a practice tool below. Works on phone, tablet and computer.</span>
     </p>
   </div>
 </header>
@@ -52,10 +54,10 @@
 <main>
   <div class="inner">
     <div class="toolbar">
-      <div class="chips" id="chips" role="group" aria-label="按科目篩選"></div>
+      <div class="chips" id="chips" role="group" aria-label="Filter"></div>
       <label class="search">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-        <input id="q" type="search" placeholder="搜尋工具 Search" aria-label="搜尋練習工具" autocomplete="off">
+        <input id="q" type="search" placeholder="搜尋 Search" aria-label="Search" autocomplete="off">
       </label>
     </div>
     <p class="count" id="count"></p>
@@ -65,140 +67,151 @@
 
 <footer>
   <div class="inner">
-    <span class="zh">提示：可將本頁加入主畫面，方便下次開啟。</span>
-    <span>HKDSE虛擬教室 · local redesign preview</span>
+    <span><span class="ui-zh">提示：可將本頁加入主畫面，方便下次開啟。</span><span class="ui-en">Tip: add this page to your home screen for quick access.</span></span>
+    <span>HKDSE虛擬教室</span>
   </div>
 </footer>
 
+<script src="lang.js"></script>
 <script>
 const ITEMS = [
   {
     file: "數學科.html",
-    title: "數學科", en: "Maths",
+    titleZh: "數學科", titleEn: "Maths",
     descZh: "指數、因式分解、展開等代數練習",
     descEn: "Indices, factorisation, expansion and algebra practice",
-    topic: "maths", kind: "科目", kindEn: "Subject",
+    topic: "maths", kindZh: "科目", kindEn: "Subject",
     icon: "mathsSubject", img: "images/home-maths.jpg", added: "2026-10-28"
   },
   {
     file: "物理科.html",
-    title: "物理科", en: "Physics",
+    titleZh: "物理科", titleEn: "Physics",
     descZh: "單位、公式、計數機技巧與概念詞彙",
     descEn: "Units, formulae, calculator skills and concept vocabulary",
-    topic: "physics", kind: "科目", kindEn: "Subject",
+    topic: "physics", kindZh: "科目", kindEn: "Subject",
     icon: "physicsSubject", img: "images/home-physics.jpg", added: "2026-10-28"
   },
   {
+    file: "物理模擬實驗室.html",
+    titleZh: "物理模擬實驗室", titleEn: "Physics Simulation Lab",
+    descZh: "按 HKDSE 課題分類嘅互動模擬（外連公開站）",
+    descEn: "Interactive simulations by HKDSE topic (opens the public lab site)",
+    topic: "sim", kindZh: "模擬室", kindEn: "Lab",
+    icon: "simLab", img: "", added: "2026-11-01"
+  },
+  {
     file: "指數定律練習.html",
-    title: "指數定律練習", en: "Laws of Indices",
+    titleZh: "指數定律練習", titleEn: "Laws of Indices",
     descZh: "練習指數運算法則",
     descEn: "Practise the laws of indices",
-    topic: "maths", kind: "練習", kindEn: "Practice",
+    topic: "maths", kindZh: "練習", kindEn: "Practice",
     icon: "indices", img: "images/maths-indices.jpg", added: "2026-10-28"
   },
   {
     file: "因式分解練習.html",
-    title: "因式分解練習", en: "Factorization",
+    titleZh: "因式分解練習", titleEn: "Factorization",
     descZh: "練習多項式因式分解",
     descEn: "Practise factorising polynomials",
-    topic: "maths", kind: "練習", kindEn: "Practice",
+    topic: "maths", kindZh: "練習", kindEn: "Practice",
     icon: "factor", img: "images/maths-factorization.jpg", added: "2026-10-28"
   },
   {
     file: "展開練習.html",
-    title: "展開練習", en: "Expansion Practice",
+    titleZh: "展開練習", titleEn: "Expansion Practice",
     descZh: "練習代數式展開",
     descEn: "Practise expanding algebraic expressions",
-    topic: "maths", kind: "練習", kindEn: "Practice",
+    topic: "maths", kindZh: "練習", kindEn: "Practice",
     icon: "expand", img: "images/maths-expansion.jpg", added: "2026-10-28"
   },
   {
     file: "物理量單位練習.html",
-    title: "物理量單位練習", en: "Quantities & Units",
+    titleZh: "物理量單位練習", titleEn: "Quantities & Units",
     descZh: "練習物理量與單位配對",
     descEn: "Match physical quantities with their units",
-    topic: "physics", kind: "練習", kindEn: "Practice",
+    topic: "physics", kindZh: "練習", kindEn: "Practice",
     icon: "units", img: "images/physics-units.jpg", added: "2026-10-28"
   },
   {
     file: "物理公式練習.html",
-    title: "物理公式練習", en: "Physics Formulae",
+    titleZh: "物理公式練習", titleEn: "Physics Formulae",
     descZh: "練習常用物理公式",
     descEn: "Practise common physics formulae",
-    topic: "physics", kind: "練習", kindEn: "Practice",
+    topic: "physics", kindZh: "練習", kindEn: "Practice",
     icon: "formula", img: "images/physics-formula.jpg", added: "2026-10-28"
   },
   {
     file: "物理計數機技巧練習.html",
-    title: "物理計數機技巧練習", en: "Calculator Skills",
+    titleZh: "物理計數機技巧練習", titleEn: "Calculator Skills",
     descZh: "練習科學計數機操作技巧",
     descEn: "Practise scientific calculator skills for physics",
-    topic: "physics", kind: "練習", kindEn: "Practice",
+    topic: "physics", kindZh: "練習", kindEn: "Practice",
     icon: "calc", img: "images/physics-calculator.jpg", added: "2026-10-28"
   },
   {
     file: "物理概念詞彙練習.html",
-    title: "物理概念詞彙練習", en: "Concept Vocabulary",
+    titleZh: "物理概念詞彙練習", titleEn: "Concept Vocabulary",
     descZh: "練習物理概念中英詞彙",
     descEn: "Practise bilingual physics concept vocabulary",
-    topic: "physics", kind: "練習", kindEn: "Practice",
+    topic: "physics", kindZh: "練習", kindEn: "Practice",
     icon: "vocab", img: "images/physics-vocab.jpg", added: "2026-10-30"
+  },
+  {
+    file: "https://steventamkh.github.io/simulation/motion-graph-lab.html",
+    titleZh: "運動圖像練習室", titleEn: "Motion Graph Lab",
+    descZh: "在 s–t、v–t、a–t 圖之間轉換與練習",
+    descEn: "Convert and practise between s–t, v–t and a–t graphs",
+    topic: "sim", kindZh: "模擬", kindEn: "Simulation",
+    tagZh: "物理模擬實驗室", tagEn: "Lab",
+    icon: "motion", img: "", added: "2026-11-01", external: true
+  },
+  {
+    file: "https://steventamkh.github.io/simulation/lens-ray-diagram.html",
+    titleZh: "透鏡光線圖", titleEn: "Lens Ray Diagram",
+    descZh: "畫出凸／凹透鏡光線，定位像並用透鏡公式核對",
+    descEn: "Draw rays through lenses, locate the image, check with the lens formula",
+    topic: "sim", kindZh: "模擬", kindEn: "Simulation",
+    tagZh: "物理模擬實驗室", tagEn: "Lab",
+    icon: "lens", img: "", added: "2026-11-01", external: true
+  },
+  {
+    file: "https://steventamkh.github.io/simulation/plane-mirror-ray-diagram.html",
+    titleZh: "平面鏡光線圖", titleEn: "Plane Mirror Ray Diagram",
+    descZh: "探索平面鏡反射：觀察者能否看見像？",
+    descEn: "Explore reflection: can the observer see the image?",
+    topic: "sim", kindZh: "模擬", kindEn: "Simulation",
+    tagZh: "物理模擬實驗室", tagEn: "Lab",
+    icon: "mirror", img: "", added: "2026-11-01", external: true
   }
 ];
 
-const TOPICS = {
-  maths:   {en: "Maths", zh: "數學科"},
-  physics: {en: "Physics", zh: "物理科"}
+const TOPIC_LABEL = {
+  maths:   { zh: "數學科", en: "Maths" },
+  physics: { zh: "物理科", en: "Physics" },
+  sim:     { zh: "物理模擬實驗室", en: "Lab" }
 };
 
 const ICONS = {
-  mathsSubject: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)">
-    <rect x="10" y="12" width="36" height="32" rx="4" stroke="currentColor" stroke-width="2"/>
-    <path d="M18 24h8M18 32h20M18 40h14" stroke="currentColor" stroke-width="2" opacity=".7"/>
-    <circle cx="38" cy="24" r="3" fill="currentColor"/></svg>`,
-  physicsSubject: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)">
-    <ellipse cx="28" cy="28" rx="18" ry="8" stroke="currentColor" stroke-width="2" transform="rotate(60 28 28)"/>
-    <ellipse cx="28" cy="28" rx="18" ry="8" stroke="currentColor" stroke-width="2" transform="rotate(-60 28 28)"/>
-    <ellipse cx="28" cy="28" rx="18" ry="8" stroke="currentColor" stroke-width="2"/>
-    <circle cx="28" cy="28" r="3.5" fill="currentColor"/></svg>`,
-  indices: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" style="color:var(--tc)">
-    <text x="12" y="38" font-size="22" font-weight="700" fill="currentColor" font-family="Lexend,sans-serif">x</text>
-    <text x="28" y="22" font-size="14" font-weight="700" fill="currentColor" font-family="Lexend,sans-serif">n</text>
-    <path d="M36 40h12M42 34v12" stroke="currentColor" stroke-width="2.2" opacity=".55"/></svg>`,
-  factor: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)">
-    <rect x="8" y="18" width="16" height="20" rx="3" stroke="currentColor" stroke-width="2"/>
-    <rect x="32" y="18" width="16" height="20" rx="3" stroke="currentColor" stroke-width="2"/>
-    <path d="M26 28h4" stroke="currentColor" stroke-width="2.4"/>
-    <circle cx="16" cy="28" r="2.5" fill="currentColor"/><circle cx="40" cy="28" r="2.5" fill="currentColor"/></svg>`,
-  expand: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)">
-    <path d="M14 18v20M42 18v20" stroke="currentColor" stroke-width="2.4"/>
-    <path d="M14 18q6 10 0 20M42 18q-6 10 0 20" stroke="currentColor" stroke-width="2"/>
-    <path d="M22 28h12" stroke="currentColor" stroke-width="2" opacity=".55"/></svg>`,
-  units: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)">
-    <rect x="12" y="10" width="20" height="36" rx="3" stroke="currentColor" stroke-width="2"/>
-    <path d="M16 18h12M16 26h12M16 34h8" stroke="currentColor" stroke-width="1.8" opacity=".7"/>
-    <circle cx="40" cy="36" r="8" stroke="currentColor" stroke-width="2"/>
-    <path d="M40 30v6l4 3" stroke="currentColor" stroke-width="2"/></svg>`,
-  formula: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" style="color:var(--tc)">
-    <text x="10" y="34" font-size="18" font-weight="700" fill="currentColor" font-family="Lexend,sans-serif">E=</text>
-    <text x="34" y="34" font-size="16" font-weight="700" fill="currentColor" font-family="Lexend,sans-serif">mc</text>
-    <text x="48" y="24" font-size="12" font-weight="700" fill="currentColor" font-family="Lexend,sans-serif">2</text></svg>`,
-  calc: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)">
-    <rect x="14" y="8" width="28" height="40" rx="4" stroke="currentColor" stroke-width="2"/>
-    <rect x="18" y="12" width="20" height="8" rx="2" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.5"/>
-    <circle cx="22" cy="30" r="2.2" fill="currentColor"/><circle cx="28" cy="30" r="2.2" fill="currentColor"/><circle cx="34" cy="30" r="2.2" fill="currentColor"/>
-    <circle cx="22" cy="38" r="2.2" fill="currentColor"/><circle cx="28" cy="38" r="2.2" fill="currentColor"/><circle cx="34" cy="38" r="2.2" fill="currentColor"/></svg>`,
-  vocab: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)">
-    <path d="M12 14h14a6 6 0 0 1 6 6v22H18a6 6 0 0 0-6 6V14z" stroke="currentColor" stroke-width="2"/>
-    <path d="M44 14H30a6 6 0 0 0-6 6v22h14a6 6 0 0 1 6 6V14z" stroke="currentColor" stroke-width="2"/>
-    <path d="M20 24h6M20 30h8" stroke="currentColor" stroke-width="1.6" opacity=".65"/></svg>`,
-  generic: `<svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--tc)">
-    <path d="M22 8h12M24 8v14L12 44a4 4 0 0 0 3.5 6h25a4 4 0 0 0 3.5-6L32 22V8"/><path d="M17 36h22" opacity=".5"/></svg>`
+  mathsSubject: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)"><rect x="10" y="12" width="36" height="32" rx="4" stroke="currentColor" stroke-width="2"/><path d="M18 24h8M18 32h20M18 40h14" stroke="currentColor" stroke-width="2" opacity=".7"/><circle cx="38" cy="24" r="3" fill="currentColor"/></svg>`,
+  physicsSubject: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)"><ellipse cx="28" cy="28" rx="18" ry="8" stroke="currentColor" stroke-width="2" transform="rotate(60 28 28)"/><ellipse cx="28" cy="28" rx="18" ry="8" stroke="currentColor" stroke-width="2" transform="rotate(-60 28 28)"/><ellipse cx="28" cy="28" rx="18" ry="8" stroke="currentColor" stroke-width="2"/><circle cx="28" cy="28" r="3.5" fill="currentColor"/></svg>`,
+  simLab: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)"><path d="M20 12h16v10l10 24a8 8 0 0 1-7 12H17a8 8 0 0 1-7-12l10-24V12z" stroke="currentColor" stroke-width="2"/><path d="M20 12h16" stroke="currentColor" stroke-width="3"/><path d="M18 30h20" stroke="currentColor" stroke-width="1.6" opacity=".45"/></svg>`,
+  indices: `<svg viewBox="0 0 56 56" fill="none" style="color:var(--tc)"><text x="12" y="38" font-size="22" font-weight="700" fill="currentColor" font-family="Lexend,sans-serif">x</text><text x="28" y="22" font-size="14" font-weight="700" fill="currentColor" font-family="Lexend,sans-serif">n</text></svg>`,
+  factor: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" style="color:var(--tc)"><rect x="8" y="18" width="16" height="20" rx="3" stroke="currentColor" stroke-width="2"/><rect x="32" y="18" width="16" height="20" rx="3" stroke="currentColor" stroke-width="2"/><path d="M26 28h4" stroke="currentColor" stroke-width="2.4"/></svg>`,
+  expand: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" style="color:var(--tc)"><path d="M14 18v20M42 18v20" stroke="currentColor" stroke-width="2.4"/><path d="M14 18q6 10 0 20M42 18q-6 10 0 20" stroke="currentColor" stroke-width="2"/></svg>`,
+  units: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" style="color:var(--tc)"><rect x="12" y="10" width="20" height="36" rx="3" stroke="currentColor" stroke-width="2"/><circle cx="40" cy="36" r="8" stroke="currentColor" stroke-width="2"/></svg>`,
+  formula: `<svg viewBox="0 0 56 56" fill="none" style="color:var(--tc)"><text x="8" y="34" font-size="16" font-weight="700" fill="currentColor" font-family="Lexend,sans-serif">E=mc²</text></svg>`,
+  calc: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" style="color:var(--tc)"><rect x="14" y="8" width="28" height="40" rx="4" stroke="currentColor" stroke-width="2"/><rect x="18" y="12" width="20" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/></svg>`,
+  vocab: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" style="color:var(--tc)"><path d="M12 14h14a6 6 0 0 1 6 6v22H18a6 6 0 0 0-6 6V14z" stroke="currentColor" stroke-width="2"/><path d="M44 14H30a6 6 0 0 0-6 6v22h14a6 6 0 0 1 6 6V14z" stroke="currentColor" stroke-width="2"/></svg>`,
+  motion: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" style="color:var(--tc)"><path d="M8 40h40" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="40" r="6" stroke="currentColor" stroke-width="2"/><circle cx="38" cy="40" r="6" stroke="currentColor" stroke-width="2"/><path d="M12 28h10l6-12h8" stroke="currentColor" stroke-width="2"/></svg>`,
+  lens: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" style="color:var(--tc)"><path d="M24 8 Q31 28 24 48 Q17 28 24 8Z" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.8"/><line x1="4" y1="28" x2="52" y2="28" stroke="currentColor" stroke-width="1.2" opacity=".45"/></svg>`,
+  mirror: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" style="color:var(--tc)"><rect x="34" y="10" width="6" height="36" rx="1" fill="currentColor" fill-opacity=".2" stroke="currentColor" stroke-width="1.6"/><path d="M10 18 L34 28 M10 38 L34 28" stroke="currentColor" stroke-width="2"/></svg>`,
+  generic: `<svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--tc)"><path d="M22 8h12M24 8v14L12 44a4 4 0 0 0 3.5 6h25a4 4 0 0 0 3.5-6L32 22V8"/></svg>`
 };
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const dual = (zh, en) => `<span class="ui-zh">${esc(zh)}</span><span class="ui-en">${esc(en)}</span>`;
 const arrow = `<svg class="go" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg>`;
+const uiLang = () => (window.HKDSE_UI_LANG ? window.HKDSE_UI_LANG.get() : (document.documentElement.getAttribute("data-ui-lang") || "zh"));
 
 let topic = "all";
 try {
@@ -209,33 +222,42 @@ try {
 function renderChips(){
   const btn = (k, label, n) => `<button type="button" class="chip" data-k="${k}" aria-pressed="${topic===k}">${label}<span class="n">${n}</span></button>`;
   $("chips").innerHTML =
-    btn("all", `全部 <span class="zh">All</span>`, ITEMS.length) +
-    btn("maths", `<span class="zh">數學科</span> Maths`, ITEMS.filter(s => s.topic === "maths").length) +
-    btn("physics", `<span class="zh">物理科</span> Physics`, ITEMS.filter(s => s.topic === "physics").length);
+    btn("all", dual("全部", "All"), ITEMS.length) +
+    btn("maths", dual("數學科", "Maths"), ITEMS.filter(s => s.topic === "maths").length) +
+    btn("physics", dual("物理科", "Physics"), ITEMS.filter(s => s.topic === "physics").length) +
+    btn("sim", dual("物理模擬實驗室", "Lab"), ITEMS.filter(s => s.topic === "sim").length);
 }
 
 function render(){
   const q = $("q").value.trim().toLowerCase();
+  const lang = uiLang();
   const list = ITEMS
     .filter(s => topic === "all" || s.topic === topic)
-    .filter(s => !q || [s.title, s.en, s.descZh, s.descEn, s.kind, s.kindEn, TOPICS[s.topic].en, TOPICS[s.topic].zh].join(" ").toLowerCase().includes(q))
+    .filter(s => !q || [s.titleZh, s.titleEn, s.descZh, s.descEn, s.kindZh, s.kindEn, TOPIC_LABEL[s.topic].zh, TOPIC_LABEL[s.topic].en].join(" ").toLowerCase().includes(q))
     .sort((a, b) => {
-      // subjects first, then by title
-      if (a.kind !== b.kind) return a.kind === "科目" ? -1 : 1;
-      return a.title.localeCompare(b.title, "zh-Hant");
+      const rank = k => (k === "科目" || k === "模擬室") ? 0 : (k === "入口" ? 1 : 2);
+      const ra = rank(a.kindZh), rb = rank(b.kindZh);
+      if (ra !== rb) return ra - rb;
+      return a.titleZh.localeCompare(b.titleZh, "zh-Hant");
     });
-  $("grid").innerHTML = list.length ? list.map(s => `
-    <a class="tile" href="${esc(s.file)}" data-topic="${s.topic}">
+  $("grid").innerHTML = list.length ? list.map(s => {
+    const tag = s.tagZh ? dual(s.tagZh, s.tagEn || "Lab") : dual(TOPIC_LABEL[s.topic].zh, TOPIC_LABEL[s.topic].en);
+    const ext = s.external ? ' target="_blank" rel="noopener"' : "";
+    return `
+    <a class="tile" href="${esc(s.file)}"${ext} data-topic="${s.topic}">
       <span class="icon">${s.img ? `<img src="${esc(s.img)}" alt="" loading="lazy">` : (ICONS[s.icon] || ICONS.generic)}</span>
       <span class="body">
-        <span class="title">${esc(s.title)}<span class="en">${esc(s.en)}</span></span>
-        <span class="desc"><span class="zh">${esc(s.descZh)}</span>${esc(s.descEn)}</span>
-        <span class="tags"><span class="tag">${TOPICS[s.topic].zh} · ${TOPICS[s.topic].en}</span><span class="tag kind">${esc(s.kind)} / ${esc(s.kindEn)}</span></span>
+        <span class="title">${dual(s.titleZh, s.titleEn)}</span>
+        <span class="desc">${dual(s.descZh, s.descEn)}</span>
+        <span class="tags"><span class="tag">${tag}</span><span class="tag kind">${dual(s.kindZh, s.kindEn)}</span></span>
       </span>
       ${arrow}
-    </a>`).join("")
-    : `<div class="empty">搵唔到「${esc($("q").value)}」。試吓其他關鍵字，或揀 <b>全部</b>。<br>No matches — try another word, or choose <b>All</b>.</div>`;
-  $("count").textContent = `顯示 ${list.length} / ${ITEMS.length} 項 · Showing ${list.length} of ${ITEMS.length}`;
+    </a>`;
+  }).join("")
+    : `<div class="empty">${dual("搵唔到結果。試吓其他關鍵字，或揀「全部」。", "No matches — try another word, or choose All.")}</div>`;
+  $("count").textContent = lang === "en"
+    ? `Showing ${list.length} of ${ITEMS.length}`
+    : `顯示 ${list.length} / ${ITEMS.length} 項`;
 }
 
 $("chips").addEventListener("click", e => {
@@ -246,7 +268,7 @@ $("chips").addEventListener("click", e => {
   render();
 });
 $("q").addEventListener("input", render);
-
+document.addEventListener("ui-lang-change", () => { renderChips(); render(); });
 renderChips(); render();
 </script>
 </body>

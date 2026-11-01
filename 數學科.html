@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" data-ui-lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>數學科 | Maths — HKDSE虛擬教室</title>
 <meta name="description" content="HKDSE 數學科互動練習：指數定律、因式分解、展開。">
+<script>(function(){try{var l=localStorage.getItem("hkdse-vc-ui-lang");document.documentElement.setAttribute("data-ui-lang",(l==="en"||l==="zh")?l:"zh");}catch(e){document.documentElement.setAttribute("data-ui-lang","zh");}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Noto+Sans+HK:wght@400;500;600;700&display=swap">
@@ -12,12 +13,16 @@
 </head>
 <body>
 
-<nav class="topnav" aria-label="主導覽">
+<nav class="topnav" aria-label="Main">
   <div class="inner">
-    <span class="brand zh">HKDSE虛擬教室</span>
-    <a href="index.html">首頁</a>
-    <a href="數學科.html" aria-current="page">數學科</a>
-    <a href="物理科.html">物理科</a>
+    <a class="brand" href="index.html"><span class="ui-zh">HKDSE虛擬教室</span><span class="ui-en">HKDSE Virtual Classroom</span></a>
+    <a href="數學科.html" aria-current="page"><span class="ui-zh">數學科</span><span class="ui-en">Maths</span></a>
+    <a href="物理科.html"><span class="ui-zh">物理科</span><span class="ui-en">Physics</span></a>
+    <a href="物理模擬實驗室.html"><span class="ui-zh">物理模擬實驗室</span><span class="ui-en">Physics Simulation Lab</span></a>
+    <div class="lang-switch" role="group" aria-label="Language / 語言">
+      <button type="button" class="lang-btn" data-lang="zh" aria-pressed="true">中文</button>
+      <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+    </div>
   </div>
 </nav>
 
@@ -33,44 +38,44 @@
     </g>
   </svg>
   <div class="inner">
-    <p class="crumb"><a href="index.html">首頁</a> · 數學科</p>
+    <p class="crumb"><a href="index.html"><span class="ui-zh">首頁</span><span class="ui-en">Home</span></a> · <span class="ui-zh">數學科</span><span class="ui-en">Maths</span></p>
     <p class="eyebrow">Maths · Algebra</p>
-    <h1>數學科<span class="en">Maths</span></h1>
+    <h1><span class="ui-zh">數學科</span><span class="ui-en">Maths</span></h1>
     <p class="lead">
-      <span class="zh">指數、因式分解與展開等代數練習工具。</span>
-      Interactive tools for indices, factorisation and algebraic expansion.
+      <span class="ui-zh">指數、因式分解與展開等代數練習工具。</span>
+      <span class="ui-en">Interactive tools for indices, factorisation and algebraic expansion.</span>
     </p>
   </div>
 </header>
 
 <main>
   <div class="inner">
-    <p class="count">3 個練習工具 · 3 practice tools</p>
+    <p class="count"><span class="ui-zh">3 個練習工具</span><span class="ui-en">3 practice tools</span></p>
     <div class="grid">
       <a class="tile" href="指數定律練習.html" data-topic="maths">
         <span class="icon"><img src="images/maths-indices.jpg" alt="" loading="lazy"></span>
         <span class="body">
-          <span class="title">指數定律練習<span class="en">Laws of Indices</span></span>
-          <span class="desc"><span class="zh">練習指數運算法則</span>Practise the laws of indices</span>
-          <span class="tags"><span class="tag">數學科 · Maths</span><span class="tag kind">練習 / Practice</span></span>
+          <span class="title"><span class="ui-zh">指數定律練習</span><span class="ui-en">Laws of Indices</span></span>
+          <span class="desc"><span class="ui-zh">練習指數運算法則</span><span class="ui-en">Practise the laws of indices</span></span>
+          <span class="tags"><span class="tag"><span class="ui-zh">數學科</span><span class="ui-en">Maths</span></span><span class="tag kind"><span class="ui-zh">練習</span><span class="ui-en">Practice</span></span></span>
         </span>
         <svg class="go" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg>
       </a>
       <a class="tile" href="因式分解練習.html" data-topic="maths">
         <span class="icon"><img src="images/maths-factorization.jpg" alt="" loading="lazy"></span>
         <span class="body">
-          <span class="title">因式分解練習<span class="en">Factorization</span></span>
-          <span class="desc"><span class="zh">練習多項式因式分解</span>Practise factorising polynomials</span>
-          <span class="tags"><span class="tag">數學科 · Maths</span><span class="tag kind">練習 / Practice</span></span>
+          <span class="title"><span class="ui-zh">因式分解練習</span><span class="ui-en">Factorization</span></span>
+          <span class="desc"><span class="ui-zh">練習多項式因式分解</span><span class="ui-en">Practise factorising polynomials</span></span>
+          <span class="tags"><span class="tag"><span class="ui-zh">數學科</span><span class="ui-en">Maths</span></span><span class="tag kind"><span class="ui-zh">練習</span><span class="ui-en">Practice</span></span></span>
         </span>
         <svg class="go" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg>
       </a>
       <a class="tile" href="展開練習.html" data-topic="maths">
         <span class="icon"><img src="images/maths-expansion.jpg" alt="" loading="lazy"></span>
         <span class="body">
-          <span class="title">展開練習<span class="en">Expansion Practice</span></span>
-          <span class="desc"><span class="zh">練習代數式展開</span>Practise expanding algebraic expressions</span>
-          <span class="tags"><span class="tag">數學科 · Maths</span><span class="tag kind">練習 / Practice</span></span>
+          <span class="title"><span class="ui-zh">展開練習</span><span class="ui-en">Expansion Practice</span></span>
+          <span class="desc"><span class="ui-zh">練習代數式展開</span><span class="ui-en">Practise expanding algebraic expressions</span></span>
+          <span class="tags"><span class="tag"><span class="ui-zh">數學科</span><span class="ui-en">Maths</span></span><span class="tag kind"><span class="ui-zh">練習</span><span class="ui-en">Practice</span></span></span>
         </span>
         <svg class="go" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg>
       </a>
@@ -80,9 +85,10 @@
 
 <footer>
   <div class="inner">
-    <span class="zh">數學科 · Maths · HKDSE虛擬教室</span>
-    <a href="index.html" style="color:var(--accent);text-decoration:none;font-weight:500">← 返回首頁</a>
+    <span><span class="ui-zh">數學科 · HKDSE虛擬教室</span><span class="ui-en">Maths · HKDSE Virtual Classroom</span></span>
+    <a href="index.html" style="color:var(--accent);text-decoration:none;font-weight:500"><span class="ui-zh">← 返回首頁</span><span class="ui-en">← Back to home</span></a>
   </div>
 </footer>
+<script src="lang.js"></script>
 </body>
 </html>
