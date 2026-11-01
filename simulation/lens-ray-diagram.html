@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Lens Ray Diagram</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&family=STIX+Two+Text:ital,wght@1,500&display=swap">
+<style>
+/* Layout: graph-paper board as the hero, a step-by-step coaching panel beside it (stacks on phones) */
+:root{
+  --bg:#edf2f4; --surface:#ffffff; --paper:#fcfeff; --ink:#18262e; --muted:#566872;
+  --line:#d5e1e6; --grid:#cfe2e9; --grid-strong:#a9c6d1;
+  --ray:#d3322a; --accent:#0a7aa0; --accent-ink:#ffffff; --accent-soft:#dff1f7;
+  --ok:#1d7f46; --ok-soft:#e2f4e9; --bad:#b9461a; --bad-soft:#fbeae2; --sol:#5763c9;
+  --font-ui:"Lexend",system-ui,-apple-system,"Segoe UI","PingFang HK","Microsoft JhengHei","Noto Sans HK",sans-serif;
+  --font-sym:"STIX Two Text","Times New Roman",Times,serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161b; --surface:#152129; --paper:#111d24; --ink:#e4edf1; --muted:#93a7b2;
+  --line:#253842; --grid:#1f323c; --grid-strong:#34505d;
+  --ray:#ff6a5c; --accent:#46bfe3; --accent-ink:#06222c; --accent-soft:#16323d;
+  --ok:#5ad08a; --ok-soft:#173226; --bad:#ff9a62; --bad-soft:#3a2219; --sol:#9ea8ff; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161b; --surface:#152129; --paper:#111d24; --ink:#e4edf1; --muted:#93a7b2;
+  --line:#253842; --grid:#1f323c; --grid-strong:#34505d;
+  --ray:#ff6a5c; --accent:#46bfe3; --accent-ink:#06222c; --accent-soft:#16323d;
+  --ok:#5ad08a; --ok-soft:#173226; --bad:#ff9a62; --bad-soft:#3a2219; --sol:#9ea8ff; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 32px}
+i.s,.sym{font-family:var(--font-sym);font-style:italic;font-weight:500}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.brand h1{font-size:1.35rem;font-weight:600;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.brand p{margin:0;color:var(--muted);font-size:.85rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+select,button,input{font:inherit;color:inherit}
+select{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 10px;min-height:44px}
+.btn{min-height:44px;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:500;touch-action:manipulation}
+.btn:hover{border-color:var(--grid-strong)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn:focus-visible,select:focus-visible,input:focus-visible,.chip:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);gap:14px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:minmax(0,1fr)}}
+.board{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;min-width:0}
+.paper{background:var(--paper);border-radius:8px;overflow:hidden}
+#svg{display:block;width:100%;height:auto;touch-action:none;user-select:none;-webkit-user-select:none;cursor:crosshair}
+.meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;margin:8px 4px 0;font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.rotate{display:none;margin:6px 4px 0;font-size:.8rem;color:var(--muted)}
+@media (max-width:560px) and (orientation:portrait){.rotate{display:block}}
+.panel{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.steps{list-style:none;margin:0 0 12px;padding:0;display:flex;gap:6px;flex-wrap:wrap}
+.steps li{font-size:.75rem;padding:4px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.steps li.cur{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.steps li.done{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+.instr{margin:0;font-size:.98rem}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tools:empty{display:none}
+.fb{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:.92rem;background:var(--accent-soft)}
+.fb:empty{display:none}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);color:var(--bad)}
+.foot{display:flex;flex-wrap:wrap;gap:8px}
+.quiz{display:flex;flex-direction:column;gap:12px}
+.q label,.q .qlab{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{min-height:40px;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--paper);cursor:pointer;font-size:.9rem;touch-action:manipulation}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.num{display:flex;align-items:center;gap:8px}
+.num input{width:110px;min-height:44px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--paper);font-variant-numeric:tabular-nums}
+.mark{font-size:.85rem;font-weight:600}
+.mark.ok{color:var(--ok)} .mark.bad{color:var(--bad)}
+.formula{background:var(--paper);border:1px dashed var(--grid-strong);border-radius:10px;padding:10px 12px;font-size:.92rem;font-variant-numeric:tabular-nums}
+.formula p{margin:2px 0}
+.rules h2{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 8px;font-weight:600}
+.rules ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.9rem}
+.rules p{margin:10px 0 0;font-size:.82rem;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.fb{animation:pop .2s ease-out}@keyframes pop{from{transform:translateY(3px);opacity:.6}to{transform:none;opacity:1}}}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;color:var(--ink);font:600 13px var(--font-ui);min-height:44px;padding:6px 14px;cursor:pointer;touch-action:manipulation}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+</style>
+</head>
+<body>
+<a id="homeLink" href="./" style="display:inline-flex;align-items:center;gap:6px;margin:10px 0 0 max(16px,env(safe-area-inset-left,0px));min-height:36px;padding:4px 12px;border-radius:999px;border:1px solid rgba(127,140,150,.35);font:500 13px/1.2 system-ui,-apple-system,sans-serif;color:inherit;text-decoration:none;opacity:.85">&#8592; All simulations</a>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1 data-t="title">Lens Ray Diagram</h1>
+      <p data-t="sub"></p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Language / 語言">
+        <button id="lang-en" type="button" aria-pressed="true">EN</button><button id="lang-zh" type="button" aria-pressed="false">中文</button>
+      </div>
+      <select id="caseSel">
+        <option value="mixed"></option>
+        <option value="any"></option>
+        <option value="1"></option>
+        <option value="2"></option>
+        <option value="concave"></option>
+        <option value="right"></option>
+        <option value="below"></option>
+      </select>
+      <button class="btn primary" id="newBtn" data-t="newQ"></button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <section class="board">
+      <div class="paper"><svg id="svg" viewBox="0 0 480 260"></svg></div>
+      <div class="meta"><span data-t="scale"></span><span id="metaInfo"></span></div>
+      <p class="rotate" data-t="rotate"></p>
+    </section>
+
+    <aside class="panel">
+      <div class="card">
+        <ol class="steps" id="steps"><li></li><li></li><li></li><li></li><li></li></ol>
+        <p class="instr" id="instr"></p>
+        <div class="tools" id="tools"></div>
+        <div class="fb" id="fb" role="status" aria-live="polite"></div>
+
+        <div class="quiz" id="quiz" hidden>
+          <div class="q"><span class="qlab" data-t="imgIs"></span>
+            <div class="chips" data-g="type"><button class="chip" data-v="real" aria-pressed="false" data-t="real"></button><button class="chip" data-v="virtual" aria-pressed="false" data-t="virtual"></button><span class="mark" data-m="type"></span></div>
+          </div>
+          <div class="q"><div class="chips" data-g="orient"><button class="chip" data-v="upright" aria-pressed="false" data-t="upright"></button><button class="chip" data-v="inverted" aria-pressed="false" data-t="inverted"></button><span class="mark" data-m="orient"></span></div></div>
+          <div class="q"><div class="chips" data-g="size"><button class="chip" data-v="magnified" aria-pressed="false" data-t="magnified"></button><button class="chip" data-v="diminished" aria-pressed="false" data-t="diminished"></button><button class="chip" data-v="same" aria-pressed="false" data-t="same"></button><span class="mark" data-m="size"></span></div></div>
+          <div class="q"><label for="qv" data-t="vLabel"></label>
+            <div class="num"><input id="qv" inputmode="decimal" autocomplete="off" placeholder="e.g. 6.5"><span class="mark" data-m="v"></span></div></div>
+          <div class="q"><label for="qm" data-h="mLabel"></label>
+            <div class="num"><input id="qm" inputmode="decimal" autocomplete="off" placeholder="e.g. 1.5"><span class="mark" data-m="m"></span></div></div>
+          <div class="foot"><button class="btn primary" id="checkBtn" data-t="check"></button></div>
+          <div class="formula" id="formula" hidden></div>
+        </div>
+      </div>
+
+      <div class="foot">
+        <button class="btn" id="undoBtn" data-t="undo"></button>
+        <button class="btn" id="solBtn" aria-pressed="false"></button>
+        <button class="btn" id="hintBtn" aria-pressed="true"></button>
+      </div>
+
+      <div class="card rules" id="rules">
+        <h2 id="rulesHead"></h2>
+        <ol id="rulesList"></ol>
+        <p id="rulesTip"></p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+const S=20, XMIN=-12, XMAX=12, YMIN=-6.5, YMAX=6.5;
+const X=x=>(x-XMIN)*S, Y=y=>(YMAX-y)*S;
+const svg=document.getElementById('svg');
+const $=id=>document.getElementById(id);
+const fmt=n=>(Math.round(n*100)/100).toString();
+const snap=v=>Math.round(v*4)/4;
+const I=x=>`<i class="s">${x}</i>`;
+
+/* ================= TEXT (English / 中文) ================= */
+const L={
+en:{
+ home:'← All simulations', title:'Lens Ray Diagram', sub:'Convex and concave lenses · locate the image by construction',
+ scoreDone:'Diagrams', scorePerfect:'No mistakes', caseLabel:'Lens and object position',
+ namePh:'Class, no. and name: 3A03 Chan Tai Man', nameBtn:'Enter', nameLabel:'Your class, class number and name',
+ nameErr:'Use this format: class, 2-digit class number, then your name, e.g. 3A03 Chan Tai Man.',
+ nameAsk:n=>`Is this right? <b>${n}</b> You can’t change it after this.`, nameYes:'Yes, confirm', nameEdit:'Edit',
+ cases:{mixed:'Mixed: convex and concave',any:'Convex lens: any position','1':'Convex lens: object beyond F','2':'Convex lens: object within F',concave:'Concave lens',right:'Object on the right of the lens',below:'Object below the principal axis'},
+ newQ:'New question', scale:'Scale: 1 small square = 1 cm', rotate:'Tip: turn your phone sideways for a bigger grid.', grid:'Ray diagram grid',
+ steps:['Ray 1','Ray 2','Locate image','Draw image','Questions'],
+ imgIs:'The image is…', real:'Real', virtual:'Virtual', upright:'Upright', inverted:'Inverted', magnified:'Magnified', diminished:'Diminished', same:'Same size',
+ vLabel:'Distance of image from lens (cm)', mLabel:`Linear magnification ${I('m')} = image height ÷ object height`, eg:'e.g.',
+ check:'Check answers', undo:'Undo', showSol:'Show solution', hideSol:'Hide solution', showRules:'Show rules', hideRules:'Hide rules',
+ instr:{
+  inc:(n)=>`<b>Ray ${n+1}.</b> Drag on the grid to aim a ray from the tip ${I('A')} towards the lens. Follow one of the construction rules${n?', but not the one you used for ray 1':''}.`,
+  ref:(n)=>`<b>Ray ${n} after the lens.</b> Drag to show where this ray travels after refraction. While you drag, a faint dotted guide shows the ray's backward extension, so you can line it up with a focus. You can drag on either side of the lens.`,
+  loc:()=>`<b>Locate the image.</b> Where is the image of ${I('A')}? Tap that point on the grid. If the refracted rays do not meet, use the tool below first.`,
+  style:()=>`<b>Draw the image ${I('A′B′')}.</b> Its tail ${I('B′')} sits on the principal axis, directly above or below ${I('A′')}. Which arrow should you use?`,
+  quiz:()=>`<b>Describe the image.</b> Count squares on the grid (1 small square = 1 cm). The object and image both sit on grid lines.`
+ },
+ extendBtn:'Extend rays backwards (dotted)', solid:'Solid arrow', dashed:'Dashed arrow',
+ meta:(cave,u,f)=>`${cave?'Concave':'Convex'} lens · object distance ${u} cm · focal length ${f} cm`,
+ rulesHead:cave=>`Construction rules: ${cave?'concave':'convex'} lens`,
+ rules:cave=>cave
+  ? [`A ray <b>parallel</b> to the principal axis is refracted <b>away</b> from the axis, as if it came from ${I('F′')}.`,
+     `A ray through the <b>optical centre</b> passes straight through without bending.`,
+     `A ray heading <b>towards</b> ${I('F')} is refracted <b>parallel</b> to the principal axis.`]
+  : [`A ray <b>parallel</b> to the principal axis is refracted to pass through ${I('F')}.`,
+     `A ray through the <b>optical centre</b> passes straight through without bending.`,
+     `A ray through ${I('F′')} is refracted <b>parallel</b> to the principal axis. If the object is within ${I('F')}, aim the ray as if it came from ${I('F′')}.`],
+ rulesTip:cave=>cave
+  ? 'Rays bend only at the vertical line of the lens symbol. The refracted rays spread out, so extend them backwards with dotted lines to find where they appear to come from.'
+  : 'Rays bend only at the vertical line of the lens symbol. Any two rules are enough to locate an image.',
+ rule:{par:'parallel to the principal axis',c:'through the optical centre',fpCave:'heading towards F',fpReal:'through F′',fpVirt:'heading as if it came from F′'},
+ fb:{
+  backwards:()=>`Rays travel from the object towards the lens. Drag to the ${q.side==='right'?'left':'right'} of ${I('A')}.`,
+  noRule:(cave,real)=>`That ray does not follow a construction rule. Aim it <b>parallel</b> to the axis, through the <b>optical centre</b>, or ${cave?`<b>towards</b> ${I('F')}`:`${real?'through':'as if from'} ${I('F′')}`}.`,
+  miss:()=>'That ray would miss the lens drawn here. Try a different rule.',
+  used:()=>'You already used that rule for ray 1. Pick a different one.',
+  good:name=>`Good. This ray is ${name}.`,
+  awayFromLens:()=>'Drag away from the lens line to set the direction of the refracted ray.',
+  convexRule:()=>`That is the convex lens rule. A concave lens spreads the ray <b>away</b> from the axis, as if it came from ${I('F′')}.`,
+  mustBendCave:()=>`The ray must bend at the lens. A concave lens spreads a parallel ray out, as if it came from ${I('F′')}.`,
+  notQuiteCave:()=>`Not quite. After a concave lens, a parallel ray spreads out so that its backward extension passes through ${I('F′')}.`,
+  towardsF:()=>`A ray heading towards ${I('F')} comes out <b>parallel</b> to the principal axis.`,
+  mustBendPar:()=>`The ray must bend at the lens. A ray parallel to the axis is refracted to pass through ${I('F')}.`,
+  notQuitePar:()=>`Not quite. A ray parallel to the principal axis is refracted to pass through ${I('F')}.`,
+  centre:()=>'A ray through the optical centre does not bend. Continue it in a straight line.',
+  fpPar:real=>`A ray ${real?'through':'from the direction of'} ${I('F′')} comes out <b>parallel</b> to the principal axis.`,
+  correctNext:()=>'Correct. Now draw a second ray using a different rule.',
+  bothCorrect:()=>'Both rays are correct.',
+  noNeedExtend:()=>`These refracted rays already meet on the ${q.side==='right'?'left':'right'} of the lens, so you do not need to extend them. Look for where they cross.`,
+  extended:()=>'Good. The refracted rays spread out, so extend them backwards with <b>dotted lines without arrows</b>. Now tap where the dotted lines meet.',
+  notMeet:()=>`These refracted rays spread apart and never meet on the ${q.side==='right'?'left':'right'}. Extend them backwards to find where they appear to come from.`,
+  tapOk:real=>`Correct. The image of ${I('A')} is at the point where the ${real?'rays cross':'dotted extensions meet'}.`,
+  tapWrong:real=>`Not there. The image of ${I('A')} is where the ${real?'two refracted rays cross':'dotted extensions cross'}. Zoom in with your eyes and tap again.`,
+  useSolid:()=>'Real rays actually meet here, so the image is real. Use a <b>solid</b> arrow.',
+  useDashed:()=>'No light really reaches this image, so it is virtual. Use a <b>dashed</b> arrow.',
+  styleOk:real=>`Right. A ${real?'real image is drawn with a solid arrow':'virtual image is drawn with a dashed arrow'}.`,
+  someWrong:()=>'Some answers need another look. Fix the ones marked ✗ and check again.',
+  perfect:()=>'All correct with no mistakes. Well done! Try a new question.',
+  allDone:(m,sol)=>`All correct. You made ${m} mistake${m===1?'':'s'} along the way${sol?' and viewed the solution':''}. Try another one.`
+ },
+ mk:{enterNum:'enter a number', measureV:'measure from the lens to B′', divide:'divide A′B′ by AB'},
+ formula:(q,cm,fmt,cave)=>`<p><b>Check with the lens formula</b> (real is positive)</p>
+  <p>1/${I('u')} + 1/${I('v')} = 1/${I('f')} → 1/${cm(q.u)} + 1/${I('v')} = 1/${cave?'(−'+cm(q.f)+')':cm(q.f)}${cave?` &nbsp;(${I('f')} is negative for a concave lens)`:''}</p>
+  <p>${I('v')} = ${cm(q.v)} cm${q.real?'':' (negative, so the image is virtual)'}</p>
+  <p>${I('m')} = |${I('v')}| / ${I('u')} = ${cm(Math.abs(q.v))} / ${cm(q.u)} = ${fmt(q.m)} &nbsp;(also = image height ${cm(Math.abs(q.ty))} cm ÷ object height ${cm(Math.abs(q.h))} cm)</p>`
+},
+zh:{
+ home:'← 所有模擬', title:'透鏡光線圖', sub:'凸透鏡及凹透鏡 · 用作圖法找出像的位置',
+ scoreDone:'已完成', scorePerfect:'全對', caseLabel:'透鏡及物體位置',
+ namePh:'班別、學號及姓名：3A03 Chan Tai Man', nameBtn:'輸入', nameLabel:'你的班別、學號及姓名',
+ nameErr:'請用這個格式：班別、兩位數學號，然後是姓名，例如 3A03 Chan Tai Man。',
+ nameAsk:n=>`確定是 <b>${n}</b> 嗎？確定後不能再更改。`, nameYes:'確定', nameEdit:'修改',
+ cases:{mixed:'混合：凸透鏡及凹透鏡',any:'凸透鏡：任意位置','1':'凸透鏡：物體在 F 以外','2':'凸透鏡：物體在 F 以內',concave:'凹透鏡',right:'物體在透鏡右方',below:'物體在主軸下方'},
+ newQ:'新題目', scale:'比例：1 小格 = 1 cm', rotate:'提示：把手機橫放，格紙會更大。', grid:'光線圖格紙',
+ steps:['光線 1','光線 2','找出像','畫出像','問題'],
+ imgIs:'這個像是…', real:'實像', virtual:'虛像', upright:'正立', inverted:'倒立', magnified:'放大', diminished:'縮小', same:'大小相同',
+ vLabel:'像與透鏡的距離（cm）', mLabel:`線性放大率 ${I('m')} = 像高 ÷ 物高`, eg:'例如',
+ check:'檢查答案', undo:'復原', showSol:'顯示答案', hideSol:'隱藏答案', showRules:'顯示規則', hideRules:'隱藏規則',
+ instr:{
+  inc:(n)=>`<b>光線 ${n+1}。</b>在格紙上拖動，從物體頂端 ${I('A')} 向透鏡射出一條光線。依照其中一條作圖規則${n?'，但不可以再用光線 1 的規則':''}。`,
+  ref:(n)=>`<b>光線 ${n} 經過透鏡後。</b>拖動以顯示這條光線折射後的路徑。拖動時，淡色虛線會顯示光線的反向延長線，方便你對準焦點。你可以在透鏡的任何一邊拖動。`,
+  loc:()=>`<b>找出像的位置。</b>${I('A')} 的像在哪裏？在格紙上點按該點。如果折射光線不相交，請先使用下面的工具。`,
+  style:()=>`<b>畫出像 ${I('A′B′')}。</b>像的尾端 ${I('B′')} 在主軸上，位於 ${I('A′')} 的正上方或正下方。應該用哪一種箭頭？`,
+  quiz:()=>`<b>描述這個像。</b>數一數格紙上的格數（1 小格 = 1 cm）。物體和像都在格線上。`
+ },
+ extendBtn:'把光線反向延長（虛線）', solid:'實線箭頭', dashed:'虛線箭頭',
+ meta:(cave,u,f)=>`${cave?'凹透鏡':'凸透鏡'} · 物距 ${u} cm · 焦距 ${f} cm`,
+ rulesHead:cave=>`作圖規則：${cave?'凹透鏡':'凸透鏡'}`,
+ rules:cave=>cave
+  ? [`<b>平行於</b>主軸的光線，折射後會<b>偏離</b>主軸，看似從 ${I('F′')} 射出。`,
+     `經過<b>光心</b>的光線沿直線穿過，不會偏折。`,
+     `<b>射向</b> ${I('F')} 的光線，折射後會<b>平行於</b>主軸。`]
+  : [`<b>平行於</b>主軸的光線，折射後會經過 ${I('F')}。`,
+     `經過<b>光心</b>的光線沿直線穿過，不會偏折。`,
+     `經過 ${I('F′')} 的光線，折射後會<b>平行於</b>主軸。如果物體在 ${I('F')} 以內，就把光線對準成看似從 ${I('F′')} 射出。`],
+ rulesTip:cave=>cave
+  ? '光線只在透鏡符號的垂直線上偏折。折射光線會散開，所以要用虛線把它們反向延長，找出它們看似射出的位置。'
+  : '光線只在透鏡符號的垂直線上偏折。任何兩條規則已足以找出像的位置。',
+ rule:{par:'平行於主軸',c:'經過光心',fpCave:'射向 F',fpReal:'經過 F′',fpVirt:'看似從 F′ 射出'},
+ fb:{
+  backwards:()=>`光線由物體射向透鏡。請在 ${I('A')} 的${q.side==='right'?'左':'右'}方拖動。`,
+  noRule:(cave,real)=>`這條光線不符合任何作圖規則。請把它對準成<b>平行於</b>主軸、經過<b>光心</b>，或${cave?`<b>射向</b> ${I('F')}`:(real?`經過 ${I('F′')}`:`看似從 ${I('F′')} 射出`)}。`,
+  miss:()=>'這條光線不會射到圖中的透鏡。試用另一條規則。',
+  used:()=>'光線 1 已用了這條規則，請選另一條。',
+  good:name=>`很好。這條光線${name}。`,
+  awayFromLens:()=>'請在離開透鏡線的位置拖動，以設定折射光線的方向。',
+  convexRule:()=>`這是凸透鏡的規則。凹透鏡會令光線<b>偏離</b>主軸，看似從 ${I('F′')} 射出。`,
+  mustBendCave:()=>`光線必須在透鏡處偏折。凹透鏡會令平行光線散開，看似從 ${I('F′')} 射出。`,
+  notQuiteCave:()=>`未完全正確。經過凹透鏡後，平行光線會散開，它的反向延長線經過 ${I('F′')}。`,
+  towardsF:()=>`射向 ${I('F')} 的光線，折射後會<b>平行於</b>主軸。`,
+  mustBendPar:()=>`光線必須在透鏡處偏折。平行於主軸的光線，折射後會經過 ${I('F')}。`,
+  notQuitePar:()=>`未完全正確。平行於主軸的光線，折射後會經過 ${I('F')}。`,
+  centre:()=>'經過光心的光線不會偏折，請沿直線延續。',
+  fpPar:real=>`${real?`經過 ${I('F′')}`:`看似從 ${I('F′')} 射出`}的光線，折射後會<b>平行於</b>主軸。`,
+  correctNext:()=>'正確。現在用另一條規則畫第二條光線。',
+  bothCorrect:()=>'兩條光線都正確。',
+  noNeedExtend:()=>`這些折射光線已在透鏡${q.side==='right'?'左':'右'}方相交，不需要延長。找出它們相交的位置。`,
+  extended:()=>'很好。折射光線會散開，所以要用<b>沒有箭頭的虛線</b>把它們反向延長。現在點按虛線相交的位置。',
+  notMeet:()=>`這些折射光線在${q.side==='right'?'左':'右'}方散開，永遠不會相交。把它們反向延長，找出它們看似射出的位置。`,
+  tapOk:real=>`正確。${I('A')} 的像位於${real?'光線相交':'虛線延長線相交'}的位置。`,
+  tapWrong:real=>`不是這裏。${I('A')} 的像位於${real?'兩條折射光線相交':'兩條虛線延長線相交'}的位置。看清楚，再點按一次。`,
+  useSolid:()=>'光線真的在這裏相交，所以這是實像。請用<b>實線</b>箭頭。',
+  useDashed:()=>'沒有光線真正到達這個像，所以這是虛像。請用<b>虛線</b>箭頭。',
+  styleOk:real=>real?'正確。實像用實線箭頭表示。':'正確。虛像用虛線箭頭表示。',
+  someWrong:()=>'有些答案需要再檢查。請修改標有 ✗ 的答案，然後再檢查。',
+  perfect:()=>'全部正確，而且沒有犯錯。做得好！試下一題吧。',
+  allDone:(m,sol)=>`全部正確。過程中你錯了 ${m} 次${sol?'，並查看了答案':''}。再試一題吧。`
+ },
+ mk:{enterNum:'請輸入數字', measureV:'由透鏡量度至 B′', divide:'用 A′B′ 除以 AB'},
+ formula:(q,cm,fmt,cave)=>`<p><b>用透鏡公式驗證</b>（實正虛負）</p>
+  <p>1/${I('u')} + 1/${I('v')} = 1/${I('f')} → 1/${cm(q.u)} + 1/${I('v')} = 1/${cave?'(−'+cm(q.f)+')':cm(q.f)}${cave?` &nbsp;（凹透鏡的 ${I('f')} 是負值）`:''}</p>
+  <p>${I('v')} = ${cm(q.v)} cm${q.real?'':'（負值，所以是虛像）'}</p>
+  <p>${I('m')} = |${I('v')}| / ${I('u')} = ${cm(Math.abs(q.v))} / ${cm(q.u)} = ${fmt(q.m)} &nbsp;（亦等於像高 ${cm(Math.abs(q.ty))} cm ÷ 物高 ${cm(Math.abs(q.h))} cm）</p>`
+}};
+
+/* language choice is remembered on this device and shared by all simulations on this site */
+let lang='en';
+try{ const s=localStorage.getItem('sim-lang'); if(s==='zh'||s==='en') lang=s; }catch(e){}
+const t=()=>L[lang];
+
+let q, rays, phase, extended, tip, drag, mistakes, solUsed, showSol, wrongTap, finished;
+let done=0, perfect=0;
+let lastFb=null;            // {k,args,kind} so feedback can be re-shown in the other language
+const marks={};             // k -> {ok,extra}
+
+/* Every question is chosen so that the object, the foci AND the image all sit exactly on
+   grid lines (1 small square = 0.5 grid unit = 1 cm), so students can read every value. */
+const POOL=(()=>{
+  const P=[], half=x=>Math.abs(x*2-Math.round(x*2))<1e-9, r2=x=>Math.round(x*2)/2;
+  for(const lens of ['convex','concave'])
+    for(let f2=4;f2<=16;f2++){ const f=f2/2;
+      if(lens==='convex'&&(f<2.5||f>6)) continue;
+      for(let u2=2;u2<=22;u2++){ const u=u2/2; if(u===f) continue;
+        const fs=lens==='convex'?f:-f, v=u*fs/(u-fs);
+        for(let h2=3;h2<=10;h2++){ const h=h2/2, ty=-h*v/u;
+          if(!half(v)||!half(ty)||Math.abs(v)>11||Math.abs(ty)>6||Math.abs(v)<1) continue;
+          if(v<0&&Math.abs(v+u)<1) continue;
+          if(Math.abs(ty)<(lens==='convex'?1:0.5)) continue;
+          P.push({lens,cs:lens==='concave'?0:(u>f?1:2),f,fs,h,u,v:r2(v),ty:r2(ty),real:v>0,m:Math.abs(v)/u});
+        }
+      }
+    }
+  return P;
+})();
+let lastQ=null;
+function gen(){
+  const sel=$('caseSel').value;
+  let pool;
+  if(sel==='right' || sel==='below'){
+    /* right / below: same convex+concave mix as mixed; below stays on the left only */
+    if(Math.random()<0.33) pool=POOL.filter(p=>p.lens==='concave');
+    else { const cs=Math.random()<0.55?1:2; pool=POOL.filter(p=>p.cs===cs); }
+  } else if(sel==='concave' || (sel==='mixed' && Math.random()<0.33)) pool=POOL.filter(p=>p.lens==='concave');
+  else if(sel==='1'||sel==='2') pool=POOL.filter(p=>p.cs===+sel);
+  else { const cs=Math.random()<0.55?1:2; pool=POOL.filter(p=>p.cs===cs); }
+  let p;
+  for(let k=0;k<20;k++){ p=pool[Math.floor(Math.random()*pool.length)]; if(p!==lastQ) break; }
+  lastQ=p;
+  const orient = sel==='below' ? 'down' : 'up';
+  const out = Object.assign({}, p, {side: sel==='right'?'right':'left', orient});
+  if(orient==='down'){ out.h=-out.h; out.ty=-out.ty; }
+  return out;
+}
+const cm=x=>fmt(2*x);
+
+function newQuestion(){
+  q=gen(); rays=[]; phase='inc'; extended=false; tip=null; drag=null;
+  mistakes=0; solUsed=false; showSol=false; wrongTap=null; finished=false;
+  $('solBtn').setAttribute('aria-pressed','false');
+  resetQuiz(); setFb(null); update();
+}
+
+/* ---------- geometry ---------- */
+const sideRight=()=>q.side==='right';
+const A=()=>({x:sideRight()?q.u:-q.u,y:q.h});
+const imgX=()=>sideRight()?-q.v:q.v;
+function toEdge(p,d){
+  const ts=[];
+  if(d.x>0)ts.push((XMAX-p.x)/d.x); if(d.x<0)ts.push((XMIN-p.x)/d.x);
+  if(d.y>0)ts.push((YMAX-p.y)/d.y); if(d.y<0)ts.push((YMIN-p.y)/d.y);
+  const tt=Math.min(...ts); return {x:p.x+d.x*tt,y:p.y+d.y*tt};
+}
+function distPointLine(p,a,b){
+  const dx=b.x-a.x, dy=b.y-a.y; return Math.abs(dx*(a.y-p.y)-dy*(a.x-p.x))/Math.hypot(dx,dy);
+}
+function angDiff(d1,d2){
+  let a=Math.atan2(d1.y,d1.x)-Math.atan2(d2.y,d2.x);
+  while(a>Math.PI)a-=2*Math.PI; while(a<-Math.PI)a+=2*Math.PI; return Math.abs(a)*180/Math.PI;
+}
+const cave=()=>q.lens==='concave';
+/* third-rule focus: convex uses F′ (object side), concave uses F (far side); mirrored when object is on the right */
+const thirdPt=()=>({x:sideRight()?q.fs:-q.fs,y:0});
+/* refracted direction from a drag point: on the exit side it is a point the ray passes through;
+   on the object side it is a point the ray appears to come from (its backward extension) */
+function refDir(P,D){
+  const forward = sideRight() ? D.x<0 : D.x>0;
+  return forward ? {x:D.x,y:D.y-P.y} : {x:-D.x,y:P.y-D.y};
+}
+function idealYp(rule){ const px=-q.fs; return rule==='par'?q.h : rule==='c'?0 : q.h*px/(px+q.u); }
+function outDir(rule){
+  const d = rule==='par'?{x:q.f,y:cave()?q.h:-q.h} : rule==='c'?{x:q.u,y:-q.h} : {x:1,y:0};
+  return sideRight() ? {x:-d.x,y:d.y} : d;
+}
+function ruleKey(rule){ return rule!=='fp' ? rule : cave()?'fpCave' : q.real?'fpReal':'fpVirt'; }
+const focusCheck=()=>({x:sideRight()?-q.fs:q.fs,y:0});
+const convexFocus=()=>({x:sideRight()?-q.f:q.f,y:0});
+
+/* ---------- drawing ---------- */
+function arrowHead(x1,y1,x2,y2,frac,col){
+  /* Tip sits exactly on the endpoint (grid-aligned). Same silhouette as the original
+     tip=+5 / base=-4 triangle, but shifted so the tip is on the point, not past it. */
+  const px=X(x1+(x2-x1)*frac), py=Y(y1+(y2-y1)*frac);
+  const ang=Math.atan2(Y(y2)-Y(y1),X(x2)-X(x1));
+  const c=Math.cos(ang), s=Math.sin(ang);
+  const pt=(a,b)=>`${(px+a*c-b*s).toFixed(1)},${(py+a*s+b*c).toFixed(1)}`;
+  return `<polygon points="${pt(0,0)} ${pt(-9,-3.6)} ${pt(-9,3.6)}" fill="${col}"/>`;
+}
+function shaftLine(p1,p2,col,w,dash,shortenPx){
+  let x2=X(p2.x), y2=Y(p2.y);
+  if(shortenPx){
+    const dx=x2-X(p1.x), dy=y2-Y(p1.y), len=Math.hypot(dx,dy)||1;
+    const t=Math.max(0,(len-shortenPx)/len);
+    x2=X(p1.x)+dx*t; y2=Y(p1.y)+dy*t;
+  }
+  return `<line x1="${X(p1.x)}" y1="${Y(p1.y)}" x2="${(+x2).toFixed(1)}" y2="${(+y2).toFixed(1)}" stroke="${col}" stroke-width="${w}" ${dash?`stroke-dasharray="${dash}"`:''} stroke-linecap="round"/>`;
+}
+function seg(p1,p2,col,w,dash,arrow){
+  /* When an arrowhead is drawn, stop the shaft at its base (~9px) so the tip stays sharp. */
+  let s=shaftLine(p1,p2,col,w,dash,arrow?9:0);
+  if(arrow) s+=arrowHead(p1.x,p1.y,p2.x,p2.y,arrow,col);
+  return s;
+}
+function arrowSeg(p1,p2,col,w,dash){
+  return shaftLine(p1,p2,col,w,dash,9)+arrowHead(p1.x,p1.y,p2.x,p2.y,1,col);
+}
+function label(x,y,txt,col,anchor){
+  return `<text x="${X(x)}" y="${Y(y)}" fill="${col}" font-family="STIX Two Text, Times New Roman, serif" font-style="italic" font-weight="500" font-size="15" text-anchor="${anchor||'middle'}">${txt}</text>`;
+}
+function imageArrow(col,dashed){
+  const ix=imgX(), b={x:ix,y:0}, tt={x:ix,y:q.ty};
+  let s=arrowSeg(b,tt,col,2.6,dashed?'5 4':'');
+  const up=q.ty>0, right=ix>=0;
+  s+=label(ix+(right?0.45:-0.45),q.ty+(up?0.25:-0.75),'A′',col,right?'start':'end');
+  s+=label(ix+(right?0.45:-0.45),up?-0.85:0.3,'B′',col,right?'start':'end');
+  return s;
+}
+function render(){
+  const ink='var(--ink)', ray='var(--ray)', sol='var(--sol)';
+  let s=`<defs><clipPath id="clip"><rect x="0" y="0" width="480" height="260"/></clipPath></defs><rect width="480" height="260" fill="var(--paper)"/>`;
+  // graph paper: small squares of 1 cm, bold line every 5 squares (counted from the lens and axis)
+  for(let i=XMIN*2;i<=XMAX*2;i++){ const x=i/2, b=i%5===0; s+=`<line x1="${X(x)}" y1="0" x2="${X(x)}" y2="260" stroke="${b?'var(--grid-strong)':'var(--grid)'}" stroke-width="${b?.9:.55}"/>`; }
+  for(let i=-13;i<=13;i++){ const y=i/2, b=i%5===0; s+=`<line x1="0" y1="${Y(y)}" x2="480" y2="${Y(y)}" stroke="${b?'var(--grid-strong)':'var(--grid)'}" stroke-width="${b?.9:.55}"/>`; }
+  s+=`<line x1="0" y1="${Y(0)}" x2="480" y2="${Y(0)}" stroke="${ink}" stroke-width="1.3"/>`;
+  s+=seg({x:0,y:-6.1},{x:0,y:6.1},ink,1.6,'',0);
+  const hd=cave()?-8:8; // convex: arrowheads point outward; concave: inward
+  s+=`<polyline points="${X(0)-6},${Y(6.1)+hd} ${X(0)},${Y(6.1)} ${X(0)+6},${Y(6.1)+hd}" fill="none" stroke="${ink}" stroke-width="1.6"/>`;
+  s+=`<polyline points="${X(0)-6},${Y(-6.1)-hd} ${X(0)},${Y(-6.1)} ${X(0)+6},${Y(-6.1)-hd}" fill="none" stroke="${ink}" stroke-width="1.6"/>`;
+  [-q.f,q.f].forEach((fx,i)=>{ s+=`<line x1="${X(fx)}" y1="${Y(0)-5}" x2="${X(fx)}" y2="${Y(0)+5}" stroke="${ink}" stroke-width="1.4"/>`; s+=label(fx+0.05,-0.95,sideRight()?(i?'F′':'F'):(i?'F':'F′'),ink); });
+  const a=A();
+  s+=arrowSeg({x:a.x,y:0},a,ink,2.6,'');
+  {
+    const up=a.y>0, ax=sideRight()?a.x+0.25:a.x-0.25, anch=sideRight()?'start':'end';
+    s+=label(ax,a.y+(up?0.35:-0.75),'A',ink,anch)+label(ax,up?-0.85:0.3,'B',ink,anch);
+  }
+
+  let r='<g clip-path="url(#clip)">';
+  if(showSol){
+    ['par','c'].forEach(rule=>{
+      const P={x:0,y:idealYp(rule)}, d=outDir(rule);
+      r+=seg(a,P,sol,1.6,'',.5)+seg(P,toEdge(P,d),sol,1.6,'',.45);
+      if(!q.real) r+=seg(P,toEdge(P,{x:-d.x,y:-d.y}),sol,1.3,'3 4',0);
+    });
+  }
+  rays.forEach(ry=>{
+    const P={x:0,y:ry.yp};
+    r+=seg(a,P,ray,2,'',.5);
+    if(ry.out){
+      r+=seg(P,toEdge(P,ry.out),ray,2,'',.4);
+      if(extended) r+=seg(P,toEdge(P,{x:-ry.out.x,y:-ry.out.y}),ray,1.6,'4 4',0);
+    }
+  });
+  if(drag){
+    const D=drag;
+    const towardLens = sideRight() ? D.x<a.x-0.2 : D.x>a.x+0.2;
+    if(phase==='inc' && towardLens){
+      const yp=a.y+(0-a.x)*(D.y-a.y)/(D.x-a.x);
+      r+=seg(a,{x:0,y:yp},ray,1.6,'6 4',0);
+    } else if(phase==='ref' && Math.abs(D.x)>0.05){
+      const P={x:0,y:rays[rays.length-1].yp}, d=refDir(P,D);
+      r+=seg(P,toEdge(P,{x:-d.x,y:-d.y}),'var(--muted)',1.3,'2 4',0);
+      r+=seg(P,toEdge(P,d),ray,1.8,'6 4',0);
+    }
+    r+=`<circle cx="${X(D.x)}" cy="${Y(D.y)}" r="5" fill="none" stroke="var(--accent)" stroke-width="2"/>`;
+    r+=`<line x1="${X(D.x)-11}" y1="${Y(D.y)}" x2="${X(D.x)+11}" y2="${Y(D.y)}" stroke="var(--accent)" stroke-width="1"/><line x1="${X(D.x)}" y1="${Y(D.y)-11}" x2="${X(D.x)}" y2="${Y(D.y)+11}" stroke="var(--accent)" stroke-width="1"/>`;
+  }
+  if(wrongTap) r+=`<circle cx="${X(wrongTap.x)}" cy="${Y(wrongTap.y)}" r="6" fill="none" stroke="var(--bad)" stroke-width="2" stroke-dasharray="3 2"/>`;
+  r+='</g>';
+  s+=r;
+  if(showSol) s+=imageArrow(sol,!q.real);
+  if(tip && phase==='style') s+=`<circle cx="${X(imgX())}" cy="${Y(q.ty)}" r="4.5" fill="var(--ray)"/>`;
+  if(phase==='quiz'||phase==='done') s+=imageArrow(ray,!q.real);
+  svg.innerHTML=s;
+}
+
+/* ---------- panel ---------- */
+function setFb(k,kind,...args){ lastFb=k?{k,kind,args}:null; showFb(); }
+function showFb(){
+  const el=$('fb');
+  if(!lastFb){ el.className='fb'; el.innerHTML=''; return; }
+  el.className='fb'+(lastFb.kind?' '+lastFb.kind:'');
+  el.innerHTML=t().fb[lastFb.k](...lastFb.args);
+}
+function update(){
+  const T=t(), n=rays.length;
+  const idx = phase==='inc'?n : phase==='ref'?n-1 : phase==='loc'?2 : phase==='style'?3 : 4;
+  [...$('steps').children].forEach((li,i)=>{ li.textContent=T.steps[i]; li.className = i<idx||(phase==='done')?'done':i===idx?'cur':''; });
+  const instr=$('instr'), tools=$('tools'); tools.innerHTML='';
+  if(phase==='inc') instr.innerHTML=T.instr.inc(n);
+  else if(phase==='ref') instr.innerHTML=T.instr.ref(n);
+  else if(phase==='loc'){
+    instr.innerHTML=T.instr.loc();
+    const b=document.createElement('button'); b.className='btn'; b.textContent=T.extendBtn; b.disabled=extended;
+    b.onclick=extendBack; tools.append(b);
+  } else if(phase==='style'){
+    instr.innerHTML=T.instr.style();
+    const b1=document.createElement('button'); b1.className='btn'; b1.textContent=T.solid; b1.onclick=()=>chooseStyle(true);
+    const b2=document.createElement('button'); b2.className='btn'; b2.textContent=T.dashed; b2.onclick=()=>chooseStyle(false);
+    tools.append(b1,b2);
+  } else instr.innerHTML=T.instr.quiz();
+  $('quiz').hidden=!(phase==='quiz'||phase==='done');
+  $('undoBtn').disabled = !( (phase==='inc'&&n>0) || phase==='ref' || phase==='loc');
+  $('metaInfo').textContent=T.meta(cave(),cm(q.u),cm(q.f));
+  $('rulesHead').textContent=T.rulesHead(cave());
+  $('rulesList').innerHTML=T.rules(cave()).map(x=>`<li>${x}</li>`).join('');
+  $('rulesTip').textContent=T.rulesTip(cave());
+  render();
+}
+
+/* ---------- language ---------- */
+function applyLang(){
+  const T=t();
+  document.documentElement.lang = lang==='zh'?'zh-HK':'en';
+  document.title = T.title;
+  $('lang-en').setAttribute('aria-pressed',String(lang==='en'));
+  $('lang-zh').setAttribute('aria-pressed',String(lang==='zh'));
+  document.querySelectorAll('[data-t]').forEach(e=>{ e.textContent=T[e.dataset.t]; });
+  document.querySelectorAll('[data-h]').forEach(e=>{ e.innerHTML=T[e.dataset.h]; });
+  $('homeLink').textContent=T.home;
+  [...$('caseSel').options].forEach(o=>{ o.textContent=T.cases[o.value]; });
+  $('caseSel').setAttribute('aria-label',T.caseLabel);
+  svg.setAttribute('aria-label',T.grid);
+  $('qv').placeholder=`${T.eg} 6.5`; $('qm').placeholder=`${T.eg} 1.5`;
+  $('solBtn').textContent=showSol?T.hideSol:T.showSol;
+  $('hintBtn').textContent=$('rules').hidden?T.showRules:T.hideRules;
+  if(q){ update(); showFb(); showMarks(); if(!$('formula').hidden) $('formula').innerHTML=T.formula(q,cm,fmt,cave()); }
+}
+function setLang(l){ lang=l; try{ localStorage.setItem('sim-lang',l); }catch(e){} applyLang(); }
+$('lang-en').onclick=()=>setLang('en');
+$('lang-zh').onclick=()=>setLang('zh');
+
+/* ---------- actions ---------- */
+function oops(k,...args){ mistakes++; setFb(k,'bad',...args); }
+function commitIncident(D){
+  const a=A();
+  if(sideRight() ? D.x>=a.x-0.2 : D.x<=a.x+0.2){ setFb('backwards',''); return; }
+  const yp=a.y+(0-a.x)*(D.y-a.y)/(D.x-a.x);
+  let rule=null;
+  if(Math.abs(yp-q.h)<0.3) rule='par';
+  else if(Math.abs(yp)<0.3) rule='c';
+  else if(distPointLine(thirdPt(),a,D)<0.3) rule='fp';
+  if(!rule){ oops('noRule',cave(),q.real); return; }
+  if(Math.abs(idealYp(rule))>6.1){ setFb('miss',''); return; }
+  if(rays.some(r=>r.rule===rule)){ setFb('used',''); return; }
+  rays.push({rule,yp:idealYp(rule),out:null});
+  phase='ref'; lastFb={k:'good',kind:'ok',args:[]}; lastFb.rk=ruleKey(rule);
+  showGood();
+}
+function showGood(){ /* the rule name inside "good" also needs translating */
+  lastFb.args=[t().rule[lastFb.rk]]; showFb();
+}
+function commitRefracted(D){
+  const ry=rays[rays.length-1], P={x:0,y:ry.yp};
+  if(Math.abs(D.x)<=0.05){ setFb('awayFromLens',''); return; }
+  const d=refDir(P,D), exp=outDir(ry.rule);
+  let ok=angDiff(d,exp)<2.5;
+  if(!ok && ry.rule==='par' && distPointLine(focusCheck(),P,D)<0.25) ok=true;
+  if(!ok){
+    if(cave() && ry.rule==='par'){
+      if(distPointLine(convexFocus(),P,D)<0.4) oops('convexRule');
+      else if(angDiff(d,{x:1,y:0})<3) oops('mustBendCave');
+      else oops('notQuiteCave');
+    }
+    else if(cave() && ry.rule==='fp') oops('towardsF');
+    else if(ry.rule==='par') oops(angDiff(d,{x:1,y:0})<3 ? 'mustBendPar' : 'notQuitePar');
+    else if(ry.rule==='c') oops('centre');
+    else oops('fpPar',q.real);
+    return;
+  }
+  ry.out=exp;
+  if(rays.length<2){ phase='inc'; setFb('correctNext','ok'); }
+  else { phase='loc'; setFb('bothCorrect','ok'); }
+}
+function extendBack(){
+  if(q.real){ oops('noNeedExtend'); return; }
+  extended=true; setFb('extended','ok'); update();
+}
+function commitTap(T){
+  wrongTap=null;
+  if(!q.real && !extended){ wrongTap=T; oops('notMeet'); return; }
+  if(Math.hypot(T.x-imgX(),T.y-q.ty)<0.55){ tip=T; phase='style'; setFb('tapOk','ok',q.real); return; }
+  wrongTap=T;
+  oops('tapWrong',q.real);
+}
+function chooseStyle(solid){
+  if(solid!==q.real){ oops(q.real?'useSolid':'useDashed'); return; }
+  phase='quiz'; setFb('styleOk','ok',q.real); update();
+}
+
+/* ---------- pointer ---------- */
+function toUnits(e){
+  const p=svg.createSVGPoint(); p.x=e.clientX; p.y=e.clientY;
+  const r=p.matrixTransform(svg.getScreenCTM().inverse());
+  return {x:snap(r.x/S+XMIN), y:snap(YMAX-r.y/S)};
+}
+const active=()=>phase==='inc'||phase==='ref'||phase==='loc';
+svg.addEventListener('pointerdown',e=>{ if(!active())return; e.preventDefault(); svg.setPointerCapture(e.pointerId); drag=toUnits(e); render(); });
+svg.addEventListener('pointermove',e=>{ if(!drag)return; drag=toUnits(e); render(); });
+function end(){
+  if(!drag)return; const D=drag; drag=null;
+  if(phase==='inc') commitIncident(D); else if(phase==='ref') commitRefracted(D); else if(phase==='loc') commitTap(D);
+  update();
+}
+svg.addEventListener('pointerup',end);
+svg.addEventListener('pointercancel',()=>{drag=null;render();});
+
+/* ---------- quiz ---------- */
+const ans={};
+document.querySelectorAll('.chips').forEach(g=>{
+  g.addEventListener('click',e=>{
+    const b=e.target.closest('.chip'); if(!b)return;
+    g.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b?'true':'false'));
+    ans[g.dataset.g]=b.dataset.v;
+  });
+});
+function resetQuiz(){
+  for(const k in ans) delete ans[k];
+  for(const k in marks) delete marks[k];
+  document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed','false'));
+  showMarks();
+  $('qv').value=''; $('qm').value=''; $('formula').hidden=true; $('checkBtn').disabled=false;
+}
+function showMarks(){
+  document.querySelectorAll('.mark').forEach(m=>{
+    const r=marks[m.dataset.m];
+    if(!r){ m.textContent=''; m.className='mark'; return; }
+    m.className='mark '+(r.ok?'ok':'bad');
+    m.textContent=r.ok?'✓':'✗'+(r.extra?' '+t().mk[r.extra]:'');
+  });
+}
+$('checkBtn').onclick=()=>{
+  const size = q.m>1.05?'magnified':q.m<0.95?'diminished':'same';
+  const vIn=parseFloat($('qv').value), mIn=parseFloat($('qm').value);
+  let all=true, wrong=0;
+  const chk=(k,ok,extra)=>{ marks[k]={ok,extra:ok?null:extra}; if(!ok){all=false;wrong++;} };
+  chk('type', ans.type===(q.real?'real':'virtual'));
+  chk('orient', ans.orient===(q.real?'inverted':'upright'));
+  chk('size', ans.size===size);
+  chk('v', !isNaN(vIn) && Math.abs(Math.abs(vIn)-2*Math.abs(q.v))<=1, isNaN(vIn)?'enterNum':'measureV');
+  chk('m', !isNaN(mIn) && Math.abs(mIn-q.m)<=Math.max(0.15,0.1*q.m), isNaN(mIn)?'enterNum':'divide');
+  showMarks();
+  mistakes+=wrong;
+  if(!all){ setFb('someWrong','bad'); return; }
+  $('formula').innerHTML=t().formula(q,cm,fmt,cave());
+  $('formula').hidden=false; $('checkBtn').disabled=true;
+  if(!finished){ finished=true; done++; if(mistakes===0&&!solUsed) perfect++; }
+  phase='done';
+  if(mistakes===0&&!solUsed) setFb('perfect','ok'); else setFb('allDone','ok',mistakes,solUsed);
+  update();
+};
+
+/* ---------- footer ---------- */
+$('undoBtn').onclick=()=>{
+  if(phase==='ref'){ rays.pop(); phase='inc'; }
+  else if(phase==='inc'&&rays.length){ rays[rays.length-1].out=null; phase='ref'; }
+  else if(phase==='loc'){ rays[1].out=null; extended=false; wrongTap=null; phase='ref'; }
+  setFb(null); update();
+};
+$('solBtn').onclick=()=>{
+  showSol=!showSol; if(showSol) solUsed=true;
+  $('solBtn').setAttribute('aria-pressed',String(showSol)); $('solBtn').textContent=showSol?t().hideSol:t().showSol;
+  render();
+};
+$('hintBtn').onclick=()=>{
+  const r=$('rules'); r.hidden=!r.hidden;
+  $('hintBtn').setAttribute('aria-pressed',String(!r.hidden)); $('hintBtn').textContent=r.hidden?t().showRules:t().hideRules;
+};
+$('newBtn').onclick=()=>{ newQuestion(); $('solBtn').textContent=t().showSol; };
+$('caseSel').onchange=()=>{ newQuestion(); $('solBtn').textContent=t().showSol; };
+
+/* re-translate the rule name inside a "Good. This ray is…" message when the language changes */
+const _show=showFb;
+showFb=function(){ if(lastFb&&lastFb.rk) lastFb.args=[t().rule[lastFb.rk]]; _show(); };
+
+applyLang();
+newQuestion();
+})();
+</script>
+</body>
+</html>

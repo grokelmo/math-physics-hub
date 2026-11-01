@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Physics Simulation Lab</title>
+<meta name="description" content="Interactive physics simulations and practice tools for HKDSE Physics students.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Noto+Sans+HK:wght@400;500&display=swap">
+<style>
+/* Layout: compact lab-bench header with a light-ray motif, then a filterable grid of simulation tiles */
+:root{
+  --bg:#f1f5f8; --surface:#ffffff; --ink:#15232c; --muted:#5a6c77; --line:#d8e2e8;
+  --accent:#1767c2; --accent-ink:#ffffff; --accent-soft:#e4effb;
+  --ray:#e0442f; --new:#c2410c; --new-soft:#fdeee5;
+  /* one colour per HKDSE topic */
+  --t-heat:#c2410c; --t-heat-soft:#fdeee5;
+  --t-force:#7c3aed; --t-force-soft:#f1eafe;
+  --t-wave:#0f7c8c; --t-wave-soft:#e1f4f6;
+  --t-elec:#b7791f; --t-elec-soft:#fbf2df;
+  --t-radio:#2f855a; --t-radio-soft:#e5f5ec;
+  --font-ui:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-zh:"Noto Sans HK","PingFang HK","Microsoft JhengHei",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#0d151b; --surface:#16222b; --ink:#e3ecf1; --muted:#94a8b4; --line:#26363f;
+  --accent:#5aa5f5; --accent-ink:#06192c; --accent-soft:#16304a;
+  --ray:#ff7a63; --new:#ffa36b; --new-soft:#3a2418;
+  --t-heat:#ff9a62; --t-heat-soft:#3a2418;
+  --t-force:#b79bff; --t-force-soft:#2a2142;
+  --t-wave:#4fd0de; --t-wave-soft:#14343a;
+  --t-elec:#f0c060; --t-elec-soft:#3a2f17;
+  --t-radio:#6bd69b; --t-radio-soft:#16352a;
+  color-scheme:dark;
+}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:15px;line-height:1.5;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.zh{font-family:var(--font-zh)}
+.inner{max-width:1120px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* header */
+.hero{background:var(--surface);border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.hero .inner{padding-block:28px 24px;position:relative;z-index:1;display:flex;flex-direction:column;gap:6px}
+.hero svg.rays{position:absolute;right:-20px;top:0;height:100%;width:min(520px,60%);z-index:0;opacity:.9;pointer-events:none}
+@media (max-width:620px){.hero svg.rays{display:none}}
+.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600;margin:0}
+h1{margin:0;font-size:clamp(1.7rem,4.5vw,2.5rem);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance}
+h1 .zh{display:block;font-size:.55em;font-weight:500;color:var(--muted);letter-spacing:.04em;margin-top:4px}
+.lead{margin:6px 0 0;color:var(--muted);max-width:52ch}
+
+/* toolbar */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding-block:18px 6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:.85rem;min-height:40px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink);cursor:pointer;touch-action:manipulation}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip .n{opacity:.6;margin-left:4px;font-variant-numeric:tabular-nums}
+.search{position:relative;flex:1 1 220px;max-width:320px}
+.search input{width:100%;font:inherit;min-height:44px;padding:9px 12px 9px 38px;border-radius:12px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink)}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--muted)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* grid */
+main{padding-block:10px 40px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+@media (max-width:620px){.grid{grid-template-columns:minmax(0,1fr)}}
+.tile{display:flex;gap:14px;align-items:flex-start;padding:16px;background:var(--surface);border:1px solid var(--line);
+  border-radius:16px;color:inherit;text-decoration:none;min-width:0;position:relative;
+  transition:border-color .15s, transform .15s, box-shadow .15s}
+.tile:hover{border-color:var(--tc);box-shadow:0 6px 20px -12px var(--tc)}
+.tile:active{transform:scale(.985)}
+.icon{flex:none;width:72px;height:72px;border-radius:14px;background:var(--tcs);display:grid;place-items:center}
+.icon svg{width:56px;height:56px}
+.body{min-width:0;display:flex;flex-direction:column;gap:4px;flex:1}
+.title{font-size:1.05rem;font-weight:600;line-height:1.25;margin:0}
+.title .zh{display:block;font-size:.85rem;font-weight:500;color:var(--muted);margin-top:2px}
+.desc{margin:2px 0 0;font-size:.88rem;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tag{font-size:.72rem;padding:2px 9px;border-radius:999px;background:var(--tcs);color:var(--tc);font-weight:500}
+.tag.kind{background:transparent;border:1px solid var(--line);color:var(--muted)}
+.badge{position:absolute;top:12px;right:12px;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--new);background:var(--new-soft);padding:2px 8px;border-radius:999px}
+.tile:has(.badge) .title{padding-right:44px}
+.go{flex:none;align-self:center;width:20px;height:20px;stroke:var(--muted);transition:transform .15s}
+.tile:hover .go{transform:translateX(3px);stroke:var(--tc)}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 16px;background:var(--surface);border:1px dashed var(--line);border-radius:16px}
+.count{font-size:.82rem;color:var(--muted);margin:0 0 10px;font-variant-numeric:tabular-nums}
+
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:.8rem}
+footer .inner{padding-block:18px;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
+
+/* topic colours */
+[data-topic="heat"]{--tc:var(--t-heat);--tcs:var(--t-heat-soft)}
+[data-topic="force"]{--tc:var(--t-force);--tcs:var(--t-force-soft)}
+[data-topic="wave"]{--tc:var(--t-wave);--tcs:var(--t-wave-soft)}
+[data-topic="elec"]{--tc:var(--t-elec);--tcs:var(--t-elec-soft)}
+[data-topic="radio"]{--tc:var(--t-radio);--tcs:var(--t-radio-soft)}
+
+@media (prefers-reduced-motion:no-preference){
+  .rays .beam{stroke-dasharray:6 10;animation:flow 2.4s linear infinite}
+  @keyframes flow{to{stroke-dashoffset:-32}}
+}
+@media (prefers-reduced-motion:reduce){.tile,.go{transition:none}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <!-- light rays converging through a convex lens -->
+  <svg class="rays" viewBox="0 0 520 200" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+    <g fill="none" stroke-linecap="round">
+      <line x1="0" y1="100" x2="520" y2="100" stroke="var(--line)" stroke-width="1.5"/>
+      <line x1="250" y1="22" x2="250" y2="178" stroke="var(--muted)" stroke-width="2" opacity=".55"/>
+      <polyline points="242,32 250,22 258,32" stroke="var(--muted)" stroke-width="2" opacity=".55"/>
+      <polyline points="242,168 250,178 258,168" stroke="var(--muted)" stroke-width="2" opacity=".55"/>
+      <g stroke="var(--ray)" stroke-width="2" opacity=".55">
+        <polyline class="beam" points="60,55 250,55 400,100 520,136"/>
+        <polyline class="beam" points="60,145 250,145 400,100 520,64"/>
+        <polyline class="beam" points="60,100 520,100"/>
+      </g>
+      <circle cx="400" cy="100" r="3.5" fill="var(--ray)" stroke="none" opacity=".7"/>
+    </g>
+  </svg>
+  <div class="inner">
+    <p class="eyebrow">HKDSE Physics</p>
+    <h1>Physics Simulation Lab<span class="zh">物理模擬實驗室</span></h1>
+    <p class="lead">Choose a simulation below. Each one works on a tablet, a phone or a computer.</p>
+  </div>
+</header>
+
+<main>
+  <div class="inner">
+    <div class="toolbar">
+      <div class="chips" id="chips" role="group" aria-label="Filter by topic"></div>
+      <label class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input id="q" type="search" placeholder="Search simulations" aria-label="Search simulations" autocomplete="off">
+      </label>
+    </div>
+    <p class="count" id="count"></p>
+    <div class="grid" id="grid"></div>
+  </div>
+</main>
+
+<footer>
+  <div class="inner">
+    <span>Tip: add this page to your home screen for quick access.</span>
+    <span id="updated"></span>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   SIMULATION LIST — add a new entry here for each new page.
+   file   : the HTML file name in this repository
+   topic  : heat | force | wave | elec | radio  (HKDSE compulsory topics)
+   kind   : "Practice" or "Simulation" (shown as a small tag)
+   added  : date added (YYYY-MM-DD); tiles show "New" for 21 days
+   icon   : key of an icon in ICONS below
+   ============================================================ */
+const SIMS = [
+  {
+    file: "motion-graph-lab.html",
+    title: "Motion Graph Lab", zh: "運動圖像練習室",
+    desc: "Convert between s–t, v–t and a–t graphs: describe the motion, quick match, complete the graph, and play the motion on a track.",
+    topic: "force", sub: "Motion graphs", kind: "Practice", added: "2026-10-23", icon: "motion"
+  },
+  {
+    file: "lens-ray-diagram.html",
+    title: "Lens Ray Diagram", zh: "透鏡光線圖",
+    desc: "Draw rays through convex and concave lenses to locate the image, then describe it and check with the lens formula.",
+    topic: "wave", sub: "Lenses", kind: "Practice", added: "2026-10-15", icon: "lens"
+  },
+  {
+    file: "plane-mirror-ray-diagram.html",
+    title: "Plane Mirror Ray Diagram", zh: "平面鏡光線圖",
+    desc: "Can the observer see the image? Explore how light reflects off a plane mirror, then try the challenge examples.",
+    topic: "wave", sub: "Reflection", kind: "Practice", added: "2026-10-19", icon: "mirror"
+  }
+];
+
+const TOPICS = {
+  heat:  {en:"Heat and Gases",               zh:"熱和氣體"},
+  force: {en:"Force and Motion",             zh:"力和運動"},
+  wave:  {en:"Wave Motion",                  zh:"波動"},
+  elec:  {en:"Electricity and Magnetism",    zh:"電和磁"},
+  radio: {en:"Radioactivity and Nuclear Energy", zh:"放射現象和核能"}
+};
+
+/* Icons are drawn in a 56×56 box; "currentColor" takes the topic colour. */
+const ICONS = {
+  lens: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)">
+    <line x1="4" y1="28" x2="52" y2="28" stroke="currentColor" stroke-width="1.2" opacity=".45"/>
+    <path d="M24 8 Q31 28 24 48 Q17 28 24 8Z" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.8"/>
+    <polyline points="4,16 24,16 40,28 52,37" stroke="var(--ray)" stroke-width="2"/>
+    <polyline points="4,40 24,40 40,28 52,19" stroke="var(--ray)" stroke-width="2"/>
+    <circle cx="40" cy="28" r="2.2" fill="var(--ray)"/></svg>`,
+  mirror: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)">
+    <line x1="30" y1="6" x2="30" y2="50" stroke="currentColor" stroke-width="2.4"/>
+    <g stroke="currentColor" stroke-width="1.2" opacity=".55">
+      <line x1="30" y1="10" x2="35" y2="6"/><line x1="30" y1="18" x2="35" y2="14"/><line x1="30" y1="26" x2="35" y2="22"/>
+      <line x1="30" y1="34" x2="35" y2="30"/><line x1="30" y1="42" x2="35" y2="38"/><line x1="30" y1="50" x2="35" y2="46"/></g>
+    <line x1="9" y1="40" x2="9" y2="24" stroke="currentColor" stroke-width="2"/>
+    <polyline points="6,28 9,24 12,28" stroke="currentColor" stroke-width="2"/>
+    <polyline points="9,24 30,32 12,44" stroke="var(--ray)" stroke-width="2"/>
+    <line x1="30" y1="32" x2="49" y2="24" stroke="var(--ray)" stroke-width="1.4" stroke-dasharray="2.5 2.5" opacity=".75"/>
+    <path d="M6 44 q6 -5 12 0 q-6 5 -12 0z" stroke="currentColor" stroke-width="1.6"/>
+    <circle cx="12" cy="44" r="1.6" fill="currentColor"/></svg>`,
+  motion: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)">
+    <polyline points="8,6 8,48 52,48" stroke="currentColor" stroke-width="1.8" opacity=".6"/>
+    <path d="M8 44 Q22 44 30 30 T52 12" stroke="currentColor" stroke-width="2.4"/>
+    <line x1="8" y1="36" x2="52" y2="18" stroke="var(--ray)" stroke-width="1.6" stroke-dasharray="3 3" opacity=".8"/>
+    <circle cx="30" cy="30" r="2.6" fill="var(--ray)"/></svg>`,
+  generic: `<svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--tc)">
+    <path d="M22 8h12M24 8v14L12 44a4 4 0 0 0 3.5 6h25a4 4 0 0 0 3.5-6L32 22V8"/><path d="M17 36h22" opacity=".5"/></svg>`
+};
+
+/* ---------- page logic (no need to edit below) ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const NEW_DAYS = 21;
+const isNew = d => (Date.now() - new Date(d + "T00:00:00+08:00")) / 864e5 < NEW_DAYS;
+const arrow = `<svg class="go" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9,5 16,12 9,19"/></svg>`;
+
+let topic = "all";
+try { const t = localStorage.getItem("simlab-topic"); if (t && (t === "all" || SIMS.some(s => s.topic === t))) topic = t; } catch (e) {}
+
+function renderChips(){
+  const used = Object.keys(TOPICS).filter(k => SIMS.some(s => s.topic === k));
+  const btn = (k, label, n) => `<button class="chip" data-k="${k}" aria-pressed="${topic===k}">${label}<span class="n">${n}</span></button>`;
+  $("chips").innerHTML = btn("all", "All", SIMS.length) +
+    used.map(k => btn(k, `${TOPICS[k].en} <span class="zh">${TOPICS[k].zh}</span>`, SIMS.filter(s => s.topic === k).length)).join("");
+}
+
+function render(){
+  const q = $("q").value.trim().toLowerCase();
+  const list = SIMS
+    .filter(s => topic === "all" || s.topic === topic)
+    .filter(s => !q || [s.title, s.zh, s.desc, s.sub, TOPICS[s.topic].en, TOPICS[s.topic].zh].join(" ").toLowerCase().includes(q))
+    .sort((a, b) => b.added.localeCompare(a.added));
+  $("grid").innerHTML = list.length ? list.map(s => `
+    <a class="tile" href="${esc(s.file)}" data-topic="${s.topic}">
+      ${isNew(s.added) ? '<span class="badge">New</span>' : ''}
+      <span class="icon">${ICONS[s.icon] || ICONS.generic}</span>
+      <span class="body">
+        <span class="title">${esc(s.title)}<span class="zh">${esc(s.zh)}</span></span>
+        <span class="desc">${esc(s.desc)}</span>
+        <span class="tags"><span class="tag">${TOPICS[s.topic].en} · ${esc(s.sub)}</span><span class="tag kind">${esc(s.kind)}</span></span>
+      </span>
+      ${arrow}
+    </a>`).join("")
+    : `<div class="empty">No simulations match “${esc($("q").value)}”. Try another word, or choose <b>All</b>.</div>`;
+  $("count").textContent = `${list.length} of ${SIMS.length} simulation${SIMS.length === 1 ? "" : "s"}`;
+}
+
+$("chips").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  topic = b.dataset.k;
+  try { localStorage.setItem("simlab-topic", topic); } catch (e) {}
+  [...$("chips").children].forEach(c => c.setAttribute("aria-pressed", String(c === b)));
+  render();
+});
+$("q").addEventListener("input", render);
+
+const latest = SIMS.map(s => s.added).sort().pop();
+$("updated").textContent = `Last updated ${new Date(latest + "T00:00:00+08:00").toLocaleDateString("en-GB", {day:"numeric", month:"long", year:"numeric"})}`;
+renderChips(); render();
+</script>
+</body>
+</html>
