@@ -17,17 +17,8 @@
   --ok:#1d7f46; --ok-soft:#e2f4e9; --bad:#b9461a; --bad-soft:#fbeae2; --sol:#5763c9;
   --font-ui:"Lexend",system-ui,-apple-system,"Segoe UI","PingFang HK","Microsoft JhengHei","Noto Sans HK",sans-serif;
   --font-sym:"STIX Two Text","Times New Roman",Times,serif;
+  color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0e161b; --surface:#152129; --paper:#111d24; --ink:#e4edf1; --muted:#93a7b2;
-  --line:#253842; --grid:#1f323c; --grid-strong:#34505d;
-  --ray:#ff6a5c; --accent:#46bfe3; --accent-ink:#06222c; --accent-soft:#16323d;
-  --ok:#5ad08a; --ok-soft:#173226; --bad:#ff9a62; --bad-soft:#3a2219; --sol:#9ea8ff; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0e161b; --surface:#152129; --paper:#111d24; --ink:#e4edf1; --muted:#93a7b2;
-  --line:#253842; --grid:#1f323c; --grid-strong:#34505d;
-  --ray:#ff6a5c; --accent:#46bfe3; --accent-ink:#06222c; --accent-soft:#16323d;
-  --ok:#5ad08a; --ok-soft:#173226; --bad:#ff9a62; --bad-soft:#3a2219; --sol:#9ea8ff; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:15px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 32px}

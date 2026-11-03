@@ -21,7 +21,7 @@
   --font-zh:"Noto Sans HK","PingFang HK","Microsoft JhengHei",sans-serif;
   color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root{
+@media (prefers-color-scheme: dark){:root:not([data-force-light]){
   --bg:#0d151b; --surface:#16222b; --ink:#e3ecf1; --muted:#94a8b4; --line:#26363f;
   --accent:#5aa5f5; --accent-ink:#06192c; --accent-soft:#16304a;
   --ray:#5aa5f5; --new:#ffa36b; --new-soft:#3a2418;
