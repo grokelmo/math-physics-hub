@@ -171,6 +171,12 @@ const SIMS = [
     title: "Plane Mirror Ray Diagram", zh: "平面鏡光線圖",
     desc: "Can the observer see the image? Explore how light reflects off a plane mirror, then try the challenge examples.",
     topic: "wave", sub: "Reflection", kind: "Practice", added: "2026-10-19", icon: "mirror"
+  },
+  {
+    file: "rayleigh-criterion.html",
+    title: "Rayleigh Criterion", zh: "瑞利判據",
+    desc: "Diffraction and imaging: explore how wavelength, aperture and angular separation affect resolving two sources.",
+    topic: "wave", sub: "Diffraction", kind: "Practice", added: "2026-11-20", icon: "diffraction"
   }
 ];
 
@@ -184,6 +190,7 @@ const TOPICS = {
 
 /* Icons are drawn in a 56×56 box; "currentColor" takes the topic colour. */
 const ICONS = {
+  diffraction: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)"><circle cx="22" cy="28" r="14" stroke="currentColor" stroke-width="1.6" opacity=".4"/><circle cx="22" cy="28" r="8" stroke="currentColor" stroke-width="1.5" opacity=".7"/><circle cx="22" cy="28" r="2.6" fill="currentColor"/><circle cx="34" cy="28" r="14" stroke="currentColor" stroke-width="1.6" opacity=".4"/><circle cx="34" cy="28" r="8" stroke="currentColor" stroke-width="1.5" opacity=".7"/><circle cx="34" cy="28" r="2.6" fill="currentColor"/></svg>`,
   lens: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)">
     <line x1="4" y1="28" x2="52" y2="28" stroke="currentColor" stroke-width="1.2" opacity=".45"/>
     <path d="M24 8 Q31 28 24 48 Q17 28 24 8Z" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.8"/>

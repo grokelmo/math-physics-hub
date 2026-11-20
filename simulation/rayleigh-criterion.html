@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="zh-Hant" data-ui-lang="zh" data-force-light>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>瑞利判據 · 繞射與成像 — HKDSE虛擬教室</title>
+<meta name="description" content="繞射與成像：探索波長、孔徑與角距如何影響兩個光源能否分辨。">
+<script>(function(){try{const q=new URLSearchParams(location.search).get("lang");if(q==="en"||q==="zh"){localStorage.setItem("hkdse-vc-ui-lang",q);localStorage.setItem("rayleigh-lang",q);}const l=localStorage.getItem("hkdse-vc-ui-lang")||localStorage.getItem("rayleigh-lang");const lang=l==="en"?"en":"zh";document.documentElement.setAttribute("data-ui-lang",lang);document.documentElement.lang=lang==="en"?"en":"zh-Hant";}catch(e){document.documentElement.setAttribute("data-ui-lang","zh");}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Noto+Sans+HK:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../styles.css">
+<meta name="color-scheme" content="light only">
+<style>:root{color-scheme:light}</style>
+<style>
+#rayleigh-app{
+  --bg:#d7eaf7;
+  --panel:#eaf4fb;
+  --card:#f6fbfe;
+  --text:#1a3a52;
+  --muted:#3a5a70;
+  --line:#8fb0c6;
+  --accent:#2a7ea0;
+  --hover:#c5e3f4;
+  --canvas:#eef6fb;
+  background:var(--bg);
+  color:var(--text);
+  font:14px Arial,"Microsoft JhengHei",sans-serif;
+}
+#rayleigh-app .rayleigh-back{
+  max-width:1440px;
+  margin-inline:auto;
+  padding:8px 24px 0;
+}
+#rayleigh-app .rayleigh-back a{
+  color:var(--text);
+  text-decoration:none;
+  font:600 13px Arial,"Microsoft JhengHei",sans-serif;
+  display:inline-block;
+  padding:8px 0 4px;
+}
+#rayleigh-app .rayleigh-back a:hover{text-decoration:underline}
+#rayleigh-app main{display:grid;grid-template-columns:minmax(0,1fr) 330px;min-height:calc(100vh - 96px);width:100%;max-width:1440px;margin-inline:auto;padding:0}
+#rayleigh-app aside{grid-column:2;grid-row:1;padding:18px;background:var(--panel);border-left:1px solid var(--line)}
+#rayleigh-app h1{font-size:19px;line-height:1.3;margin:0 0 16px;font-weight:700;letter-spacing:normal;text-wrap:initial;font-family:Arial,"Microsoft JhengHei",sans-serif}
+#rayleigh-app h2{font-size:15px;margin:0 0 12px;font-family:Arial,"Microsoft JhengHei",sans-serif;letter-spacing:normal}
+#rayleigh-app section{border-top:1px solid var(--line);margin-top:17px;padding-top:14px}
+#rayleigh-app label{line-height:1.5}
+#rayleigh-app select,#rayleigh-app button,#rayleigh-app input[type=number]{background:var(--card);border:1px solid #6e93aa;border-radius:5px;color:var(--text);font:inherit;padding:7px;min-height:0}
+#rayleigh-app select{width:100%;font-size:13px}
+#rayleigh-app button{cursor:pointer}
+#rayleigh-app button:hover{background:var(--hover)}
+#rayleigh-app button:focus-visible,#rayleigh-app input:focus-visible,#rayleigh-app select:focus-visible{outline:2px solid #7ec8e6;outline-offset:3px}
+#rayleigh-app input[type=range]{width:100%;accent-color:var(--accent);margin:9px 0}
+#rayleigh-app input[type=checkbox]{accent-color:var(--accent);margin:3px 7px 0 0}
+#rayleigh-app .control{margin-top:13px}
+#rayleigh-app .control>label{display:flex;align-items:flex-start;justify-content:space-between;gap:5px;flex-wrap:wrap}
+#rayleigh-app .control>label>span{margin-left:auto;white-space:nowrap}
+#rayleigh-app .control input[type=number]{width:82px;color:var(--text)}
+#rayleigh-app .control:has(input:disabled){opacity:.55}
+#rayleigh-app .toggles{display:grid;gap:9px}
+#rayleigh-app .toggles label{display:flex;align-items:flex-start;line-height:1.65}
+#rayleigh-app .small{font-size:12px;line-height:1.55;color:var(--muted)}
+#rayleigh-app .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+#rayleigh-app article{grid-column:1;grid-row:1;min-width:0;padding:18px 24px;background:var(--bg)}
+#rayleigh-app .article-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:8px}
+#rayleigh-app .article-head .top{flex:1;min-width:0;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#rayleigh-app .top h2{font-size:21px;line-height:1.6}
+#rayleigh-app .badge{color:var(--text);font-size:16px;line-height:1.6}
+#rayleigh-app .lang-toggle{display:inline-flex;flex-shrink:0;border:1px solid #6e93aa;border-radius:8px;overflow:hidden;background:var(--card);margin-top:4px}
+#rayleigh-app .lang-toggle button{border:0;border-radius:0;padding:7px 14px;background:transparent;color:var(--text);font:13px Arial,"Microsoft JhengHei",sans-serif}
+#rayleigh-app .lang-toggle button[aria-pressed="true"]{background:#2a6f96;color:#fff}
+#rayleigh-app .lang-toggle button:hover{background:var(--hover)}
+#rayleigh-app .lang-toggle button[aria-pressed="true"]:hover{background:#245f80}
+#rayleigh-app canvas{display:block;width:100%}
+#rayleigh-app .image{height:260px;background:#03070c}
+#rayleigh-app .graph{height:265px}
+#rayleigh-app .caption{margin:7px 0 15px;font-size:12px;color:var(--muted);line-height:1.5}
+#rayleigh-app .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;margin:8px 0;background:var(--canvas);padding:6px 10px}
+#rayleigh-app .p{color:#00645d}
+#rayleigh-app .q{color:#984019}
+#rayleigh-app .total{color:#1d3550}
+#rayleigh-app .formula{background:var(--card);padding:12px 15px;line-height:1.8;margin:12px 0}
+#rayleigh-app .explanation{line-height:1.65;max-width:1000px;margin:8px 0;white-space:pre-line}
+#rayleigh-app a{color:var(--text)}
+#rayleigh-app [hidden]{display:none!important}
+#rayleigh-app i{font-family:Arial,sans-serif}
+#rayleigh-app output{font-variant-numeric:tabular-nums}
+#rayleigh-app .image-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+#rayleigh-app .zoom{display:flex;align-items:center;gap:8px}
+#rayleigh-app .zoom input{width:110px}
+#rayleigh-app .parameter-group{border:1px solid #7aa3bb;border-left:4px solid #3aa8c7;border-radius:6px;padding:12px;margin-top:18px}
+#rayleigh-app .parameter-group.instrument{border-left-color:#e0a05a;margin-top:20px;border-top:3px solid #e0a05a}
+#rayleigh-app .parameter-group h2{font-size:15px;margin:0 0 6px;color:var(--text)}
+#rayleigh-app .parameter-group.instrument h2{color:#8a4e16}
+#rayleigh-app .parameter-group .small{margin:0 0 10px}
+#rayleigh-app .parameter-group h3{font-size:12px;color:var(--muted);margin:15px 0 0;border-top:1px solid #7aa3bb;padding-top:10px}
+#rayleigh-app .display-heading{border-top:3px solid #7aa3bb;padding-top:16px;margin-top:23px}
+#rayleigh-app #graphPanel canvas.graph,#rayleigh-app #graphPanel .legend{background:var(--canvas)}
+@media(max-width:1000px){#rayleigh-app main{grid-template-columns:minmax(0,1fr) 290px}}
+@media(max-width:800px){
+  #rayleigh-app .rayleigh-back{padding:8px 12px 0}
+  #rayleigh-app main{grid-template-columns:1fr}
+  #rayleigh-app aside{grid-column:auto;grid-row:auto;border-left:0;border-bottom:1px solid var(--line)}
+  #rayleigh-app article{grid-column:auto;grid-row:auto}
+  #rayleigh-app .controls{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+  #rayleigh-app .toggles{grid-template-columns:1fr 1fr}
+  #rayleigh-app article{padding:18px 12px}
+  #rayleigh-app .article-head{flex-wrap:wrap}
+  #rayleigh-app .lang-toggle{margin-left:auto}
+}
+@media(max-width:420px){
+  #rayleigh-app .controls,#rayleigh-app .toggles{grid-template-columns:1fr}
+  #rayleigh-app .top h2{font-size:18px}
+}
+html[lang="en"] .i18n-zh,html:not([lang="en"]) .i18n-en{display:none!important}
+body{margin:0;background:#d7eaf7}
+
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="Main">
+  <div class="inner">
+    <a class="brand" href="../index.html"><span class="ui-zh">HKDSE虛擬教室</span><span class="ui-en">HKDSE Virtual Classroom</span></a>
+    <a href="../數學科.html"><span class="ui-zh">數學科</span><span class="ui-en">Maths</span></a>
+    <a href="../物理科.html"><span class="ui-zh">物理科</span><span class="ui-en">Physics</span></a>
+    <a href="../物理模擬實驗室.html" aria-current="page"><span class="ui-zh">物理模擬實驗室</span><span class="ui-en">Physics Simulation Lab</span></a>
+    <div class="lang-switch" role="group" aria-label="Language / 語言">
+      <button type="button" class="lang-btn" data-lang="zh" aria-pressed="true">中文</button>
+      <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</nav>
+<div id="rayleigh-app">
+  <div class="rayleigh-back">
+    <a href="../物理模擬實驗室.html"><span class="ui-zh">← 返回物理模擬實驗室</span><span class="ui-en">← Back to Physics Simulation Lab</span></a>
+  </div>
+  <main>
+<aside>
+  <h1><span class="i18n-zh">瑞利判據</span><span class="i18n-en">Rayleigh criterion</span></h1>
+  <label for="mode"><span class="i18n-zh">探究單一變量</span><span class="i18n-en">Investigate one variable</span></label>
+  <select id="mode">
+    <option value="lambda" data-en="Wavelength λ" data-zh="波長 λ">波長 λ</option>
+    <option value="D" data-en="Aperture diameter D" data-zh="孔徑直徑 D">孔徑直徑 D</option>
+    <option value="theta" data-en="Angular separation θ" data-zh="角距 θ">角距 θ</option>
+    <option value="s" data-en="Source separation s" data-zh="光源間距 s">光源間距 s</option>
+    <option value="L" data-en="Observation distance L" data-zh="觀察距離 L">觀察距離 L</option>
+    <option value="free" data-en="Free exploration" data-zh="自由探究">自由探究</option>
+  </select>
+  <div id="parameters">
+    <section class="parameter-group" aria-labelledby="sourceHeading">
+      <h2 id="sourceHeading"><span class="i18n-zh">光源與觀察幾何</span><span class="i18n-en">Light sources &amp; viewing geometry</span></h2>
+      <p class="small"><span class="i18n-zh">光的性質，以及光源相對於儀器的位置。</span><span class="i18n-en">Properties of the light and positions of the sources relative to the instrument.</span></p>
+      <div class="toggles">
+        <label><input type="checkbox" id="P" checked><span class="i18n-zh">光源 <i>P</i></span><span class="i18n-en">Source <i>P</i></span></label>
+        <label><input type="checkbox" id="Q" checked><span class="i18n-zh">光源 <i>Q</i></span><span class="i18n-en">Source <i>Q</i></span></label>
+      </div>
+      <div class="controls" id="sourceControls"></div>
+      <h3><span class="i18n-zh">觀察幾何 · θ ≈ s/L</span><span class="i18n-en">Viewing geometry · θ ≈ s/L</span></h3>
+      <div class="controls" id="geometryControls"></div>
+    </section>
+    <section class="parameter-group instrument" aria-labelledby="instrumentHeading">
+      <h2 id="instrumentHeading"><span class="i18n-zh">光學儀器</span><span class="i18n-en">Optical instrument</span></h2>
+      <p class="small"><span class="i18n-zh">透鏡／望遠鏡的孔徑大小。</span><span class="i18n-en">Aperture size of the lens / telescope.</span></p>
+      <div class="controls" id="instrumentControls"></div>
+    </section>
+  </div>
+  <div class="actions">
+    <button id="reset"><span class="i18n-zh">重設</span><span class="i18n-en">Reset</span></button>
+    <button id="limit"><span class="i18n-zh">設為剛可分辨</span><span class="i18n-en">Set just resolved</span></button>
+  </div>
+  <p class="small" id="lockNote"></p>
+  <h2 class="display-heading"><span class="i18n-zh">顯示選項</span><span class="i18n-en">Display options</span></h2>
+  <section>
+    <h2><span class="i18n-zh">像平面</span><span class="i18n-en">Image plane</span></h2>
+    <div class="toggles">
+      <label><input type="checkbox" id="imageOn" checked><span class="i18n-zh">重疊繞射圖案</span><span class="i18n-en">Combined diffraction image</span></label>
+      <label><input type="checkbox" id="rings"><span class="i18n-zh">第一暗環輔助線</span><span class="i18n-en">First-minimum guides</span></label>
+      <label><input type="checkbox" id="centres" checked><span class="i18n-zh">像的中心</span><span class="i18n-en">Image centres</span></label>
+      <label><input type="checkbox" id="enhance" checked><span class="i18n-zh">加強微弱光環</span><span class="i18n-en">Enhance faint rings</span></label>
+    </div>
+  </section>
+  <section>
+    <h2><span class="i18n-zh">強度關係線圖</span><span class="i18n-en">Intensity graph</span></h2>
+    <div class="toggles">
+      <label><input type="checkbox" id="graphOn" checked><span class="i18n-zh">顯示關係線圖</span><span class="i18n-en">Show graph</span></label>
+      <label><input type="checkbox" id="graphEnhance" checked><span class="i18n-zh">放大微弱旁峰</span><span class="i18n-en">Exaggerate weak side peaks</span></label>
+      <label><input type="checkbox" id="graphMinima" checked><span class="i18n-zh">標示光強度首次降至零的位置</span><span class="i18n-en">Mark first minima</span></label>
+      <label><input type="checkbox" id="components" checked><span class="i18n-zh">個別光源的強度</span><span class="i18n-en">Individual intensities</span></label>
+      <label><input type="checkbox" id="sum" checked><span class="i18n-zh">總強度</span><span class="i18n-en">Total intensity</span></label>
+      <label><input type="checkbox" id="criterion" checked><span class="i18n-zh">瑞利判據數值</span><span class="i18n-en">Rayleigh values</span></label>
+    </div>
+  </section>
+</aside>
+<article>
+  <div class="article-head">
+    <div class="top">
+      <h2><span class="i18n-zh">繞射與成像</span><span class="i18n-en">Diffraction and image formation</span></h2>
+      <output id="status" class="badge" aria-live="polite"></output>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button type="button" data-lang="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang="en" aria-pressed="false">English</button>
+    </div>
+  </div>
+  <p id="explanation" class="explanation"></p>
+  <div id="values" class="formula"></div>
+  <div class="image-head">
+    <h2><span class="i18n-zh">像平面 · 正面觀察</span><span class="i18n-en">Image plane · front view</span></h2>
+    <label class="zoom" for="zoom"><span class="i18n-zh">顯示縮放</span><span class="i18n-en">View zoom</span> <output id="zoomValue">1.0×</output><input id="zoom" type="range" min="0.25" max="3" step="0.05" value="1"></label>
+  </div>
+  <div id="imagePanel">
+    <canvas id="image" class="image" role="img" data-en="Combined two-dimensional Airy diffraction image, brighter pixels indicate higher intensity." data-zh="重疊的二維繞射圖案，較亮的像素表示較高強度。" aria-label="重疊的二維繞射圖案，較亮的像素表示較高強度。"></canvas>
+  </div>
+  <div id="graphPanel">
+    <h2><span class="i18n-zh">沿兩像中心連線的強度</span><span class="i18n-en">Intensity along the line joining the image centres</span></h2>
+    <div class="legend">
+      <span class="p">— <i>P</i></span>
+      <span class="q">– – <i>Q</i></span>
+      <span class="total">━ <span class="i18n-zh">總強度</span><span class="i18n-en">Total</span></span>
+    </div>
+    <p id="minimaKey" class="caption">
+      <span class="i18n-zh">沿每個光源的強度曲線，由中央主峰向左、右找出光強度首次降至零的位置。沿點線看橫軸：青色圓圈代表 P，啡色菱形代表 Q。</span>
+      <span class="i18n-en">Dotted guides meet the horizontal axis at the first minimum on each side of each source’s central peak. Teal circles mark P and brown diamonds mark Q.</span>
+    </p>
+    <canvas id="graph" class="graph" role="img" data-en="Intensity profiles with optional exaggerated side peaks and first-minimum markers" data-zh="強度曲線，可選擇放大旁峰及標示光強度首次降至零的位置" aria-label="強度曲線，可選擇放大旁峰及標示光強度首次降至零的位置"></canvas>
+  </div>
+</article>
+</main>
+</div>
+<script src="../lang.js"></script>
+<script>
+'use strict';
+let lang='zh';
+try{const l=localStorage.getItem('hkdse-vc-ui-lang')||localStorage.getItem('rayleigh-lang');if(l==='en')lang='en'}catch(e){}
+const t=(en,zh)=>lang==='en'?en:zh;
+const $=id=>document.getElementById(id),base={lambda:550,D:4,theta:167.75,s:16.775,L:100},state={...base};
+const specs=[['lambda',{en:'Wavelength λ',zh:'波長 λ'},400,700,1,'nm'],['D',{en:'Aperture diameter D',zh:'孔徑直徑 D'},1,8,.05,'mm'],['theta',{en:'Angular separation θ',zh:'角距 θ'},0,800,.25,'μrad'],['s',{en:'Source separation s',zh:'光源間距 s'},0,80,.025,'mm'],['L',{en:'Observation distance L',zh:'觀察距離 L'},25,400,1,'m']];
+const toggleIds=['P','Q','imageOn','rings','centres','enhance','graphOn','graphEnhance','graphMinima','components','sum','criterion'];
+const controlMarkup=specs.map(([id,lab,min,max,step,unit])=>{const label=t(lab.en,lab.zh);return `<div class="control"><label for="${id}">${label}<span><input type="number" id="${id}Number" aria-label="${t(label+' numerical value',label+' 數值')}" min="${min}" max="${max}" step="${step}" value="${state[id]}"> ${unit}</span></label><input type="range" id="${id}" aria-label="${label}" min="${min}" max="${max}" step="${step}" value="${state[id]}"></div>`}).join('');
+const controls=document.createElement('div');controls.innerHTML=controlMarkup;
+specs.forEach(([id],index)=>$(id==='lambda'?'sourceControls':id==='D'?'instrumentControls':'geometryControls').appendChild(controls.children[0]));
+const on=id=>$(id).checked,mode=()=>$('mode').value;
+function model(){const thetaMin=1.22*state.lambda/state.D;return{thetaMin,ratio:state.theta/thetaMin,radius:thetaMin*.1,separation:state.theta*.1,yp:-state.theta*.05,yq:state.theta*.05};}
+function sync(){specs.forEach(([id])=>{$(id).value=state[id];$(id+'Number').value=+state[id].toFixed(4);const enabled=mode()==='free'?['lambda','D','s','L'].includes(id):mode()===id;$(id).disabled=$(id+'Number').disabled=!enabled;});$('lockNote').textContent=mode()==='free'?t('Change λ, D, s and L independently. θ is calculated from s/L.','可獨立改變 λ、D、s 及 L；θ 由 s/L 計算。'):'';}
+function set(id,value){const spec=specs.find(v=>v[0]===id);if(!Number.isFinite(value))return;state[id]=Math.max(spec[2],Math.min(spec[3],value));if(id==='theta')state.s=state.theta*state.L/1000;else if(id==='s'||id==='L')state.theta=1000*state.s/state.L;sync();draw();}
+specs.forEach(([id])=>{ $(id).oninput=e=>set(id,+e.target.value);$(id+'Number').onchange=e=>{if(e.target.value.trim()!==''&&Number.isFinite(+e.target.value))set(id,+e.target.value);else sync();};});
+function reset(){Object.assign(state,base);sync();draw();}
+$('mode').onchange=reset;$('reset').onclick=()=>{toggleIds.forEach(id=>$(id).checked=!['rings'].includes(id));$('zoom').value=1;reset();};
+$('limit').onclick=()=>{let k=mode(),v;if(k==='lambda')v=state.theta*state.D/1.22;else if(k==='D')v=1.22*state.lambda/state.theta;else if(k==='L')v=1000*state.s/model().thetaMin;else if(k==='s'||k==='free'){k='s';v=model().thetaMin*state.L/1000;}else{k='theta';v=model().thetaMin;}const sp=specs.find(x=>x[0]===k);if(Number.isFinite(v)&&v>=sp[2]&&v<=sp[3])set(k,v);else{reset();}};
+toggleIds.forEach(id=>$(id).onchange=draw);$('zoom').oninput=draw;
+function j1(x){const a=Math.abs(x);let ans;if(a<8){const y=x*x;ans=x*(72362614232+y*(-7895059235+y*(242396853.1+y*(-2972611.439+y*(15704.48260+y*(-30.16036606))))))/(144725228442+y*(2300535178+y*(18583304.74+y*(99447.43394+y*(376.9991397+y)))));}else{const z=8/a,y=z*z,xx=a-2.356194491;const p=1+y*(.00183105+y*(-.00003516396496+y*(.000002457520174+y*(-.000000240337019))));const q=.04687499995+y*(-.0002002690873+y*(.000008449199096+y*(-.00000088228987+y*.000000105787412)));ans=Math.sqrt(.636619772/a)*(Math.cos(xx)*p-z*Math.sin(xx)*q);if(x<0)ans=-ans;}return ans;}
+const lut=new Float64Array(40001);for(let i=0;i<lut.length;i++){const u=i*.005;lut[i]=i?Math.pow(2*j1(u)/u,2):1;}
+function airy(r,radius){const u=Math.PI*1.22*r/radius,t=u/.005,i=Math.floor(t);return i>=lut.length-1?Math.pow(2*j1(u)/u,2):lut[i]+(lut[i+1]-lut[i])*(t-i);}
+function setup(id){const c=$(id),w=Math.max(250,c.clientWidth),h=c.clientHeight,d=Math.min(devicePixelRatio||1,2);c.width=Math.round(w*d);c.height=Math.round(h*d);const g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);return{c,g,w,h};}
+function line(g,x1,y1,x2,y2,color='#adc4d3',width=1.5,dash=[],arrow=false){g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.strokeStyle=color;g.lineWidth=width;g.setLineDash(dash);g.stroke();g.setLineDash([]);if(arrow){const x=x1+(x2-x1)*.54,y=y1+(y2-y1)*.54,a=Math.atan2(y2-y1,x2-x1);g.beginPath();g.moveTo(x,y);g.lineTo(x-9*Math.cos(a-.4),y-9*Math.sin(a-.4));g.lineTo(x-9*Math.cos(a+.4),y-9*Math.sin(a+.4));g.closePath();g.fillStyle=color;g.fill();}}
+function text(g,str,x,y,color='#d8e8f2',align='left',italic=false){g.font=(italic?'italic ':'')+'13px Arial, "Microsoft JhengHei", sans-serif';g.fillStyle=color;g.textAlign=align;g.fillText(str,x,y);}
+function centreMarker(g,x,y,id){
+const colour=id==='P'?'#005345':'#8a3400';
+for(const [stroke,width]of[['#ffffff',5],[colour,2.5]]){line(g,x-6,y,x+6,y,stroke,width);line(g,x,y-6,x,y+6,stroke,width);}
+const bx=id==='P'?x-33:x+10,by=y-29;
+
+g.font='bold italic 14px Arial';g.textAlign='center';g.strokeStyle='#ffffff';g.lineWidth=3;g.strokeText(id+'′',bx+12.5,by+15);g.fillStyle=colour;g.fillText(id+'′',bx+12.5,by+15);
+}
+function image(id,which,m){const{c,g,w,h}=setup(id),zoom=+$('zoom').value,span=200/zoom,scale=(w-40)/span,ph=h-48,px=Math.min(Math.round(w-40),650),py=Math.max(1,Math.round(ph*px/(w-40))),off=document.createElement('canvas');off.width=px;off.height=py;const oc=off.getContext('2d'),im=oc.createImageData(px,py);let n=0;for(let y=0;y<py;y++){const yy=(y+.5-py/2)/(px/span);for(let x=0;x<px;x++){const xx=(x+.5-px/2)/(px/span);let v=0;if(which!=='Q'&&on('P'))v+=airy(Math.hypot(xx-m.yp,yy),m.radius);if(which!=='P'&&on('Q'))v+=airy(Math.hypot(xx-m.yq,yy),m.radius);const z=on('enhance')?Math.pow(Math.min(v/2,1),.32):Math.min(v/2,1);const b=Math.round(255*z);im.data[n++]=b;im.data[n++]=b;im.data[n++]=b;im.data[n++]=255;}}oc.putImageData(im,0,0);g.drawImage(off,20,0,w-40,ph);for(const[id,pos,col]of[['P',m.yp,'#75e2d5'],['Q',m.yq,'#ffc781']]){if(!on(id)||(which!=='both'&&which!==id))continue;const x=w/2+pos*scale;if(on('rings')){g.beginPath();g.arc(x,ph/2,m.radius*scale,0,2*Math.PI);g.strokeStyle=col;g.lineWidth=1.3;g.setLineDash(id==='P'?[3,4]:[9,5]);g.stroke();g.setLineDash([]);}if(on('centres'))centreMarker(g,x,ph/2,id);}
+line(g,20,ph+1,w-20,ph+1,'#819cab',1);for(const t of[-1,-.5,0,.5,1]){const x=w/2+t*(w-40)/2;line(g,x,ph+1,x,ph+6);if(w>450||Math.abs(t)!==.5)text(g,(t*span/2).toFixed(0),x,ph+20,'#c0d3df','center');}text(g,t('Image position / μm','像的位置 / μm'),w/2,h-9,'#c0d3df','center');}
+// Finite slope at zero preserves the quadratic, horizontal-tangent Airy minima.
+function graphScale(v,enhanced){return enhanced?Math.log1p(80*Math.max(0,v))/Math.log1p(160):v/2;}
+function graphIntensity(r,radius){const u=Math.PI*1.22*r/radius;return Math.abs(u)<1e-8?1:Math.pow(2*j1(u)/u,2);}
+function graph(m){
+const ink={grid:'#c5d6e3',axis:'#4d6a7c',label:'#1a3a52',title:'#1a3a52',p:'#00645d',q:'#984019',sum:'#1d3550',marker:'#eef6fb'};
+$('minimaKey').hidden=!(on('graphMinima')&&on('components')&&(on('P')||on('Q')));const{g,w,h}=setup('graph'),left=45,right=w-18,top=54,bottom=h-49,span=200/+$('zoom').value,enhanced=on('graphEnhance'),map=v=>graphScale(v,enhanced),X=x=>(left+right)/2+x/span*(right-left),Y=v=>bottom-map(v)*(bottom-top);
+for(const v of enhanced?[0,1,2]:[0,.5,1,1.5,2]){const y=Y(v);line(g,left,y,right,y,ink.grid,1);if(!enhanced||v===0)text(g,v.toFixed(1),left-8,y+4,ink.label,'right');}line(g,left,top,left,bottom,ink.axis);line(g,left,bottom,right,bottom,ink.axis);for(const t of[-1,-.5,0,.5,1]){const x=X(t*span/2);text(g,(t*span/2).toFixed(0),x,bottom+18,ink.label,'center');}text(g,t('Image position / μm','像的位置 / μm'),(left+right)/2,h-9,ink.title,'center');text(g,enhanced?t('Intensity · expanded vertical scale','強度 · 擴展縱軸刻度'):'I / I₀',left+4,15,ink.title);
+const curves=[];if(on('components')){if(on('P'))curves.push(['P',ink.p,[],2.3]);if(on('Q'))curves.push(['Q',ink.q,[7,4],2.3]);}if(on('sum'))curves.push(['sum',ink.sum,[],3.3]);for(const[id,col,dash,width]of curves){const samples=[];for(let i=0;i<=2400;i++)samples.push(i/2400*span-span/2);for(const c of [m.yp,m.yq])for(const sign of [-1,1])samples.push(c+sign*m.radius*3.8317059702075125/(Math.PI*1.22));samples.sort((a,b)=>a-b);g.beginPath();let started=false;for(const x of samples){if(Math.abs(x)>span/2)continue;const p=on('P')?graphIntensity(Math.abs(x-m.yp),m.radius):0,q=on('Q')?graphIntensity(Math.abs(x-m.yq),m.radius):0,v=id==='P'?p:id==='Q'?q:p+q;started?g.lineTo(X(x),Y(v)):g.moveTo(X(x),Y(v));started=true;}g.strokeStyle=col;g.lineWidth=width;g.setLineDash(dash);g.stroke();g.setLineDash([]);}
+if(on('graphMinima')&&on('components')){for(const[id,c,col]of[['P',m.yp,ink.p],['Q',m.yq,ink.q]]){if(!on(id))continue;for(const sign of[-1,1]){const x=X(c+sign*m.radius*3.8317059702075125/(Math.PI*1.22));if(x<left||x>right)continue;line(g,x,top+5,x,bottom,col,1,[3,5]);g.beginPath();if(id==='P'){g.arc(x,bottom,5,0,2*Math.PI)}else{g.moveTo(x,bottom-4);g.lineTo(x+4,bottom);g.lineTo(x,bottom+4);g.lineTo(x-4,bottom);g.closePath()}g.fillStyle=ink.marker;g.fill();g.strokeStyle=col;g.lineWidth=2;g.stroke();}}}
+}
+function draw(){const m=model(),both=on('P')&&on('Q'),ratio=m.ratio,at=Math.abs(ratio-1)<.0005;const status=!on('P')&&!on('Q')?t('Both sources off','兩個光源均已關閉'):!both?t('One source only','只有一個光源'):at?t('Just resolved','剛可分辨'):ratio<1?t('Unresolved by Rayleigh criterion','按瑞利判據不可分辨'):t('Resolved by Rayleigh criterion','按瑞利判據可分辨');$('status').textContent=status;
+const explanations={lambda:'',D:t('Keep wavelength and source angular separation fixed. A larger aperture narrows both diffraction patterns; their centres do not move.','保持波長及光源角距不變。增大孔徑會使兩個繞射圖案變窄；它們的中心位置不變。'),theta:t('Keep wavelength and aperture fixed. Changing angular separation moves the image centres but leaves each diffraction pattern unchanged.','保持波長及孔徑不變。改變角距會移動像的中心，但每個繞射圖案的大小不變。'),s:t('Keep source distance, wavelength and aperture fixed. Increasing source separation increases angular separation and moves the image centres apart.','保持光源距離、波長及孔徑不變。增大光源間距會增大角距，使兩像的中心互相遠離。'),L:t('Keep physical source separation, wavelength and aperture fixed. Moving the sources farther away decreases angular separation; each diffraction pattern keeps the same size.','保持實際光源間距、波長及孔徑不變。把光源移遠會減小角距；每個繞射圖案的大小不變。'),free:t('Compare actual angular separation with the minimum resolvable angle. Change one parameter at a time when identifying cause and effect.','比較實際角距與最小可分辨角。探究因果關係時，每次只改變一個參數。')};$('explanation').textContent=explanations[mode()];$('explanation').hidden=!explanations[mode()];$('values').hidden=!on('criterion');const verdict=both?(at?t('The two sources are just resolved.','兩個光源剛可分辨。'):ratio<1?t('The two sources cannot be resolved.','兩個光源不可分辨。'):t('The two sources can be resolved.','兩個光源可以分辨。')):t('Switch on both sources to compare their resolution.','請開啟兩個光源，以比較它們能否被分辨。');$('values').innerHTML=`<i>θ</i><sub>min</sub> = 1.22<i>λ</i>/<i>D</i> = <b>${m.thetaMin.toFixed(2)} μrad</b> &nbsp; · &nbsp; <i>θ</i> ≈ <i>s</i>/<i>L</i> = <b>${state.theta.toFixed(2)} μrad</b><br><i>θ</i> ${at?'=':ratio<1?'&lt;':'&gt;'} <i>θ</i><sub>min</sub> &nbsp; → &nbsp; <b>${verdict}</b>`;
+$('imagePanel').hidden=!on('imageOn');$('graphPanel').hidden=!on('graphOn');$('zoomValue').textContent=(+$('zoom').value).toFixed(1)+'×';
+if(on('imageOn'))image('image','both',m);if(on('graphOn'))graph(m);}
+function updateControlLabels(){
+  specs.forEach(([id,lab])=>{
+    const label=t(lab.en,lab.zh);
+    const labelEl=document.querySelector(`label[for="${id}"]`);
+    if(!labelEl)return;
+    labelEl.childNodes[0].textContent=label;
+    $(id).setAttribute('aria-label',label);
+    $(id+'Number').setAttribute('aria-label',t(label+' numerical value',label+' 數值'));
+  });
+}
+function applyLang(next){
+  if(next)lang=next;
+  try{localStorage.setItem('rayleigh-lang',lang);localStorage.setItem('hkdse-vc-ui-lang',lang)}catch(e){}
+  document.documentElement.lang=lang==='en'?'en':'zh-Hant';
+  document.documentElement.setAttribute('data-ui-lang',lang==='en'?'en':'zh');
+  document.title=t('Rayleigh Criterion · Diffraction and Image Formation — HKDSE Virtual Classroom','瑞利判據 · 繞射與成像 — HKDSE虛擬教室');
+  document.querySelectorAll('[data-en][data-zh]').forEach(el=>{
+    const v=t(el.getAttribute('data-en'),el.getAttribute('data-zh'));
+    if(el.tagName==='CANVAS')el.setAttribute('aria-label',v);
+    else el.textContent=v;
+  });
+  document.querySelectorAll('.lang-toggle button').forEach(b=>{
+    b.setAttribute('aria-pressed',String(b.dataset.lang===(lang==='en'?'en':'zh')));
+  });
+  if(window.HKDSE_UI_LANG && window.HKDSE_UI_LANG.get()!==lang) window.HKDSE_UI_LANG.set(lang);
+  updateControlLabels();
+  sync();
+  draw();
+}
+document.querySelectorAll('.lang-toggle button').forEach(b=>{
+  b.onclick=()=>applyLang(b.dataset.lang);
+});
+document.addEventListener('ui-lang-change',e=>{
+  const next=(e.detail&&e.detail.lang==='en')?'en':'zh';
+  if(next!==lang) applyLang(next);
+});
+let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(draw,80);});
+applyLang(lang);
+
+window.rayleighTest={state,model,airy,j1,set,reset};
+
+
+</script>
+</body>
+</html>
