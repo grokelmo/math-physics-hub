@@ -1,0 +1,2250 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-ui-lang="zh" data-force-light>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>降落傘下落 — 空氣阻力運動 — HKDSE虛擬教室</title>
+<meta name="description" content="觀察空氣阻力下的下落運動，並比較打開降落傘前後的位移、速度和加速度。" />
+<script>(function(){try{const q=new URLSearchParams(location.search).get("lang");if(q==="en"||q==="zh"){localStorage.setItem("hkdse-vc-ui-lang",q);localStorage.setItem("parachute-lang",q);}const l=localStorage.getItem("hkdse-vc-ui-lang")||localStorage.getItem("parachute-lang");const lang=l==="en"?"en":"zh";document.documentElement.setAttribute("data-ui-lang",lang);document.documentElement.lang=lang==="en"?"en":"zh-Hant";}catch(e){document.documentElement.setAttribute("data-ui-lang","zh");}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Noto+Sans+HK:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../styles.css">
+<meta name="color-scheme" content="light only">
+<style>:root{color-scheme:light}</style>
+<style>
+
+  #parachute-app{
+    --bg: #fff1e4;
+    --panel: #fffaf6;
+    --ejss-lavender: #d8efff;
+    --ejss-graph-bg: #ffe8d2;
+    --border: #f3c7a8;
+    --text: #4a3428;
+    --muted: #8a6556;
+    --accent: #ef7c5a;
+    --accent-hover: #e26543;
+    --danger: #ee6b7a;
+    --success: #4caf8a;
+    --warn: #f0a83a;
+    --shadow: 0 8px 22px rgba(210, 120, 80, 0.12);
+  }
+
+  #parachute-app, #parachute-app *{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html[lang="en"] .i18n-zh,
+    html:not([lang="en"]) .i18n-en{
+    display: none !important;
+  }
+
+  [hidden]{
+    display: none !important;
+  }
+
+  #parachute-app{
+    font-family: "Nunito", "Noto Sans CJK HK", "Noto Sans CJK TC", "Microsoft JhengHei", "PingFang HK", sans-serif;
+    background:
+      radial-gradient(ellipse at 0% 0%, #ffd9b8 0%, transparent 52%),
+      radial-gradient(ellipse at 100% 0%, #ffd0e0 0%, transparent 46%),
+      radial-gradient(ellipse at 50% 100%, #cfefff 0%, #fff1e4 58%);
+    color: var(--text);
+    line-height: 1.45;
+    padding: 16px;
+  }
+
+  #parachute-app h1,
+    #parachute-app h2,
+    #parachute-app button,
+    #parachute-app .lang-toggle{
+    font-family: "Fredoka", "Nunito", "Noto Sans CJK HK", "Noto Sans CJK TC", sans-serif;
+  }
+
+  #parachute-app .app-container{
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  #parachute-app header{
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 14px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow);
+  }
+
+  #parachute-app header h1 {
+    font-size: 1.28rem;
+    font-weight: 650;
+    color: #4a3428;
+    letter-spacing: 0.01em;
+    line-height: 1.3;
+    text-wrap: initial;
+    margin: 0;
+    font-family: "Fredoka", "Nunito", "Noto Sans HK", "Noto Sans CJK HK", "Microsoft JhengHei", sans-serif;
+  }
+
+  #parachute-app header p{
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  #parachute-app .header-actions{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  #parachute-app .shortcut-hint{
+    font-size: 0.78rem;
+    color: var(--muted);
+    background: #fff3e8;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid #f3d0b8;
+  }
+
+  #parachute-app kbd{
+    background: #ffffff;
+    border: 1px solid #f0c7a8;
+    border-radius: 6px;
+    padding: 1px 5px;
+    font-size: 0.74rem;
+    font-family: "Nunito", ui-monospace, monospace;
+  }
+
+  #parachute-app .lang-toggle{
+    display: inline-flex;
+    flex-shrink: 0;
+    border: 1px solid #e8a888;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #fff8f2;
+  }
+
+  #parachute-app .lang-toggle button{
+    border: 0;
+    border-radius: 0;
+    padding: 6px 13px;
+    background: transparent;
+    color: var(--text);
+    font-size: 0.82rem;
+    font-weight: 600;
+    box-shadow: none;
+  }
+
+  #parachute-app .lang-toggle button[aria-pressed="true"]{
+    background: var(--accent);
+    color: #fff;
+  }
+
+  #parachute-app .lang-toggle button:hover:not(:disabled){
+    background: #ffd8c8;
+    border-color: transparent;
+  }
+
+  #parachute-app .lang-toggle button[aria-pressed="true"]:hover:not(:disabled){
+    background: var(--accent-hover);
+  }
+
+  /* Main layout: Left = Stage + Graphs, Right = Interactive Controls */
+  #parachute-app .workspace{
+    display: grid;
+    grid-template-columns: minmax(600px, 1.65fr) minmax(310px, 1fr);
+    gap: 14px;
+    align-items: start;
+  }
+
+  @media (max-width: 980px) {
+
+    #parachute-app .workspace{
+      grid-template-columns: 1fr;
+    }
+  }
+
+
+  #parachute-app .sim-card{
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  #parachute-app .ejss-stage{
+    display: grid;
+    grid-template-columns: 270px 1fr;
+    background: var(--ejss-lavender);
+    border-bottom: 1px solid #f3c7a8;
+    min-height: 540px;
+  }
+
+  @media (max-width: 640px) {
+
+    #parachute-app .ejss-stage{
+      grid-template-columns: 1fr;
+    }
+  }
+
+
+  #parachute-app .sky-wrapper{
+    position: relative;
+    border-right: 1px solid #f3c7a8;
+    height: 540px;
+    background: linear-gradient(180deg, #7ec8f8 0%, #b9e4ff 40%, #ffe3b5 100%);
+  }
+
+  #parachute-app #simCanvas{
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  #parachute-app .status-pill{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+    font-size: 0.76rem;
+    font-weight: 700;
+  }
+
+  #parachute-app .badge {
+    position: static;
+    top: auto;
+    right: auto;
+    left: auto;
+    margin: 0;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(255, 252, 247, 0.92);
+    border: 1px solid rgba(232, 160, 120, 0.35);
+    color: #4a3428;
+    box-shadow: 0 2px 6px rgba(180, 90, 60, 0.08);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: normal;
+    text-transform: none;
+    z-index: auto;
+  }
+
+  #parachute-app .badge.chute-open{
+    background: #ffe0e6;
+    color: #b33b4e;
+    border-color: #f5b3bd;
+  }
+
+  #parachute-app .badge.landed-safe{
+    background: #d9f5e8;
+    color: #1f7a56;
+    border-color: #9ee0c0;
+  }
+
+  #parachute-app .badge.landed-hard{
+    background: #fff0cc;
+    color: #8a5a10;
+    border-color: #f0d48a;
+  }
+
+  #parachute-app .badge.landed-crash{
+    background: #ffe0e0;
+    color: #b32626;
+    border-color: #f5a3a3;
+  }
+
+  #parachute-app .graphs-stack{
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    height: 540px;
+    background: var(--ejss-graph-bg);
+    padding: 6px 8px;
+    gap: 6px;
+  }
+
+  #parachute-app .graph-box{
+    position: relative;
+    background: rgba(255, 252, 247, 0.75);
+    border: 1px solid #f3c7a8;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  #parachute-app .graph-box canvas{
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: crosshair;
+  }
+
+  #parachute-app .transport-bar{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #fff3e8;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #parachute-app button{
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid #f0c7a8;
+    background: #ffffff;
+    color: #4a3428;
+    cursor: pointer;
+    transition: all 0.14s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  #parachute-app button:hover:not(:disabled){
+    background: #fff3e8;
+    border-color: #e8a888;
+  }
+
+  #parachute-app button:active:not(:disabled){
+    transform: translateY(1px);
+  }
+
+  #parachute-app button:disabled{
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  #parachute-app .btn-primary{
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+  }
+
+  #parachute-app .btn-primary:hover:not(:disabled){
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+  }
+
+  #parachute-app .btn-chute{
+    background: #ee6b7a;
+    border-color: #e05566;
+    color: #ffffff;
+  }
+
+  #parachute-app .btn-chute:hover:not(:disabled){
+    background: #de5566;
+  }
+
+  #parachute-app .btn-chute.cut-mode{
+    background: #f08a4b;
+    border-color: #e07a3a;
+  }
+
+  #parachute-app .speed-select{
+    font-size: 0.82rem;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid #f0c7a8;
+    background: #fff;
+    font-weight: 600;
+    color: #4a3428;
+    font-family: inherit;
+  }
+
+  #parachute-app .telemetry-grid{
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    padding: 10px 12px;
+    background: #fff8f2;
+  }
+
+  @media (max-width: 720px) {
+
+    #parachute-app .telemetry-grid{
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+
+  #parachute-app .metric{
+    background: #ffffff;
+    border: 1px solid #f3d0b8;
+    border-radius: 14px;
+    padding: 6px 8px;
+    text-align: center;
+  }
+
+  #parachute-app .metric-label{
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  #parachute-app .metric-val{
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #4a3428;
+  }
+
+  #parachute-app .controls-panel{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  #parachute-app .panel-section{
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 12px 14px;
+    box-shadow: var(--shadow);
+  }
+
+  #parachute-app .panel-section h2{
+    font-size: 0.95rem;
+    font-weight: 650;
+    margin-bottom: 0;
+    color: #4a3428;
+    display: block;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  #parachute-app .panel-section.is-open h2{
+    border-bottom: 1px solid #fde0cc;
+    padding-bottom: 8px;
+    margin-bottom: 0;
+  }
+
+  #parachute-app .section-toggle{
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+    background: transparent;
+    border: 0;
+    border-radius: 12px;
+    padding: 4px 6px;
+    box-shadow: none;
+    font-size: 0.95rem;
+    font-weight: 650;
+    color: var(--text);
+    text-align: left;
+  }
+
+  #parachute-app .section-toggle:hover:not(:disabled){
+    background: rgba(255, 200, 160, 0.28);
+    border-color: transparent;
+  }
+
+  #parachute-app .section-toggle .chevron{
+    color: var(--accent);
+    width: 1.1em;
+    flex-shrink: 0;
+  }
+
+  #parachute-app .section-toggle .toggle-hint{
+    margin-left: auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  #parachute-app .section-body{
+    padding-top: 10px;
+  }
+
+  #parachute-app .control-row{
+    margin-bottom: 10px;
+  }
+
+  #parachute-app .control-row:last-child{
+    margin-bottom: 0;
+  }
+
+  #parachute-app .control-header{
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin-bottom: 3px;
+  }
+
+  #parachute-app .control-header label{
+    font-weight: 600;
+    color: #5a4032;
+  }
+
+  #parachute-app .control-val{
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  #parachute-app input[type="range"]{
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  #parachute-app select.full-select{
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 12px;
+    border: 1px solid #f0c7a8;
+    background: #fff;
+    font-size: 0.82rem;
+    color: #4a3428;
+    font-family: inherit;
+  }
+
+  #parachute-app .checkbox-list{
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    font-size: 0.82rem;
+  }
+
+  #parachute-app .checkbox-item{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #5a4032;
+  }
+
+  #parachute-app .checkbox-item input{
+    accent-color: var(--accent);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+  }
+
+  #parachute-app .preset-row{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  #parachute-app .preset-btn{
+    font-size: 0.75rem;
+    padding: 4px 9px;
+    background: #fff3e8;
+    border-color: #f0c7a8;
+  }
+
+  #parachute-app .preset-btn.active{
+    background: #ffd8c8;
+    border-color: var(--accent);
+    color: #c14d30;
+  }
+
+  #parachute-app .formula-box{
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #fff6ee;
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    font-size: 0.78rem;
+    color: #5a4032;
+  }
+
+  #parachute-app .btn-row{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  #parachute-app .btn-sm{
+    font-size: 0.78rem;
+    padding: 5px 10px;
+  }
+
+  #parachute-app .legend-inline{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.75rem;
+    color: #6b4e40;
+    margin-top: 6px;
+  }
+
+  #parachute-app .dot{
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    margin-right: 4px;
+  }
+
+
+  #parachute-app {
+    min-height: calc(100vh - 52px);
+    box-sizing: border-box;
+  }
+  #parachute-app .parachute-back {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 0 4px;
+  }
+  #parachute-app .parachute-back a {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 650;
+    font-size: 0.88rem;
+    display: inline-block;
+    padding: 2px 0 6px;
+    border-bottom: 0;
+  }
+  #parachute-app .parachute-back a:hover {
+    text-decoration: underline;
+    color: var(--accent);
+  }
+
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="Main">
+  <div class="inner">
+    <a class="brand" href="../index.html"><span class="ui-zh">HKDSE虛擬教室</span><span class="ui-en">HKDSE Virtual Classroom</span></a>
+    <a href="../數學科.html"><span class="ui-zh">數學科</span><span class="ui-en">Maths</span></a>
+    <a href="../物理科.html"><span class="ui-zh">物理科</span><span class="ui-en">Physics</span></a>
+    <a href="../物理模擬實驗室.html" aria-current="page"><span class="ui-zh">物理模擬實驗室</span><span class="ui-en">Physics Simulation Lab</span></a>
+    <div class="lang-switch" role="group" aria-label="Language / 語言">
+      <button type="button" class="lang-btn" data-lang="zh" aria-pressed="true">中文</button>
+      <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</nav>
+<div id="parachute-app">
+  <div class="parachute-back">
+    <a href="../物理模擬實驗室.html"><span class="ui-zh">← 返回物理模擬實驗室</span><span class="ui-en">← Back to Physics Simulation Lab</span></a>
+  </div>
+<div class="app-container">
+  <header>
+    <div>
+      <h1>
+        <span class="i18n-zh">降落傘下落 — 空氣阻力模擬</span>
+        <span class="i18n-en">Falling with Parachute — Air Resistance Simulation</span>
+      </h1>
+      <p>
+        <span class="i18n-zh">觀察打開降落傘前後的位移、速度、加速度和受力。</span>
+        <span class="i18n-en">Observe displacement, velocity, acceleration, and forces before and after opening a parachute.</span>
+      </p>
+    </div>
+    <div class="header-actions">
+      <div class="shortcut-hint">
+        <span class="i18n-zh">快捷鍵：</span><span class="i18n-en">Shortcuts: </span>
+        <kbd>Space</kbd> <span class="i18n-zh">播放／暫停</span><span class="i18n-en">Play/Pause</span>
+        &nbsp;|&nbsp; <kbd>P</kbd> <span class="i18n-zh">降落傘</span><span class="i18n-en">Parachute</span>
+        &nbsp;|&nbsp; <kbd>S</kbd> <span class="i18n-zh">逐步</span><span class="i18n-en">Step</span>
+        &nbsp;|&nbsp; <kbd>R</kbd> <span class="i18n-zh">重設</span><span class="i18n-en">Reset</span>
+      </div>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-lang="zh" aria-pressed="true">中文</button>
+        <button type="button" data-lang="en" aria-pressed="false">English</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <!-- LEFT: SIMULATION + GRAPHS -->
+    <div class="sim-card">
+      <div class="ejss-stage">
+        <div class="sky-wrapper">
+          <canvas id="simCanvas"></canvas>
+          <div class="status-pill">
+            <span id="stateBadge" class="badge">就緒（自由落體）</span>
+            <span id="altBadge" class="badge">h = 400 m</span>
+          </div>
+        </div>
+
+        <div class="graphs-stack">
+          <div class="graph-box"><canvas id="sCanvas"></canvas></div>
+          <div class="graph-box"><canvas id="vCanvas"></canvas></div>
+          <div class="graph-box"><canvas id="aCanvas"></canvas></div>
+        </div>
+      </div>
+
+      <div class="transport-bar">
+        <button id="playBtn" class="btn-primary" data-title-en="Play / Pause (Space)" data-title-zh="播放／暫停（Space）" title="播放／暫停（Space）">▶ 播放</button>
+        <button id="stepBtn" data-title-en="Advance by 0.05 s (S)" data-title-zh="前進 0.05 s（S）" title="前進 0.05 s（S）">▶| 逐步</button>
+        <button id="chuteBtn" class="btn-chute" data-title-en="Open or Cut Parachute (P)" data-title-zh="打開或割斷降落傘（P）" title="打開或割斷降落傘（P）">🪂 降落傘</button>
+        <button id="resetBtn" data-title-en="Reset Simulation (R)" data-title-zh="重設模擬（R）" title="重設模擬（R）">↻ 重設</button>
+        <select id="speedSelect" class="speed-select" data-title-en="Simulation Playback Speed" data-title-zh="模擬播放速度" title="模擬播放速度">
+          <option value="0.25" data-en="0.25× Slow" data-zh="0.25× 慢速">0.25× 慢速</option>
+          <option value="0.5" data-en="0.5× Speed" data-zh="0.5× 速度">0.5× 速度</option>
+          <option value="1" selected data-en="1.0× Real-Time" data-zh="1.0× 實時">1.0× 實時</option>
+          <option value="2" data-en="2.0× Fast" data-zh="2.0× 快速">2.0× 快速</option>
+        </select>
+      </div>
+
+      <div class="telemetry-grid">
+        <div class="metric">
+          <div class="metric-label"><span class="i18n-zh">時間 (t)</span><span class="i18n-en">Time (t)</span></div>
+          <div class="metric-val" id="valT">0.00 s</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label"><span class="i18n-zh">位移 (s)</span><span class="i18n-en">Displacement (s)</span></div>
+          <div class="metric-val" id="valS">0.0 m</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label"><span class="i18n-zh">速度 (v)</span><span class="i18n-en">Velocity (v)</span></div>
+          <div class="metric-val" id="valV">0.0 m/s</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label"><span class="i18n-zh">加速度 (a)</span><span class="i18n-en">Accel. (a)</span></div>
+          <div class="metric-val" id="valA">9.81 m/s²</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label"><span class="i18n-zh">空氣阻力 (Fd)</span><span class="i18n-en">Air Drag (Fd)</span></div>
+          <div class="metric-val" id="valFd">0 N</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label"><span class="i18n-zh">終端速度 (vt)</span><span class="i18n-en">Term. Vel. (vt)</span></div>
+          <div class="metric-val" id="valVt">40.4 m/s</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: INTERACTIVE PHYSICS CONTROLS (collapsed by default) -->
+    <div class="controls-panel">
+      <div class="panel-section" data-section="env">
+        <h2>
+          <button type="button" class="section-toggle" aria-expanded="false">
+            <span class="chevron" aria-hidden="true">▸</span>
+            <span class="i18n-zh">空氣阻力與環境</span>
+            <span class="i18n-en">Air Resistance &amp; Environment</span>
+            <span class="toggle-hint">展開</span>
+          </button>
+        </h2>
+        <div class="section-body" hidden>
+          <div class="control-row">
+            <div class="control-header">
+              <label for="dragModel"><span class="i18n-zh">阻力模型</span><span class="i18n-en">Drag Model</span></label>
+            </div>
+            <select id="dragModel" class="full-select">
+              <option value="quadratic" selected data-en="Quadratic Drag: Fd = k·v² (Realistic Turbulent)" data-zh="二次阻力：Fd = k·v²（湍流，較接近現實）">二次阻力：Fd = k·v²（湍流，較接近現實）</option>
+              <option value="linear" data-en="Linear Drag: Fd = b·v (Viscous Model)" data-zh="線性阻力：Fd = b·v（黏滯模型）">線性阻力：Fd = b·v（黏滯模型）</option>
+              <option value="vacuum" data-en="Vacuum: Fd = 0 (No Air Resistance)" data-zh="真空：Fd = 0（無空氣阻力）">真空：Fd = 0（無空氣阻力）</option>
+            </select>
+          </div>
+
+          <div class="control-row">
+            <div class="control-header">
+              <label><span class="i18n-zh">行星／重力 (g)</span><span class="i18n-en">Planet / Gravity (g)</span></label>
+              <span class="control-val" id="lblG">9.81 m/s²</span>
+            </div>
+            <input type="range" id="sliderG" min="1.0" max="25.0" step="0.01" value="9.81" />
+            <div class="preset-row">
+              <button class="preset-btn active" data-g="9.81" data-en="Earth (9.81)" data-zh="地球 (9.81)">地球 (9.81)</button>
+              <button class="preset-btn" data-g="3.72" data-en="Mars (3.72)" data-zh="火星 (3.72)">火星 (3.72)</button>
+              <button class="preset-btn" data-g="1.62" data-en="Moon (1.62)" data-zh="月球 (1.62)">月球 (1.62)</button>
+              <button class="preset-btn" data-g="24.79" data-en="Jupiter (24.79)" data-zh="木星 (24.79)">木星 (24.79)</button>
+            </div>
+          </div>
+
+          <div class="formula-box" id="equationBox">
+            向下為正：<b>m·a = m·g − k·v²</b><br/>
+            自由落體 v<sub>t1</sub> = <b>40.4 m/s</b> &nbsp;|&nbsp; 降落傘 v<sub>t2</sub> = <b>8.2 m/s</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section" data-section="skydiver">
+        <h2>
+          <button type="button" class="section-toggle" aria-expanded="false">
+            <span class="chevron" aria-hidden="true">▸</span>
+            <span class="i18n-zh">跳傘者與降落傘</span>
+            <span class="i18n-en">Skydiver &amp; Parachute</span>
+            <span class="toggle-hint">展開</span>
+          </button>
+        </h2>
+        <div class="section-body" hidden>
+          <div class="btn-row" style="margin-top:0;margin-bottom:8px;">
+            <button id="defaultParamsBtn" class="btn-sm"><span class="i18n-zh">重設預設值</span><span class="i18n-en">Reset Defaults</span></button>
+          </div>
+
+          <div class="control-row">
+            <div class="control-header">
+              <label for="sliderMass"><span class="i18n-zh">總質量 (m)</span><span class="i18n-en">Total Mass (m)</span></label>
+              <span class="control-val" id="lblMass">75 kg</span>
+            </div>
+            <input type="range" id="sliderMass" min="40" max="130" step="1" value="75" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-header">
+              <label for="sliderHeight"><span class="i18n-zh">初始下落高度 (H)</span><span class="i18n-en">Initial Drop Height (H)</span></label>
+              <span class="control-val" id="lblHeight">400 m</span>
+            </div>
+            <input type="range" id="sliderHeight" min="200" max="1500" step="25" value="400" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-header">
+              <label for="sliderK1"><span class="i18n-zh">自由落體阻力係數 (k₁)</span><span class="i18n-en">Freefall Drag Factor (k₁)</span></label>
+              <span class="control-val" id="lblK1">0.45 kg/m</span>
+            </div>
+            <input type="range" id="sliderK1" min="0.15" max="1.20" step="0.01" value="0.45" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-header">
+              <label for="sliderK2"><span class="i18n-zh">降落傘阻力係數 (k₂)</span><span class="i18n-en">Parachute Drag Factor (k₂)</span></label>
+              <span class="control-val" id="lblK2">11.0 kg/m</span>
+            </div>
+            <input type="range" id="sliderK2" min="3.0" max="25.0" step="0.5" value="11.0" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-header">
+              <label for="sliderInflate"><span class="i18n-zh">傘衣充氣時間</span><span class="i18n-en">Canopy Inflation Time</span></label>
+              <span class="control-val" id="lblInflate">0.45 s</span>
+            </div>
+            <input type="range" id="sliderInflate" min="0.00" max="1.50" step="0.05" value="0.45" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-header">
+              <label for="autoDeploy"><span class="i18n-zh">自動開傘觸發</span><span class="i18n-en">Auto-Open Parachute Trigger</span></label>
+            </div>
+            <select id="autoDeploy" class="full-select">
+              <option value="manual" selected data-en="Manual Only (Click &quot;Parachute&quot; or press P)" data-zh="僅手動（按「降落傘」或按 P 鍵）">僅手動（按「降落傘」或按 P 鍵）</option>
+              <option value="vt98" data-en="Auto-open on reaching 98% Terminal Velocity" data-zh="到達終端速度 98% 時自動開傘">到達終端速度 98% 時自動開傘</option>
+              <option value="alt150" data-en="Auto-open at Altitude h ≤ 150 m" data-zh="高度 h ≤ 150 m 時自動開傘">高度 h ≤ 150 m 時自動開傘</option>
+              <option value="time5" data-en="Auto-open at Time t = 5.5 s" data-zh="時間 t = 5.5 s 時自動開傘">時間 t = 5.5 s 時自動開傘</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section" data-section="visual">
+        <h2>
+          <button type="button" class="section-toggle" aria-expanded="false">
+            <span class="chevron" aria-hidden="true">▸</span>
+            <span class="i18n-zh">視覺輔助與對比</span>
+            <span class="i18n-en">Visual Aids &amp; Run Comparison</span>
+            <span class="toggle-hint">展開</span>
+          </button>
+        </h2>
+        <div class="section-body" hidden>
+          <div class="checkbox-list">
+            <label class="checkbox-item">
+              <input type="checkbox" id="chkForces" checked />
+              <span class="i18n-zh">顯示受力圖（重量、阻力、淨力）</span>
+              <span class="i18n-en">Show Free-Body Force Vectors (Weight, Drag, Net)</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="chkVtLines" checked />
+              <span class="i18n-zh">在 v–t 圖顯示終端速度參考線</span>
+              <span class="i18n-en">Show Terminal Velocity Reference Lines on v–t Graph</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="chkVacuumGhost" />
+              <span class="i18n-zh">與真空自由落體比較（Fd = 0 虛線）</span>
+              <span class="i18n-en">Compare with Vacuum Freefall (Fd = 0 Dashed Curve)</span>
+            </label>
+          </div>
+
+          <div class="btn-row">
+            <button id="saveGhostBtn" class="btn-sm"><span class="i18n-zh">📌 儲存今次為殘影</span><span class="i18n-en">📌 Save Current Run as Ghost</span></button>
+            <button id="clearGhostBtn" class="btn-sm" disabled><span class="i18n-zh">清除殘影</span><span class="i18n-en">Clear Ghost</span></button>
+            <button id="exportCsvBtn" class="btn-sm"><span class="i18n-zh">📥 匯出 CSV</span><span class="i18n-en">📥 Export CSV</span></button>
+          </div>
+
+          <div class="legend-inline">
+            <span><i class="dot" style="background:#16a34a"></i><span class="i18n-zh">重量 (mg)</span><span class="i18n-en">Weight (mg)</span></span>
+            <span><i class="dot" style="background:#dc2626"></i><span class="i18n-zh">空氣阻力 (Fd)</span><span class="i18n-en">Air Drag (Fd)</span></span>
+            <span><i class="dot" style="background:#2563eb"></i><span class="i18n-zh">本次運行</span><span class="i18n-en">Active Run</span></span>
+            <span><i class="dot" style="background:#9333ea"></i><span class="i18n-zh">已儲存殘影</span><span class="i18n-en">Saved Ghost</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<script src="../lang.js"></script>
+<script>
+(() => {
+  // --- Language (default Traditional Chinese) ---
+  let lang = 'zh';
+  try {
+    const l = localStorage.getItem('hkdse-vc-ui-lang') || localStorage.getItem('parachute-lang');
+    if (l === 'en') lang = 'en';
+  } catch (e) {}
+  const t = (en, zh) => (lang === 'en' ? en : zh);
+
+  function refreshDataEnZh() {
+    document.querySelectorAll('[data-en][data-zh]').forEach(el => {
+      el.textContent = t(el.getAttribute('data-en'), el.getAttribute('data-zh'));
+    });
+    document.querySelectorAll('[data-title-en][data-title-zh]').forEach(el => {
+      el.title = t(el.getAttribute('data-title-en'), el.getAttribute('data-title-zh'));
+    });
+  }
+
+  function updateCollapseHints() {
+    document.querySelectorAll('.panel-section').forEach(sec => {
+      const open = sec.classList.contains('is-open');
+      const hint = sec.querySelector('.toggle-hint');
+      const chev = sec.querySelector('.chevron');
+      const btn = sec.querySelector('.section-toggle');
+      if (hint) hint.textContent = open ? t('Collapse', '收起') : t('Expand', '展開');
+      if (chev) chev.textContent = open ? '▾' : '▸';
+      if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+
+  function applyLang(next) {
+    if (next) lang = next;
+    try {
+      localStorage.setItem('parachute-lang', lang);
+      localStorage.setItem('hkdse-vc-ui-lang', lang);
+    } catch (e) {}
+    document.documentElement.lang = lang === 'en' ? 'en' : 'zh-Hant';
+    document.documentElement.setAttribute('data-ui-lang', lang === 'en' ? 'en' : 'zh');
+    document.title = t(
+      'Falling with Parachute — Motion with Air Resistance — HKDSE Virtual Classroom',
+      '降落傘下落 — 空氣阻力運動 — HKDSE虛擬教室'
+    );
+    refreshDataEnZh();
+    updateCollapseHints();
+    if (typeof updateUIControls === 'function') updateUIControls();
+    if (typeof updateTelemetryDisplay === 'function') updateTelemetryDisplay();
+    if (typeof renderAll === 'function') renderAll();
+    document.querySelectorAll('.lang-toggle button').forEach(b => {
+      b.setAttribute('aria-pressed', String(b.dataset.lang === (lang === 'en' ? 'en' : 'zh')));
+    });
+    if (window.HKDSE_UI_LANG && window.HKDSE_UI_LANG.get() !== lang) window.HKDSE_UI_LANG.set(lang);
+  }
+
+  // --- DOM Elements ---
+  const simCanvas = document.getElementById('simCanvas');
+  const sCanvas = document.getElementById('sCanvas');
+  const vCanvas = document.getElementById('vCanvas');
+  const aCanvas = document.getElementById('aCanvas');
+
+  const playBtn = document.getElementById('playBtn');
+  const stepBtn = document.getElementById('stepBtn');
+  const chuteBtn = document.getElementById('chuteBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const speedSelect = document.getElementById('speedSelect');
+
+  const stateBadge = document.getElementById('stateBadge');
+  const altBadge = document.getElementById('altBadge');
+
+  const valT = document.getElementById('valT');
+  const valS = document.getElementById('valS');
+  const valV = document.getElementById('valV');
+  const valA = document.getElementById('valA');
+  const valFd = document.getElementById('valFd');
+  const valVt = document.getElementById('valVt');
+
+  const dragModelEl = document.getElementById('dragModel');
+  const sliderG = document.getElementById('sliderG');
+  const sliderMass = document.getElementById('sliderMass');
+  const sliderHeight = document.getElementById('sliderHeight');
+  const sliderK1 = document.getElementById('sliderK1');
+  const sliderK2 = document.getElementById('sliderK2');
+  const sliderInflate = document.getElementById('sliderInflate');
+  const autoDeployEl = document.getElementById('autoDeploy');
+
+  const lblG = document.getElementById('lblG');
+  const lblMass = document.getElementById('lblMass');
+  const lblHeight = document.getElementById('lblHeight');
+  const lblK1 = document.getElementById('lblK1');
+  const lblK2 = document.getElementById('lblK2');
+  const lblInflate = document.getElementById('lblInflate');
+  const equationBox = document.getElementById('equationBox');
+
+  const chkForces = document.getElementById('chkForces');
+  const chkVtLines = document.getElementById('chkVtLines');
+  const chkVacuumGhost = document.getElementById('chkVacuumGhost');
+
+  const defaultParamsBtn = document.getElementById('defaultParamsBtn');
+  const saveGhostBtn = document.getElementById('saveGhostBtn');
+  const clearGhostBtn = document.getElementById('clearGhostBtn');
+  const exportCsvBtn = document.getElementById('exportCsvBtn');
+  const presetBtns = document.querySelectorAll('.preset-btn');
+
+  // --- Simulation State & Parameters ---
+  const params = {
+    m: 75,
+    g: 9.81,
+    H: 400,
+    k1: 0.45,
+    k2: 11.0,
+    inflateTime: 0.45,
+    dragModel: 'quadratic', // 'quadratic' | 'linear' | 'vacuum'
+    autoDeploy: 'manual',
+    speed: 1.0
+  };
+
+  let sim = {
+    running: false,
+    landed: false,
+    t: 0,
+    s: 0,
+    v: 0,
+    a: 9.81,
+    Fd: 0,
+    chuteOpen: false,
+    chuteProgress: 0, // 0 = closed, 1 = fully inflated
+    chuteEvents: [],  // timestamps when parachute opened/cut
+    history: []       // { t, s, v, a, Fd, chuteProgress }
+  };
+
+  let savedGhost = null; // Array of { t, s, v, a } + H + chuteEvents
+  let hoverTime = null;  // Shared graph hover scrubber timestamp
+  let lastFrameTs = null;
+
+  // Deterministic clouds for altitude motion perception
+  const clouds = [
+    { xFrac: 0.18, altFrac: 0.12, scale: 1.05, tint: 0 },
+    { xFrac: 0.72, altFrac: 0.22, scale: 1.25, tint: 1 },
+    { xFrac: 0.38, altFrac: 0.40, scale: 0.95, tint: 0 },
+    { xFrac: 0.82, altFrac: 0.52, scale: 1.10, tint: 2 },
+    { xFrac: 0.24, altFrac: 0.68, scale: 1.15, tint: 1 },
+    { xFrac: 0.62, altFrac: 0.82, scale: 0.90, tint: 0 }
+  ];
+
+  // --- Physics Computation ---
+  // In Linear mode, scale k1 & k2 into effective linear coefficients b1 & b2
+  // so terminal velocities remain physically comparable for classroom demonstration.
+  function getEffectiveCoeff(chuteProg) {
+    if (params.dragModel === 'vacuum') return 0;
+    const kEff = params.k1 + (params.k2 - params.k1) * chuteProg;
+    if (params.dragModel === 'quadratic') {
+      return kEff; // kg/m
+    } else {
+      // Linear mapping: b1 = k1 * 40 (gives ~40.8 m/s at default), b2 = k2 * 8.2 (gives ~8.1 m/s)
+      const b1 = params.k1 * 40.0;
+      const b2 = params.k2 * 8.2;
+      return b1 + (b2 - b1) * chuteProg; // N·s/m
+    }
+  }
+
+  function computeDragForce(v, chuteProg) {
+    if (params.dragModel === 'vacuum') return 0;
+    const c = getEffectiveCoeff(chuteProg);
+    const speed = Math.abs(v);
+    const mag = params.dragModel === 'quadratic' ? c * speed * speed : c * speed;
+    return v >= 0 ? mag : -mag;
+  }
+
+  function getTerminalVelocities() {
+    if (params.dragModel === 'vacuum') {
+      return { vt1: Infinity, vt2: Infinity, vtCurrent: Infinity };
+    }
+    const W = params.m * params.g;
+    if (params.dragModel === 'quadratic') {
+      const vt1 = Math.sqrt(W / params.k1);
+      const vt2 = Math.sqrt(W / params.k2);
+      const cNow = getEffectiveCoeff(sim.chuteProgress);
+      const vtCurrent = Math.sqrt(W / cNow);
+      return { vt1, vt2, vtCurrent };
+    } else {
+      const b1 = params.k1 * 40.0;
+      const b2 = params.k2 * 8.2;
+      const cNow = getEffectiveCoeff(sim.chuteProgress);
+      return { vt1: W / b1, vt2: W / b2, vtCurrent: W / cNow };
+    }
+  }
+
+  function updateChuteProgress(tNow, dt) {
+    const target = sim.chuteOpen ? 1 : 0;
+    if (params.inflateTime <= 0.001) {
+      sim.chuteProgress = target;
+    } else {
+      const rate = dt / params.inflateTime;
+      if (sim.chuteProgress < target) {
+        sim.chuteProgress = Math.min(target, sim.chuteProgress + rate);
+      } else if (sim.chuteProgress > target) {
+        sim.chuteProgress = Math.max(target, sim.chuteProgress - rate * 1.5);
+      }
+    }
+  }
+
+  function toggleParachute(manual = true) {
+    if (sim.landed) return;
+    sim.chuteOpen = !sim.chuteOpen;
+    sim.chuteEvents.push({ t: sim.t, opened: sim.chuteOpen });
+    if (params.inflateTime <= 0.001) {
+      sim.chuteProgress = sim.chuteOpen ? 1 : 0;
+    }
+    refreshInstantAcceleration();
+    updateUIControls();
+    renderAll();
+  }
+
+  function refreshInstantAcceleration() {
+    sim.Fd = computeDragForce(sim.v, sim.chuteProgress);
+    sim.a = params.g - sim.Fd / params.m;
+  }
+
+  // Advance physics by deltaTime using RK4 sub-stepping
+  function advancePhysics(deltaTime) {
+    if (sim.landed) return;
+
+    const subDt = 0.005;
+    let remaining = deltaTime;
+
+    while (remaining > 1e-7 && !sim.landed) {
+      const dt = Math.min(subDt, remaining);
+      remaining -= dt;
+
+      // Check Auto-Deploy Triggers
+      if (!sim.chuteOpen && params.autoDeploy !== 'manual') {
+        const { vt1 } = getTerminalVelocities();
+        const alt = params.H - sim.s;
+        if (
+          (params.autoDeploy === 'vt98' && Number.isFinite(vt1) && sim.v >= 0.98 * vt1) ||
+          (params.autoDeploy === 'alt150' && alt <= 150) ||
+          (params.autoDeploy === 'time5' && sim.t >= 5.5)
+        ) {
+          sim.chuteOpen = true;
+          sim.chuteEvents.push({ t: sim.t, opened: true });
+          updateUIControls();
+        }
+      }
+
+      const prevProg = sim.chuteProgress;
+      updateChuteProgress(sim.t, dt);
+      const midProg = 0.5 * (prevProg + sim.chuteProgress);
+      const endProg = sim.chuteProgress;
+
+      const accelAt = (vel, prog) => params.g - computeDragForce(vel, prog) / params.m;
+
+      // RK4 for (s, v)
+      const s0 = sim.s;
+      const v0 = sim.v;
+
+      const k1_s = v0;
+      const k1_v = accelAt(v0, prevProg);
+
+      const vA = v0 + 0.5 * dt * k1_v;
+      const k2_s = vA;
+      const k2_v = accelAt(vA, midProg);
+
+      const vB = v0 + 0.5 * dt * k2_v;
+      const k3_s = vB;
+      const k3_v = accelAt(vB, midProg);
+
+      const vC = v0 + dt * k3_v;
+      const k4_s = vC;
+      const k4_v = accelAt(vC, endProg);
+
+      let nextS = s0 + (dt / 6) * (k1_s + 2 * k2_s + 2 * k3_s + k4_s);
+      let nextV = v0 + (dt / 6) * (k1_v + 2 * k2_v + 2 * k3_v + k4_v);
+      let nextT = sim.t + dt;
+
+      // Ground contact interpolation
+      if (nextS >= params.H) {
+        const frac = (params.H - s0) / Math.max(1e-9, nextS - s0);
+        nextT = sim.t + dt * frac;
+        nextS = params.H;
+        nextV = v0 + (nextV - v0) * frac;
+        sim.landed = true;
+        sim.running = false;
+      }
+
+      sim.t = nextT;
+      sim.s = nextS;
+      sim.v = nextV;
+      sim.Fd = computeDragForce(sim.v, sim.chuteProgress);
+      sim.a = params.g - sim.Fd / params.m;
+
+      // Record sample every ~0.025s or on landing/events
+      const lastRec = sim.history[sim.history.length - 1];
+      if (!lastRec || sim.t - lastRec.t >= 0.024 || sim.landed) {
+        sim.history.push({
+          t: sim.t,
+          s: sim.s,
+          v: sim.v,
+          a: sim.a,
+          Fd: sim.Fd,
+          chuteProgress: sim.chuteProgress
+        });
+      }
+    }
+
+    updateUIControls();
+  }
+
+  function resetSimulation() {
+    sim.running = false;
+    sim.landed = false;
+    sim.t = 0;
+    sim.s = 0;
+    sim.v = 0;
+    sim.chuteOpen = false;
+    sim.chuteProgress = 0;
+    sim.chuteEvents = [];
+    sim.Fd = 0;
+    sim.a = params.g;
+    sim.history = [{
+      t: 0,
+      s: 0,
+      v: 0,
+      a: params.g,
+      Fd: 0,
+      chuteProgress: 0
+    }];
+    lastFrameTs = null;
+    updateUIControls();
+    renderAll();
+  }
+
+  // --- Canvas Sizing Helper ---
+  function setupHiDPICanvas(canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.max(10, Math.floor(rect.width));
+    const h = Math.max(10, Math.floor(rect.height));
+    if (canvas.width !== Math.floor(w * dpr) || canvas.height !== Math.floor(h * dpr)) {
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+    }
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, w, h };
+  }
+
+
+  // roundRect fallback for older engines
+  if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+      const rr = typeof r === 'number' ? r : 0;
+      this.moveTo(x + rr, y);
+      this.arcTo(x + w, y, x + w, y + h, rr);
+      this.arcTo(x + w, y + h, x, y + h, rr);
+      this.arcTo(x, y + h, x, y, rr);
+      this.arcTo(x, y, x + w, y, rr);
+      this.closePath();
+      return this;
+    };
+  }
+
+  // --- Draw Skydiver Stage ---
+  function drawStage() {
+    const { ctx, w, h } = setupHiDPICanvas(simCanvas);
+    ctx.clearRect(0, 0, w, h);
+
+    const topMargin = 58;
+    const groundH = 28;
+    const fallSpanPx = h - topMargin - groundH;
+
+    // Cute cartoon sky: soft peach-blue gradient, fluffy clouds, sun, tiny birds
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, h - groundH);
+    skyGrad.addColorStop(0, '#7ec8f8');
+    skyGrad.addColorStop(0.38, '#b7e4ff');
+    skyGrad.addColorStop(0.72, '#ffe6b8');
+    skyGrad.addColorStop(1, '#ffd3a8');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, w, h - groundH);
+
+    // Soft sun in the upper-right (stays out of the altitude ruler)
+    const sunX = w * 0.78;
+    const sunY = topMargin + 36;
+    const sunR = Math.min(22, w * 0.09);
+    const sunGlow = ctx.createRadialGradient(sunX, sunY, 2, sunX, sunY, sunR * 2.2);
+    sunGlow.addColorStop(0, 'rgba(255, 236, 150, 0.95)');
+    sunGlow.addColorStop(0.45, 'rgba(255, 210, 120, 0.55)');
+    sunGlow.addColorStop(1, 'rgba(255, 200, 120, 0)');
+    ctx.fillStyle = sunGlow;
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, sunR * 2.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffe27a';
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, sunR, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 186, 80, 0.7)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Tiny decorative birds (far / small so they don't confuse the skydiver)
+    ctx.strokeStyle = 'rgba(90, 70, 60, 0.35)';
+    ctx.lineWidth = 1.4;
+    ctx.lineCap = 'round';
+    [[0.55, 0.18], [0.62, 0.22], [0.48, 0.55]].forEach(([xf, af], idx) => {
+      const bx = xf * w;
+      const by = topMargin + af * fallSpanPx;
+      const s = 4 + (idx % 2);
+      ctx.beginPath();
+      ctx.moveTo(bx - s, by);
+      ctx.quadraticCurveTo(bx - s * 0.3, by - s * 0.8, bx, by);
+      ctx.quadraticCurveTo(bx + s * 0.3, by - s * 0.8, bx + s, by);
+      ctx.stroke();
+    });
+
+    // Fluffy pastel clouds
+    const cloudFills = [
+      'rgba(255,255,255,0.92)',
+      'rgba(255, 230, 245, 0.95)',
+      'rgba(230, 248, 255, 0.95)'
+    ];
+    clouds.forEach(c => {
+      const cx = c.xFrac * w;
+      const cy = topMargin + c.altFrac * fallSpanPx;
+      const r = 15 * c.scale;
+      ctx.fillStyle = cloudFills[c.tint % cloudFills.length];
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.arc(cx + r * 0.95, cy + 2, r * 0.82, 0, Math.PI * 2);
+      ctx.arc(cx - r * 0.95, cy + 3, r * 0.78, 0, Math.PI * 2);
+      ctx.arc(cx + r * 0.2, cy - r * 0.55, r * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    });
+
+    // Altitude Ruler Ticks on Left Edge
+    ctx.strokeStyle = 'rgba(90, 70, 60, 0.45)';
+    ctx.fillStyle = 'rgba(74, 52, 40, 0.82)';
+    ctx.font = '10px Nunito, "Noto Sans CJK HK", sans-serif';
+    ctx.textAlign = 'left';
+    const stepM = params.H <= 400 ? 50 : params.H <= 800 ? 100 : 200;
+    for (let alt = 0; alt <= params.H; alt += stepM) {
+      const sPos = params.H - alt;
+      const y = topMargin + (sPos / params.H) * fallSpanPx;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(8, y);
+      ctx.stroke();
+      if (alt > 0 && alt < params.H) {
+        ctx.fillText(`${alt}m`, 11, y + 3);
+      }
+    }
+
+    // Friendly grassy ground with little hills
+    const groundTop = h - groundH;
+    const grass = ctx.createLinearGradient(0, groundTop, 0, h);
+    grass.addColorStop(0, '#9be7a2');
+    grass.addColorStop(1, '#6dcb7b');
+    ctx.fillStyle = grass;
+    ctx.beginPath();
+    ctx.moveTo(0, groundTop + 6);
+    ctx.quadraticCurveTo(w * 0.2, groundTop - 4, w * 0.4, groundTop + 5);
+    ctx.quadraticCurveTo(w * 0.6, groundTop + 12, w * 0.78, groundTop + 3);
+    ctx.quadraticCurveTo(w * 0.9, groundTop - 2, w, groundTop + 6);
+    ctx.lineTo(w, h);
+    ctx.lineTo(0, h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#57b86a';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(0, groundTop + 6);
+    ctx.quadraticCurveTo(w * 0.2, groundTop - 4, w * 0.4, groundTop + 5);
+    ctx.quadraticCurveTo(w * 0.6, groundTop + 12, w * 0.78, groundTop + 3);
+    ctx.quadraticCurveTo(w * 0.9, groundTop - 2, w, groundTop + 6);
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+    [[0.12, 0.55], [0.35, 0.7], [0.68, 0.5], [0.88, 0.65]].forEach(([xf, yf]) => {
+      ctx.beginPath();
+      ctx.arc(w * xf, groundTop + groundH * yf, 1.6, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Determine inspection state (live or hover scrubber)
+    const activeSample = hoverTime !== null ? sampleHistoryAt(sim.history, hoverTime) : sim;
+
+    // Draw Vacuum Ghost Skydiver if checked
+    if (chkVacuumGhost.checked) {
+      const tCheck = activeSample.t;
+      const sVac = Math.min(params.H, 0.5 * params.g * tCheck * tCheck);
+      const yVac = topMargin + (sVac / params.H) * fallSpanPx;
+      drawSkydiverFigure(ctx, w * 0.25, yVac, 0, 'rgba(100, 116, 139, 0.35)', false, t('Vacuum', '真空'));
+    }
+
+    // Draw Saved Ghost Skydiver if present
+    if (savedGhost && savedGhost.history.length > 0) {
+      const gSample = sampleHistoryAt(savedGhost.history, activeSample.t);
+      const yGhost = topMargin + (Math.min(params.H, gSample.s) / params.H) * fallSpanPx;
+      drawSkydiverFigure(
+        ctx,
+        w * 0.76,
+        yGhost,
+        gSample.chuteProgress || 0,
+        'rgba(147, 51, 234, 0.42)',
+        true,
+        t('Ghost', '殘影')
+      );
+    }
+
+    // Main Skydiver Position
+    const yMain = topMargin + (activeSample.s / params.H) * fallSpanPx;
+    const xMain = w * 0.5;
+    drawSkydiverFigure(ctx, xMain, yMain, activeSample.chuteProgress, '#0f172a', false, null);
+
+    // Draw Free-Body Force Arrows on Main Skydiver
+    if (chkForces.checked && !sim.landed) {
+      const W = params.m * params.g;
+      const Fd = activeSample.Fd;
+      const Fnet = W - Fd;
+      // Scale where Weight = 38 px, soft-clamped so huge opening drag stays neatly visible
+      const pxPerN = 38 / Math.max(1, W);
+      const wLen = Math.min(90, W * pxPerN);
+      const dLen = Math.min(115, Math.abs(Fd) * pxPerN);
+
+      // Weight (downward, green)
+      drawForceArrow(ctx, xMain + 26, yMain - 6, xMain + 26, yMain - 6 + wLen, '#16a34a', `W=${Math.round(W)}N`);
+
+      // Air Drag (upward, red)
+      if (dLen > 1.5) {
+        drawForceArrow(ctx, xMain - 26, yMain - 6, xMain - 26, yMain - 6 - dLen, '#dc2626', `Fd=${Math.round(Fd)}N`);
+      }
+
+      // Net Force indicator bar
+      if (Math.abs(Fnet) > 2) {
+        const netLen = Math.max(-85, Math.min(85, Fnet * pxPerN));
+        drawForceArrow(ctx, xMain + 52, yMain - 6, xMain + 52, yMain - 6 + netLen, '#2563eb', `Fnet`);
+      }
+    }
+  }
+
+  function drawSkydiverFigure(ctx, x, y, chuteProg, bodyColor, ghostStyle, label) {
+    ctx.save();
+    ctx.translate(x, y);
+
+    if (chuteProg > 0.02) {
+      const scale = 0.25 + 0.75 * chuteProg;
+      const canopyR = 28 * scale;
+      const canopyY = -38 * scale - 10;
+
+      ctx.strokeStyle = ghostStyle ? bodyColor : 'rgba(120, 80, 70, 0.55)';
+      ctx.lineWidth = 1.2;
+      const anchors = [-canopyR * 0.92, -canopyR * 0.4, canopyR * 0.4, canopyR * 0.92];
+      anchors.forEach(ax => {
+        ctx.beginPath();
+        ctx.moveTo(ax, canopyY + 2);
+        ctx.lineTo(0, -12);
+        ctx.stroke();
+      });
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(0, canopyY, canopyR, Math.PI, 0, false);
+      ctx.closePath();
+      ctx.clip();
+
+      if (ghostStyle) {
+        ctx.fillStyle = bodyColor;
+        ctx.fillRect(-canopyR, canopyY - canopyR, canopyR * 2, canopyR);
+      } else {
+        const stripes = ['#ff7b8a', '#ffffff', '#7ecbff', '#ffffff', '#ffd36a'];
+        const band = (canopyR * 2) / stripes.length;
+        stripes.forEach((col, i) => {
+          ctx.fillStyle = col;
+          ctx.fillRect(-canopyR + i * band, canopyY - canopyR, band + 0.5, canopyR);
+        });
+      }
+      ctx.restore();
+
+      ctx.strokeStyle = ghostStyle ? bodyColor : '#e86b78';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.arc(0, canopyY, canopyR, Math.PI, 0, false);
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    const skin = ghostStyle ? bodyColor : '#ffd2b0';
+    const suit = ghostStyle ? bodyColor : '#5b8def';
+    const suitDark = ghostStyle ? bodyColor : '#3f6fd0';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    if (chuteProg < 0.35) {
+      ctx.fillStyle = suit;
+      ctx.beginPath();
+      ctx.ellipse(-1, -4, 8.5, 5.2, -0.15, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = suitDark;
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.moveTo(-8, -4);
+      ctx.quadraticCurveTo(-14, -10, -17, -8);
+      ctx.moveTo(6, -3);
+      ctx.quadraticCurveTo(12, -9, 16, -7);
+      ctx.moveTo(-6, -1);
+      ctx.quadraticCurveTo(-12, 4, -14, 2);
+      ctx.moveTo(4, 0);
+      ctx.quadraticCurveTo(10, 5, 13, 3);
+      ctx.stroke();
+
+      ctx.fillStyle = skin;
+      ctx.beginPath();
+      ctx.arc(8, -7, 3.6, 0, Math.PI * 2);
+      ctx.fill();
+      if (!ghostStyle) {
+        ctx.fillStyle = '#4a3428';
+        ctx.beginPath();
+        ctx.arc(9.2, -7.4, 0.55, 0, Math.PI * 2);
+        ctx.arc(7.0, -7.4, 0.55, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#c45a5a';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(8.1, -6.2, 1.1, 0.15 * Math.PI, 0.85 * Math.PI);
+        ctx.stroke();
+      }
+    } else {
+      ctx.fillStyle = suit;
+      ctx.beginPath();
+      ctx.roundRect(-4.5, -13, 9, 11, 3);
+      ctx.fill();
+
+      ctx.strokeStyle = suitDark;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(-5, -12);
+      ctx.lineTo(-1, -9);
+      ctx.lineTo(5, -12);
+      ctx.moveTo(-2, -2);
+      ctx.lineTo(-4, 3);
+      ctx.moveTo(2, -2);
+      ctx.lineTo(4, 3);
+      ctx.stroke();
+
+      ctx.fillStyle = skin;
+      ctx.beginPath();
+      ctx.arc(0, -17, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      if (!ghostStyle) {
+        ctx.fillStyle = '#4a3428';
+        ctx.beginPath();
+        ctx.arc(-1.1, -17.4, 0.55, 0, Math.PI * 2);
+        ctx.arc(1.1, -17.4, 0.55, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#c45a5a';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(0, -16.3, 1.15, 0.15 * Math.PI, 0.85 * Math.PI);
+        ctx.stroke();
+      }
+    }
+
+    if (label) {
+      ctx.font = 'bold 10px Nunito, "Noto Sans CJK HK", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = ghostStyle ? bodyColor : '#6b4e40';
+      ctx.fillText(label, 0, 12);
+    }
+
+    ctx.restore();
+  }
+
+  function drawForceArrow(ctx, x1, y1, x2, y2, color, text) {
+    const dy = y2 - y1;
+    if (Math.abs(dy) < 2) return;
+    const head = 6;
+    const dir = dy >= 0 ? 1 : -1;
+
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 2.2;
+
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - head * 0.7, y2 - dir * head);
+    ctx.lineTo(x2 + head * 0.7, y2 - dir * head);
+    ctx.closePath();
+    ctx.fill();
+
+    if (text) {
+      ctx.font = 'bold 10px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(text, x2, y2 + dir * 11);
+    }
+    ctx.restore();
+  }
+
+  // --- Graph Plotting Engine ---
+  function niceStep(range, targetTicks = 4) {
+    if (range <= 0 || !Number.isFinite(range)) return 1;
+    const rough = range / targetTicks;
+    const pow10 = Math.pow(10, Math.floor(Math.log10(rough)));
+    const norm = rough / pow10;
+    let nice = 1;
+    if (norm <= 1.5) nice = 1;
+    else if (norm <= 3) nice = 2;
+    else if (norm <= 7) nice = 5;
+    else nice = 10;
+    return nice * pow10;
+  }
+
+  function sampleHistoryAt(hist, tTarget) {
+    if (!hist || hist.length === 0) return { t: 0, s: 0, v: 0, a: 0, Fd: 0, chuteProgress: 0 };
+    if (tTarget <= hist[0].t) return hist[0];
+    if (tTarget >= hist[hist.length - 1].t) return hist[hist.length - 1];
+    let lo = 0, hi = hist.length - 1;
+    while (hi - lo > 1) {
+      const mid = (lo + hi) >> 1;
+      if (hist[mid].t <= tTarget) lo = mid;
+      else hi = mid;
+    }
+    const p0 = hist[lo], p1 = hist[hi];
+    const f = (tTarget - p0.t) / Math.max(1e-9, p1.t - p0.t);
+    return {
+      t: tTarget,
+      s: p0.s + (p1.s - p0.s) * f,
+      v: p0.v + (p1.v - p0.v) * f,
+      a: p0.a + (p1.a - p0.a) * f,
+      Fd: p0.Fd + (p1.Fd - p0.Fd) * f,
+      chuteProgress: (p0.chuteProgress || 0) + ((p1.chuteProgress || 0) - (p0.chuteProgress || 0)) * f
+    };
+  }
+
+  function drawGraph(canvas, config) {
+    const { ctx, w, h } = setupHiDPICanvas(canvas);
+    ctx.clearRect(0, 0, w, h);
+
+    const pad = { left: 52, right: 16, top: 24, bottom: 26 };
+    const pw = Math.max(20, w - pad.left - pad.right);
+    const ph = Math.max(20, h - pad.top - pad.bottom);
+
+    // Determine X range (t / s)
+    let maxT = Math.max(1.0, sim.t);
+    if (savedGhost && savedGhost.history.length) {
+      maxT = Math.max(maxT, savedGhost.history[savedGhost.history.length - 1].t);
+    }
+    const xStep = niceStep(maxT, 4);
+    const xMax = Math.ceil(maxT / xStep) * xStep || 1.0;
+
+    // Determine Y range from active data + optional overlays
+    let dataMin = config.minFloor ?? 0;
+    let dataMax = config.minCeil ?? 10;
+
+    for (let i = 0; i < sim.history.length; i++) {
+      const val = sim.history[i][config.key];
+      if (val < dataMin) dataMin = val;
+      if (val > dataMax) dataMax = val;
+    }
+    if (savedGhost) {
+      for (let i = 0; i < savedGhost.history.length; i++) {
+        const val = savedGhost.history[i][config.key];
+        if (val < dataMin) dataMin = val;
+        if (val > dataMax) dataMax = val;
+      }
+    }
+    if (chkVacuumGhost.checked) {
+      if (config.key === 's') dataMax = Math.max(dataMax, Math.min(params.H, 0.5 * params.g * maxT * maxT));
+      if (config.key === 'v') {
+        const tVacLand = Math.sqrt((2 * params.H) / params.g);
+        dataMax = Math.max(dataMax, params.g * Math.min(maxT, tVacLand));
+      }
+    }
+
+    const ySpan = Math.max(1e-3, dataMax - dataMin);
+    const yStep = niceStep(ySpan, 4);
+    const yMin = Math.floor(dataMin / yStep) * yStep;
+    const yMax = Math.ceil(dataMax / yStep) * yStep;
+    const finalYMax = yMax === yMin ? yMin + yStep : yMax;
+
+    const toX = t => pad.left + (t / xMax) * pw;
+    const toY = v => pad.top + ph - ((v - yMin) / (finalYMax - yMin)) * ph;
+
+    // Plot Background
+    ctx.fillStyle = '#fffdf9';
+    ctx.fillRect(pad.left, pad.top, pw, ph);
+
+    // Grid lines & Y Ticks
+    ctx.font = '10px sans-serif';
+    ctx.fillStyle = '#334155';
+    ctx.textAlign = 'right';
+    ctx.lineWidth = 1;
+
+    for (let yv = yMin; yv <= finalYMax + yStep * 0.01; yv += yStep) {
+      const py = toY(yv);
+      ctx.strokeStyle = Math.abs(yv) < 1e-6 ? '#94a3b8' : '#e2e8f0';
+      ctx.beginPath();
+      ctx.moveTo(pad.left, py);
+      ctx.lineTo(pad.left + pw, py);
+      ctx.stroke();
+
+      const label = Math.abs(yv) < 1e-6 ? '0.0' : (yStep < 1 ? yv.toFixed(1) : yv.toFixed(0));
+      ctx.fillText(label, pad.left - 5, py + 3);
+    }
+
+    // X Ticks
+    ctx.textAlign = 'center';
+    for (let xv = 0; xv <= xMax + xStep * 0.01; xv += xStep) {
+      const px = toX(xv);
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.beginPath();
+      ctx.moveTo(px, pad.top);
+      ctx.lineTo(px, pad.top + ph);
+      ctx.stroke();
+
+      const label = xStep < 1 ? xv.toFixed(1) : xv.toFixed(1);
+      ctx.fillText(label, px, pad.top + ph + 12);
+    }
+
+    // Plot Border
+    ctx.strokeStyle = '#64748b';
+    ctx.strokeRect(pad.left, pad.top, pw, ph);
+
+    // Title & Axis Labels (matching EJSS style)
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 11.5px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(config.title, pad.left + pw / 2, 15);
+
+    ctx.font = '10px sans-serif';
+    ctx.fillStyle = '#475569';
+    ctx.fillText('t / s', pad.left + pw / 2, h - 3);
+
+    ctx.save();
+    ctx.translate(13, pad.top + ph / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText(config.yLabel, 0, 0);
+    ctx.restore();
+
+    // Clip to plot area for curves
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(pad.left, pad.top, pw, ph);
+    ctx.clip();
+
+    // Terminal velocity reference lines on v-t graph
+    if (config.key === 'v' && chkVtLines.checked && params.dragModel !== 'vacuum') {
+      const { vt1, vt2 } = getTerminalVelocities();
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 1.1;
+
+      if (vt1 <= finalYMax) {
+        const yVt1 = toY(vt1);
+        ctx.strokeStyle = 'rgba(37, 99, 235, 0.45)';
+        ctx.beginPath();
+        ctx.moveTo(pad.left, yVt1);
+        ctx.lineTo(pad.left + pw, yVt1);
+        ctx.stroke();
+        ctx.fillStyle = '#1d4ed8';
+        ctx.textAlign = 'right';
+        ctx.font = '9.5px sans-serif';
+        ctx.fillText(`vt₁=${vt1.toFixed(1)}`, pad.left + pw - 4, yVt1 - 3);
+      }
+
+      if (vt2 <= finalYMax) {
+        const yVt2 = toY(vt2);
+        ctx.strokeStyle = 'rgba(220, 38, 38, 0.45)';
+        ctx.beginPath();
+        ctx.moveTo(pad.left, yVt2);
+        ctx.lineTo(pad.left + pw, yVt2);
+        ctx.stroke();
+        ctx.fillStyle = '#b91c1c';
+        ctx.textAlign = 'right';
+        ctx.font = '9.5px sans-serif';
+        ctx.fillText(`vt₂=${vt2.toFixed(1)}`, pad.left + pw - 4, yVt2 - 3);
+      }
+      ctx.setLineDash([]);
+    }
+
+    // Parachute Event Vertical Markers
+    sim.chuteEvents.forEach(ev => {
+      const ex = toX(ev.t);
+      ctx.save();
+      ctx.setLineDash([3, 3]);
+      ctx.strokeStyle = ev.opened ? 'rgba(220, 38, 38, 0.55)' : 'rgba(234, 88, 12, 0.55)';
+      ctx.beginPath();
+      ctx.moveTo(ex, pad.top);
+      ctx.lineTo(ex, pad.top + ph);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    // Vacuum Reference Curve if checked
+    if (chkVacuumGhost.checked) {
+      const tVacEnd = Math.min(maxT, Math.sqrt((2 * params.H) / params.g));
+      ctx.save();
+      ctx.setLineDash([5, 4]);
+      ctx.strokeStyle = 'rgba(100, 116, 139, 0.65)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      const steps = 60;
+      for (let i = 0; i <= steps; i++) {
+        const tv = (i / steps) * tVacEnd;
+        let yv = 0;
+        if (config.key === 's') yv = 0.5 * params.g * tv * tv;
+        else if (config.key === 'v') yv = params.g * tv;
+        else if (config.key === 'a') yv = params.g;
+        const px = toX(tv), py = toY(yv);
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Saved Ghost Run Curve
+    if (savedGhost && savedGhost.history.length > 1) {
+      ctx.save();
+      ctx.setLineDash([4, 3]);
+      ctx.strokeStyle = 'rgba(147, 51, 234, 0.65)';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      savedGhost.history.forEach((pt, idx) => {
+        const px = toX(pt.t);
+        const py = toY(pt[config.key]);
+        if (idx === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Main Simulation Curve
+    if (sim.history.length > 0) {
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1.9;
+      ctx.beginPath();
+      sim.history.forEach((pt, idx) => {
+        const px = toX(pt.t);
+        const py = toY(pt[config.key]);
+        if (idx === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+
+      // Current Leading Point Dot
+      const last = sim.history[sim.history.length - 1];
+      ctx.fillStyle = '#2563eb';
+      ctx.beginPath();
+      ctx.arc(toX(last.t), toY(last[config.key]), 3.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Synchronized Hover Scrubber Cursor + Readout
+    if (hoverTime !== null && hoverTime <= maxT) {
+      const sample = sampleHistoryAt(sim.history, hoverTime);
+      const hx = toX(sample.t);
+      const hy = toY(sample[config.key]);
+
+      ctx.strokeStyle = 'rgba(37, 99, 235, 0.65)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(hx, pad.top);
+      ctx.lineTo(hx, pad.top + ph);
+      ctx.stroke();
+
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.arc(hx, hy, 3.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      const tag = `t=${sample.t.toFixed(2)}s, ${config.key}=${sample[config.key].toFixed(2)}`;
+      ctx.font = 'bold 10px sans-serif';
+      const tw = ctx.measureText(tag).width + 10;
+      const boxX = Math.min(pad.left + pw - tw - 2, Math.max(pad.left + 2, hx + 6));
+      const boxY = pad.top + 4;
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.fillRect(boxX, boxY, tw, 16);
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'left';
+      ctx.fillText(tag, boxX + 5, boxY + 11.5);
+    }
+
+    ctx.restore();
+
+    // Save mapping on canvas for mouse hover conversion
+    canvas._plotMeta = { pad, pw, ph, xMax, maxT };
+  }
+
+  function renderAll() {
+    drawStage();
+    drawGraph(sCanvas, {
+      key: 's',
+      title: t('displacement-time graph', '位移–時間圖'),
+      yLabel: 's / m',
+      minFloor: 0,
+      minCeil: 100
+    });
+    drawGraph(vCanvas, {
+      key: 'v',
+      title: t('velocity-time graph', '速度–時間圖'),
+      yLabel: 'v / m s⁻¹',
+      minFloor: 0,
+      minCeil: 20
+    });
+    drawGraph(aCanvas, {
+      key: 'a',
+      title: t('acceleration-time graph', '加速度–時間圖'),
+      yLabel: 'a / m s⁻²',
+      minFloor: 0,
+      minCeil: 12
+    });
+    updateTelemetryDisplay();
+  }
+
+  // --- UI & Readouts ---
+  function updateTelemetryDisplay() {
+    const active = hoverTime !== null ? sampleHistoryAt(sim.history, hoverTime) : sim;
+    const { vt1, vt2, vtCurrent } = getTerminalVelocities();
+
+    valT.textContent = `${active.t.toFixed(2)} s`;
+    valS.textContent = `${active.s.toFixed(1)} m`;
+    valV.textContent = `${active.v.toFixed(1)} m/s`;
+    valA.textContent = `${active.a.toFixed(2)} m/s²`;
+    valFd.textContent = `${Math.round(active.Fd)} N`;
+    valVt.textContent = Number.isFinite(vtCurrent) ? `${vtCurrent.toFixed(1)} m/s` : t('∞ (Vacuum)', '∞（真空）');
+
+    const alt = Math.max(0, params.H - active.s);
+    altBadge.textContent = `h = ${alt.toFixed(0)} m`;
+
+    // Equation summary box
+    if (params.dragModel === 'vacuum') {
+      equationBox.innerHTML = t(
+        `Downward positive: <b>m·a = m·g</b> (Zero Drag)<br/>Constant acceleration <b>a = ${params.g.toFixed(2)} m/s²</b>`,
+        `向下為正：<b>m·a = m·g</b>（無阻力）<br/>恆定加速度 <b>a = ${params.g.toFixed(2)} m/s²</b>`
+      );
+    } else if (params.dragModel === 'quadratic') {
+      equationBox.innerHTML = t(
+        `Downward positive: <b>m·a = m·g − k·v²</b><br/>Freefall v<sub>t1</sub> = <b>${vt1.toFixed(1)} m/s</b> &nbsp;|&nbsp; Parachute v<sub>t2</sub> = <b>${vt2.toFixed(1)} m/s</b>`,
+        `向下為正：<b>m·a = m·g − k·v²</b><br/>自由落體 v<sub>t1</sub> = <b>${vt1.toFixed(1)} m/s</b> &nbsp;|&nbsp; 降落傘 v<sub>t2</sub> = <b>${vt2.toFixed(1)} m/s</b>`
+      );
+    } else {
+      equationBox.innerHTML = t(
+        `Downward positive: <b>m·a = m·g − b·v</b><br/>Freefall v<sub>t1</sub> = <b>${vt1.toFixed(1)} m/s</b> &nbsp;|&nbsp; Parachute v<sub>t2</sub> = <b>${vt2.toFixed(1)} m/s</b>`,
+        `向下為正：<b>m·a = m·g − b·v</b><br/>自由落體 v<sub>t1</sub> = <b>${vt1.toFixed(1)} m/s</b> &nbsp;|&nbsp; 降落傘 v<sub>t2</sub> = <b>${vt2.toFixed(1)} m/s</b>`
+      );
+    }
+  }
+
+  function updateUIControls() {
+    playBtn.textContent = sim.running
+      ? t('⏸ Pause', '⏸ 暫停')
+      : (sim.landed ? t('▶ Replay', '▶ 重播') : t('▶ Play', '▶ 播放'));
+
+    if (sim.chuteOpen) {
+      chuteBtn.textContent = t('✂ Cut Parachute', '✂ 割斷降落傘');
+      chuteBtn.classList.add('cut-mode');
+    } else {
+      chuteBtn.textContent = t('🪂 Parachute', '🪂 降落傘');
+      chuteBtn.classList.remove('cut-mode');
+    }
+    chuteBtn.disabled = sim.landed || params.dragModel === 'vacuum';
+    stepBtn.disabled = sim.landed;
+    stepBtn.textContent = t('▶| Step', '▶| 逐步');
+    resetBtn.textContent = t('↻ Reset', '↻ 重設');
+
+    // Status Badge
+    stateBadge.className = 'badge';
+    if (sim.landed) {
+      if (sim.v <= 11.5) {
+        stateBadge.textContent = t(
+          `Safe Landing (${sim.v.toFixed(1)} m/s)`,
+          `安全着陸（${sim.v.toFixed(1)} m/s）`
+        );
+        stateBadge.classList.add('landed-safe');
+      } else if (sim.v <= 22) {
+        stateBadge.textContent = t(
+          `Hard Landing (${sim.v.toFixed(1)} m/s)`,
+          `硬着陸（${sim.v.toFixed(1)} m/s）`
+        );
+        stateBadge.classList.add('landed-hard');
+      } else {
+        stateBadge.textContent = t(
+          `High-Speed Impact! (${sim.v.toFixed(1)} m/s)`,
+          `高速撞擊！（${sim.v.toFixed(1)} m/s）`
+        );
+        stateBadge.classList.add('landed-crash');
+      }
+    } else if (sim.chuteOpen) {
+      stateBadge.textContent = sim.chuteProgress < 0.99
+        ? t('Canopy Inflating...', '傘衣充氣中…')
+        : t('Parachute Open', '降落傘已打開');
+      stateBadge.classList.add('chute-open');
+    } else {
+      stateBadge.textContent = sim.t === 0
+        ? t('Ready (Freefall)', '就緒（自由落體）')
+        : t('Freefall', '自由落體');
+    }
+  }
+
+  // --- Animation Loop ---
+  function loop(ts) {
+    if (sim.running) {
+      if (lastFrameTs === null) lastFrameTs = ts;
+      const elapsedSec = Math.min(0.05, (ts - lastFrameTs) / 1000);
+      lastFrameTs = ts;
+      advancePhysics(elapsedSec * params.speed);
+      renderAll();
+    } else {
+      lastFrameTs = null;
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // --- Event Listeners ---
+  playBtn.addEventListener('click', () => {
+    if (sim.landed) {
+      resetSimulation();
+      sim.running = true;
+    } else {
+      sim.running = !sim.running;
+    }
+    updateUIControls();
+  });
+
+  stepBtn.addEventListener('click', () => {
+    if (sim.landed) return;
+    sim.running = false;
+    advancePhysics(0.05);
+    renderAll();
+  });
+
+  chuteBtn.addEventListener('click', () => toggleParachute(true));
+  resetBtn.addEventListener('click', resetSimulation);
+
+  speedSelect.addEventListener('change', () => {
+    params.speed = parseFloat(speedSelect.value);
+  });
+
+  // Parameter Inputs
+  dragModelEl.addEventListener('change', () => {
+    params.dragModel = dragModelEl.value;
+    refreshInstantAcceleration();
+    updateUIControls();
+    renderAll();
+  });
+
+  sliderG.addEventListener('input', () => {
+    params.g = parseFloat(sliderG.value);
+    lblG.textContent = `${params.g.toFixed(2)} m/s²`;
+    presetBtns.forEach(b => {
+      b.classList.toggle('active', Math.abs(parseFloat(b.dataset.g) - params.g) < 0.02);
+    });
+    refreshInstantAcceleration();
+    if (sim.t === 0) sim.history[0].a = params.g;
+    renderAll();
+  });
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const gVal = parseFloat(btn.dataset.g);
+      sliderG.value = gVal;
+      sliderG.dispatchEvent(new Event('input'));
+    });
+  });
+
+  sliderMass.addEventListener('input', () => {
+    params.m = parseFloat(sliderMass.value);
+    lblMass.textContent = `${params.m} kg`;
+    refreshInstantAcceleration();
+    renderAll();
+  });
+
+  sliderHeight.addEventListener('input', () => {
+    const newH = parseFloat(sliderHeight.value);
+    params.H = newH;
+    lblHeight.textContent = `${params.H} m`;
+    if (sim.s >= params.H && !sim.landed) {
+      sim.s = params.H;
+      sim.landed = true;
+      sim.running = false;
+    }
+    updateUIControls();
+    renderAll();
+  });
+
+  sliderK1.addEventListener('input', () => {
+    params.k1 = parseFloat(sliderK1.value);
+    lblK1.textContent = `${params.k1.toFixed(2)} kg/m`;
+    refreshInstantAcceleration();
+    renderAll();
+  });
+
+  sliderK2.addEventListener('input', () => {
+    params.k2 = parseFloat(sliderK2.value);
+    lblK2.textContent = `${params.k2.toFixed(1)} kg/m`;
+    refreshInstantAcceleration();
+    renderAll();
+  });
+
+  sliderInflate.addEventListener('input', () => {
+    params.inflateTime = parseFloat(sliderInflate.value);
+    lblInflate.textContent = params.inflateTime === 0 ? t('Instant (0.00 s)', '即時（0.00 s）') : `${params.inflateTime.toFixed(2)} s`;
+  });
+
+  autoDeployEl.addEventListener('change', () => {
+    params.autoDeploy = autoDeployEl.value;
+  });
+
+  defaultParamsBtn.addEventListener('click', () => {
+    sliderMass.value = 75;
+    sliderHeight.value = 400;
+    sliderK1.value = 0.45;
+    sliderK2.value = 11.0;
+    sliderInflate.value = 0.45;
+    sliderG.value = 9.81;
+    dragModelEl.value = 'quadratic';
+    autoDeployEl.value = 'manual';
+
+    params.m = 75;
+    params.H = 400;
+    params.k1 = 0.45;
+    params.k2 = 11.0;
+    params.inflateTime = 0.45;
+    params.g = 9.81;
+    params.dragModel = 'quadratic';
+    params.autoDeploy = 'manual';
+
+    lblMass.textContent = '75 kg';
+    lblHeight.textContent = '400 m';
+    lblK1.textContent = '0.45 kg/m';
+    lblK2.textContent = '11.0 kg/m';
+    lblInflate.textContent = '0.45 s';
+    lblG.textContent = '9.81 m/s²';
+    presetBtns.forEach(b => b.classList.toggle('active', b.dataset.g === '9.81'));
+
+    resetSimulation();
+  });
+
+  [chkForces, chkVtLines, chkVacuumGhost].forEach(chk => {
+    chk.addEventListener('change', renderAll);
+  });
+
+  // Ghost Run Save & Clear
+  saveGhostBtn.addEventListener('click', () => {
+    if (sim.history.length < 2) return;
+    savedGhost = {
+      history: sim.history.map(pt => ({ ...pt })),
+      H: params.H
+    };
+    clearGhostBtn.disabled = false;
+    renderAll();
+  });
+
+  clearGhostBtn.addEventListener('click', () => {
+    savedGhost = null;
+    clearGhostBtn.disabled = true;
+    renderAll();
+  });
+
+  // CSV Data Export
+  exportCsvBtn.addEventListener('click', () => {
+    const rows = ['t_s,displacement_m,altitude_m,velocity_m_s,acceleration_m_s2,drag_force_N,parachute_progress'];
+    sim.history.forEach(pt => {
+      const alt = Math.max(0, params.H - pt.s);
+      rows.push([
+        pt.t.toFixed(4),
+        pt.s.toFixed(4),
+        alt.toFixed(4),
+        pt.v.toFixed(4),
+        pt.a.toFixed(4),
+        pt.Fd.toFixed(3),
+        pt.chuteProgress.toFixed(3)
+      ].join(','));
+    });
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `parachute_motion_${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // Synchronized Graph Hover Scrubbing
+  [sCanvas, vCanvas, aCanvas].forEach(c => {
+    c.addEventListener('mousemove', e => {
+      if (!c._plotMeta || sim.history.length < 2) return;
+      const rect = c.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const { pad, pw, xMax, maxT } = c._plotMeta;
+      if (mx >= pad.left && mx <= pad.left + pw) {
+        const tVal = ((mx - pad.left) / pw) * xMax;
+        hoverTime = Math.max(0, Math.min(maxT, tVal));
+      } else {
+        hoverTime = null;
+      }
+      renderAll();
+    });
+
+    c.addEventListener('mouseleave', () => {
+      hoverTime = null;
+      renderAll();
+    });
+  });
+
+  // Keyboard Shortcuts
+  window.addEventListener('keydown', e => {
+    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+    if (e.code === 'Space') {
+      e.preventDefault();
+      playBtn.click();
+    } else if (e.key === 'p' || e.key === 'P') {
+      if (!chuteBtn.disabled) toggleParachute(true);
+    } else if (e.key === 's' || e.key === 'S') {
+      if (!stepBtn.disabled) stepBtn.click();
+    } else if (e.key === 'r' || e.key === 'R') {
+      resetSimulation();
+    }
+  });
+
+  window.addEventListener('resize', renderAll);
+
+  // Collapsible option sections (default collapsed)
+  document.querySelectorAll('.panel-section').forEach(sec => {
+    const btn = sec.querySelector('.section-toggle');
+    const body = sec.querySelector('.section-body');
+    if (!btn || !body) return;
+    btn.addEventListener('click', () => {
+      const open = !sec.classList.contains('is-open');
+      sec.classList.toggle('is-open', open);
+      body.hidden = !open;
+      updateCollapseHints();
+    });
+  });
+
+  document.querySelectorAll('.lang-toggle button').forEach(b => {
+    b.addEventListener('click', () => applyLang(b.dataset.lang));
+  });
+  document.addEventListener('ui-lang-change', e => {
+    const next = (e.detail && e.detail.lang === 'en') ? 'en' : 'zh';
+    if (next !== lang) applyLang(next);
+  });
+
+  // Initialize
+  applyLang(lang);
+  resetSimulation();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

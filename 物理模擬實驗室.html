@@ -115,6 +115,13 @@ const SIMS = [
     descZh: "繞射與成像：探索波長、孔徑與角距如何影響兩個光源能否分辨",
     descEn: "Diffraction and imaging: explore how wavelength, aperture and angular separation affect resolving two sources",
     topic: "atomic", kindZh: "練習", kindEn: "Practice", icon: "diffraction"
+  },
+  {
+    file: "simulation/falling-with-parachute.html",
+    titleZh: "降落傘下落", titleEn: "Falling with Parachute",
+    descZh: "觀察空氣阻力下的下落運動，並比較打開降落傘前後的位移、速度和加速度",
+    descEn: "Observe falling motion with air resistance, and compare displacement, velocity and acceleration before and after the parachute opens",
+    topic: "mech", kindZh: "練習", kindEn: "Practice", icon: "parachute"
   }
 ];
 
@@ -129,6 +136,7 @@ const HUB = {
 
 const ICONS = {
   motion: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)"><rect x="8" y="10" width="40" height="28" rx="3" stroke="currentColor" stroke-width="1.6" opacity=".35"/><path d="M12 32 C18 32 20 18 28 18 S38 30 44 22" stroke="currentColor" stroke-width="2.2"/><circle cx="28" cy="18" r="2.4" fill="var(--ray)"/><circle cx="44" cy="22" r="2.4" fill="var(--ray)"/><path d="M14 44h10l5-8h8" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="48" r="3.2" stroke="currentColor" stroke-width="1.6"/><circle cx="40" cy="48" r="3.2" stroke="currentColor" stroke-width="1.6"/></svg>`,
+  parachute: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)"><path d="M10 24a18 16 0 0 1 36 0H10z" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.8"/><path d="M19 24 28 38 37 24" stroke="currentColor" stroke-width="1.5"/><path d="M10 24 28 38 46 24" stroke="currentColor" stroke-width="1.2" opacity=".55"/><path d="M28 38v2.5" stroke="currentColor" stroke-width="1.6"/><circle cx="28" cy="43.5" r="3.1" fill="currentColor"/></svg>`,
   lens: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)"><line x1="4" y1="28" x2="52" y2="28" stroke="currentColor" stroke-width="1.2" opacity=".4"/><path d="M24 8 Q32 28 24 48 Q16 28 24 8Z" fill="currentColor" fill-opacity=".16" stroke="currentColor" stroke-width="1.8"/><polyline points="4,14 24,14 42,28 52,34" stroke="var(--ray)" stroke-width="2"/><polyline points="4,42 24,42 42,28 52,22" stroke="var(--ray)" stroke-width="2"/><circle cx="42" cy="28" r="2.2" fill="var(--ray)"/><line x1="10" y1="20" x2="10" y2="36" stroke="currentColor" stroke-width="2"/><polyline points="7,24 10,20 13,24" stroke="currentColor" stroke-width="1.8"/></svg>`,
   mirror: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)"><line x1="34" y1="8" x2="34" y2="48" stroke="currentColor" stroke-width="2.4"/><g stroke="currentColor" stroke-width="1.2" opacity=".5"><line x1="34" y1="12" x2="39" y2="8"/><line x1="34" y1="20" x2="39" y2="16"/><line x1="34" y1="28" x2="39" y2="24"/><line x1="34" y1="36" x2="39" y2="32"/><line x1="34" y1="44" x2="39" y2="40"/></g><line x1="12" y1="38" x2="12" y2="22" stroke="currentColor" stroke-width="2"/><polyline points="9,26 12,22 15,26" stroke="currentColor" stroke-width="2"/><path d="M12 22 L34 30 L14 42" stroke="var(--ray)" stroke-width="2"/><line x1="34" y1="30" x2="50" y2="22" stroke="var(--ray)" stroke-width="1.4" stroke-dasharray="2.5 2.5" opacity=".8"/><path d="M8 44 q5 -4 10 0 q4 4 9 1" stroke="currentColor" stroke-width="1.6"/></svg>`,
   flask: `<svg viewBox="0 0 56 56" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tc)"><path d="M20 11h16v9l9 22a7 7 0 0 1-6 11H17a7 7 0 0 1-6-11l9-22V11z" stroke="currentColor" stroke-width="2"/><path d="M20 11h16" stroke="currentColor" stroke-width="2.8"/><circle cx="28" cy="34" r="2" fill="currentColor"/></svg>`,
