@@ -80,11 +80,19 @@
     }
     #longitudinal-waves-app .board-top-bar{
       display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      align-items: stretch;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    #longitudinal-waves-app .board-top-transport{
+      display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      margin-bottom: 12px;
     }
     #longitudinal-waves-app .playback-controls{
       display: flex;
@@ -297,6 +305,45 @@
       border-radius: 6px;
       font-weight: 600;
     }
+
+    #longitudinal-waves-app .board-top-left{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+    #longitudinal-waves-app .view-tabs{
+      display: inline-flex;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #f8fafc;
+      flex: none;
+    }
+    #longitudinal-waves-app .view-tab{
+      border: 0;
+      border-radius: 0;
+      padding: 8px 14px;
+      background: transparent;
+      color: #334155;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #longitudinal-waves-app .view-tab + .view-tab{
+      border-left: 1px solid #cbd5e1;
+    }
+    #longitudinal-waves-app .view-tab:hover{
+      background: #e2e8f0;
+    }
+    #longitudinal-waves-app .view-tab.active{
+      background: #1e293b;
+      color: #ffffff;
+    }
+    #longitudinal-waves-app .view-tab.active:hover{
+      background: #1e293b;
+      color: #ffffff;
+    }
   
     /* Hub integration only: back link, site h1/badge clash resets. Original look preserved. */
     #longitudinal-waves-app .lw-back {
@@ -366,17 +413,22 @@
 
     <div class="board-card">
       <div class="board-top-bar">
+        <div class="view-tabs" role="tablist" aria-label="View">
+          <button type="button" id="tabParticles" class="view-tab active" role="tab" aria-selected="true" data-view="particles" onclick="setView('particles')" data-i18n="tabParticles">粒子動畫</button>
+          <button type="button" id="tabSD" class="view-tab" role="tab" aria-selected="false" data-view="sd" onclick="setView('sd')" data-i18n="tabSD">位移-距離圖</button>
+        </div>
+        <div class="board-top-transport">
         <div class="playback-controls">
           <button id="playPauseBtn" class="btn btn-primary" onclick="togglePlay()">暫停</button>
           <button class="btn" onclick="stepTime(0.5)" data-i18n="stepBtn">單步 +0.5 s</button>
           <button class="btn" onclick="resetSim()" data-i18n="resetBtn">重設 t = 0</button>
           <span class="time-badge" id="timeDisplay">t = 0.0 s</span>
         </div>
-
         <button id="crToggleBtn" class="cr-toggle-btn active" onclick="toggleFeature('showCR')">
           <span data-i18n="btnShowCR">顯示密部與疏部</span>
           <span id="crStatusPill" class="cr-status-pill">開</span>
         </button>
+        </div>
       </div>
 
       <div class="canvas-wrapper">
@@ -554,7 +606,13 @@
         smallGridUnit: '小格',
         bigGridUnit: '大格',
         freqPrefix: '頻率 f = ',
-        speedPrefix: '波速率 v = '
+        speedPrefix: '波速率 v = ',
+        tabParticles: '粒子動畫',
+        tabSD: '位移-距離圖',
+        axisS: 's（位移）',
+        axisD: 'd（距離）',
+        compCentre: '密部中心',
+        rareCentre: '疏部中心'
       },
       en: {
         appTitle: 'HKDSE Physics | 7.1 Longitudinal Wave Simulation',
@@ -593,12 +651,19 @@
         smallGridUnit: 'sub-grids',
         bigGridUnit: 'major grids',
         freqPrefix: 'Frequency f = ',
-        speedPrefix: 'Wave speed v = '
+        speedPrefix: 'Wave speed v = ',
+        tabParticles: 'Particle animation',
+        tabSD: 'Displacement–distance graph',
+        axisS: 's (displacement)',
+        axisD: 'd (distance)',
+        compCentre: 'Compression centre',
+        rareCentre: 'Rarefaction centre'
       }
     };
 
     const state = {
       isPlaying: true,
+      view: 'particles', // 'particles' | 'sd'
       t: 0,
       lastTimestamp: null,
       showCR: true,
@@ -856,9 +921,65 @@
       drawDoubleArrow(scaleX1, scaleX2, scaleY, '#334155', '10 cm');
     }
 
+    const CANVAS_PARTICLE = { w: 1040, h: 330 };
+    const CANVAS_SD = { w: 1480, h: 440 };
+    const LABEL_RED = '#c62828';
+    const LABEL_FONT = 'bold 29.25px "Noto Sans TC", sans-serif';
+
+    function syncCanvasSize() {
+      const sz = state.view === 'sd' ? CANVAS_SD : CANVAS_PARTICLE;
+      if (canvas.width !== sz.w || canvas.height !== sz.h) {
+        canvas.width = sz.w;
+        canvas.height = sz.h;
+      }
+    }
+
+    function getWaveCentres() {
+      const lam = state.lambdaSubGrids;
+      const waveShift = ((state.t / state.period) * lam) % lam;
+      const compCentres = [];
+      const rareCentres = [];
+      for (let k = -1; k <= Math.ceil(NUM_SUB_X / lam) + 1; k++) {
+        const cPos = k * lam + waveShift;
+        if (cPos >= 0 && cPos <= NUM_SUB_X) compCentres.push(cPos);
+        const rPos = cPos + lam / 2;
+        if (rPos >= 0 && rPos <= NUM_SUB_X) rareCentres.push(rPos);
+      }
+      return { lam, waveShift, compCentres, rareCentres };
+    }
+
+    function drawParticleLetter(letter, x, y, baseline) {
+      ctx.save();
+      ctx.fillStyle = LABEL_RED;
+      ctx.font = LABEL_FONT;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = baseline;
+      ctx.fillText(letter, x, y);
+      ctx.restore();
+    }
+
+    function setView(view) {
+      state.view = view === 'sd' ? 'sd' : 'particles';
+      const tabP = document.getElementById('tabParticles');
+      const tabS = document.getElementById('tabSD');
+      tabP.classList.toggle('active', state.view === 'particles');
+      tabS.classList.toggle('active', state.view === 'sd');
+      tabP.setAttribute('aria-selected', String(state.view === 'particles'));
+      tabS.setAttribute('aria-selected', String(state.view === 'sd'));
+      syncCanvasSize();
+      draw();
+    }
+
     function draw() {
       const dict = i18n[lang];
+      syncCanvasSize();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (state.view === 'sd') drawSDView(dict);
+      else drawParticleView(dict);
+    }
+
+    function drawParticleView(dict) {
+
 
       // Wave direction indicator at top-left
       ctx.save();
@@ -875,22 +996,7 @@
       const gridWidth = NUM_SUB_X * SUB_GRID_PX;
       const gridHeight = NUM_SUB_Y * SUB_GRID_PX;
 
-      // Compute Compression and Rarefaction centre positions (in sub-grids)
-      const lam = state.lambdaSubGrids;
-      const waveShift = ((state.t / state.period) * lam) % lam;
-      const compCentres = [];
-      const rareCentres = [];
-
-      for (let k = -1; k <= Math.ceil(NUM_SUB_X / lam) + 1; k++) {
-        const cPos = k * lam + waveShift;
-        if (cPos >= 0 && cPos <= NUM_SUB_X) {
-          compCentres.push(cPos);
-        }
-        const rPos = cPos + lam / 2;
-        if (rPos >= 0 && rPos <= NUM_SUB_X) {
-          rareCentres.push(rPos);
-        }
-      }
+      const { lam, compCentres, rareCentres } = getWaveCentres();
 
       // 2. Highlight Compression & Rarefaction zones if enabled
       if (state.showCR) {
@@ -1015,6 +1121,18 @@
           ctx.arc(xInstPx, INST_ROW_Y, 3.2, 0, Math.PI * 2);
           ctx.stroke();
         }
+
+        // Same letter on both rows (A = leftmost), so students can match equilibrium vs time t
+        const letter = String.fromCharCode(65 + idx);
+        ctx.save();
+        ctx.fillStyle = '#c62828';
+        ctx.font = 'bold 29.25px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(letter, xEqPx, EQ_ROW_Y - 10);
+        ctx.textBaseline = 'top';
+        ctx.fillText(letter, xInstPx, INST_ROW_Y + 9);
+        ctx.restore();
       }
 
       // 5. Optional Feature: Wavelength (lambda) ruler
@@ -1102,6 +1220,322 @@
         const tag = state.phaseMode === 'in' ? dict.inPhaseTag : dict.antiPhaseTag;
         drawDoubleArrow(xP, xQ, EQ_ROW_Y - 26, '#7c3aed', tag);
       }
+    }
+
+    function drawSDView(dict) {
+      const { lam, compCentres, rareCentres } = getWaveCentres();
+      const particleStepSub = 4;
+      const numParticles = Math.floor(NUM_SUB_X / particleStepSub) + 1;
+      const cmPerSub = 2.5;
+
+      const W = canvas.width;
+      const H = canvas.height;
+      const splitX = 820;
+      const arrowX = 830;
+      const graphX = 880;
+
+      const leftPad = 120;
+      const plotW = splitX - 16 - leftPad;
+      const stepPx = plotW / (numParticles - 1);
+      const yEq = 92;
+      const yInst = 232;
+
+      ctx.save();
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 1.35;
+      ctx.beginPath();
+      ctx.rect(leftPad, 36, plotW, 300);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1;
+      for (let idx = 0; idx < numParticles; idx++) {
+        const x = leftPad + idx * stepPx + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(x, 36);
+        ctx.lineTo(x, 336);
+        ctx.stroke();
+      }
+      [yEq, yInst].forEach(y => {
+        ctx.beginPath();
+        ctx.moveTo(leftPad, y + 0.5);
+        ctx.lineTo(leftPad + plotW, y + 0.5);
+        ctx.stroke();
+      });
+
+      if (state.showCR) {
+        const bandHalf = (lam * 0.22) / particleStepSub * stepPx;
+        const zoneTop = yInst - 52;
+        const zoneH = 104;
+        const paint = (centres, fill) => {
+          centres.forEach(cSub => {
+            const cx = leftPad + (cSub / particleStepSub) * stepPx;
+            const left = Math.max(leftPad, cx - bandHalf);
+            const right = Math.min(leftPad + plotW, cx + bandHalf);
+            if (right > left) {
+              ctx.fillStyle = fill;
+              ctx.fillRect(left, zoneTop, right - left, zoneH);
+            }
+          });
+        };
+        paint(compCentres, 'rgba(239, 68, 68, 0.16)');
+        paint(rareCentres, 'rgba(37, 99, 235, 0.14)');
+      }
+
+      const markCentreOnSnapshot = (centres, color, caption) => {
+        centres.forEach(cSub => {
+          const cx = leftPad + (cSub / particleStepSub) * stepPx;
+          if (cx < leftPad - 1 || cx > leftPad + plotW + 1) return;
+          ctx.save();
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2.2;
+          ctx.setLineDash([5, 4]);
+          ctx.beginPath();
+          ctx.moveTo(cx, 40);
+          ctx.lineTo(cx, 330);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          const midY = (yEq + yInst) / 2;
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.moveTo(cx, midY - 8);
+          ctx.lineTo(cx + 8, midY);
+          ctx.lineTo(cx, midY + 8);
+          ctx.lineTo(cx - 8, midY);
+          ctx.closePath();
+          ctx.fill();
+          ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillText(caption, Math.max(leftPad + 36, Math.min(leftPad + plotW - 36, cx)), yInst + 36);
+          ctx.restore();
+        });
+      };
+      markCentreOnSnapshot(compCentres, '#b91c1c', dict.compCentre);
+      markCentreOnSnapshot(rareCentres, '#1d4ed8', dict.rareCentre);
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 14px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(dict.rowEq, leftPad - 12, yEq);
+      ctx.fillText(dict.rowInstant, leftPad - 12, yInst);
+
+      for (let idx = 0; idx < numParticles; idx++) {
+        const xSubEq = idx * particleStepSub;
+        const xEq = leftPad + idx * stepPx;
+        const dispSub = getDisplacementSub(xSubEq, state.t);
+        const xInst = leftPad + (idx + dispSub / particleStepSub) * stepPx;
+        const letter = String.fromCharCode(65 + idx);
+
+        ctx.save();
+        ctx.setLineDash([4, 3]);
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 1.1;
+        ctx.beginPath();
+        ctx.moveTo(xEq, yEq);
+        ctx.lineTo(xEq, yInst + 16);
+        ctx.stroke();
+        ctx.restore();
+
+        let isComp = false, isRare = false;
+        if (Math.abs(dispSub) < 0.08) {
+          compCentres.forEach(cSub => { if (Math.abs(xSubEq - cSub) < 0.25) isComp = true; });
+          rareCentres.forEach(cSub => { if (Math.abs(xSubEq - cSub) < 0.25) isRare = true; });
+        }
+
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1.7;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(xEq, yEq, 5.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        let dotColor = '#0f172a';
+        let r = 6;
+        if (isComp) { dotColor = '#ef4444'; r = 7; }
+        else if (isRare) { dotColor = '#2563eb'; r = 7; }
+        ctx.fillStyle = dotColor;
+        ctx.beginPath();
+        ctx.arc(xInst, yInst, r, 0, Math.PI * 2);
+        ctx.fill();
+        if (isComp || isRare) {
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.arc(xInst, yInst, 3.2, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        drawParticleLetter(letter, xEq, yEq - 10, 'bottom');
+      }
+
+      const s1 = leftPad + (numParticles - 2) * stepPx;
+      const s2 = leftPad + (numParticles - 1) * stepPx;
+      drawDoubleArrow(s1, s2, 348, '#334155', '10 cm');
+      ctx.restore();
+
+      ctx.save();
+      const ay = H / 2;
+      const ax2 = graphX - 18;
+      ctx.strokeStyle = '#0f172a';
+      ctx.fillStyle = '#0f172a';
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(arrowX, ay);
+      ctx.lineTo(ax2 - 16, ay);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(ax2, ay);
+      ctx.lineTo(ax2 - 22, ay - 16);
+      ctx.lineTo(ax2 - 22, ay + 16);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      const plotL = graphX + 58;
+      const plotR = W - 24;
+      const plotT = 36;
+      const plotB = H - 44;
+      const midY = (plotT + plotB) / 2;
+      const dMaxCm = NUM_SUB_X * cmPerSub;
+      const sMaxCm = 5 * cmPerSub;
+
+      const dToX = dCm => plotL + (dCm / dMaxCm) * (plotR - plotL);
+      const sToY = sCm => midY - (sCm / sMaxCm) * ((midY - plotT) * 0.88);
+
+      ctx.save();
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 1.35;
+      ctx.beginPath();
+      ctx.rect(graphX, 16, W - graphX - 12, H - 32);
+      ctx.fill();
+      ctx.stroke();
+
+      const markCentreOnGraph = (centres, color, caption) => {
+        centres.forEach(cSub => {
+          const dCm = cSub * cmPerSub;
+          const x = dToX(dCm);
+          if (x < plotL - 1 || x > plotR + 1) return;
+          ctx.save();
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2;
+          ctx.setLineDash([6, 4]);
+          ctx.beginPath();
+          ctx.moveTo(x, plotT);
+          ctx.lineTo(x, plotB);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(x, midY, 7, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(x, midY, 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = color;
+          ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          const capX = Math.max(plotL + 40, Math.min(plotR - 40, x));
+          ctx.fillText(caption, capX, plotT + 18);
+          ctx.restore();
+        });
+      };
+      markCentreOnGraph(compCentres, '#b91c1c', dict.compCentre);
+      markCentreOnGraph(rareCentres, '#1d4ed8', dict.rareCentre);
+
+      ctx.strokeStyle = '#0f172a';
+      ctx.fillStyle = '#0f172a';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(plotL, plotT);
+      ctx.lineTo(plotL, plotB);
+      ctx.moveTo(plotL, midY);
+      ctx.lineTo(plotR, midY);
+      ctx.stroke();
+      const head = (x, y, dx, dy) => {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - 7 * dx + 4 * dy, y - 7 * dy - 4 * dx);
+        ctx.lineTo(x - 7 * dx - 4 * dy, y - 7 * dy + 4 * dx);
+        ctx.closePath();
+        ctx.fill();
+      };
+      head(plotL, plotT, 0, 1);
+      head(plotR, midY, 1, 0);
+
+      ctx.font = 'bold 14px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(dict.axisS, plotL, plotT - 4);
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'top';
+      ctx.fillText(dict.axisD, plotR, midY + 8);
+      ctx.font = '12px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('0', plotL - 8, midY);
+
+      ctx.font = '11px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.lineWidth = 1;
+      for (let dCm = 0; dCm <= dMaxCm + 0.01; dCm += 40) {
+        const x = dToX(dCm);
+        ctx.beginPath();
+        ctx.moveTo(x, midY - 4);
+        ctx.lineTo(x, midY + 4);
+        ctx.strokeStyle = '#0f172a';
+        ctx.stroke();
+        if (dCm > 0) ctx.fillText(String(dCm), x, midY + 6);
+      }
+
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      let started = false;
+      for (let xSub = 0; xSub <= NUM_SUB_X + 1e-6; xSub += 0.2) {
+        const x = dToX(xSub * cmPerSub);
+        const y = sToY(getDisplacementSub(xSub, state.t) * cmPerSub);
+        if (!started) { ctx.moveTo(x, y); started = true; }
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      if (state.showLambda && compCentres.length >= 2) {
+        const x1 = dToX(compCentres[0] * cmPerSub);
+        const x2 = dToX(compCentres[1] * cmPerSub);
+        drawDoubleArrow(x1, x2, plotB - 8, '#dc2626', 'λ');
+      }
+
+      for (let idx = 0; idx < numParticles; idx++) {
+        const xSubEq = idx * particleStepSub;
+        const dCm = xSubEq * cmPerSub;
+        const sCm = getDisplacementSub(xSubEq, state.t) * cmPerSub;
+        const x = dToX(dCm);
+        const y = sToY(sCm);
+        const letter = String.fromCharCode(65 + idx);
+        let isComp = false, isRare = false;
+        if (Math.abs(sCm / cmPerSub) < 0.08) {
+          compCentres.forEach(cSub => { if (Math.abs(xSubEq - cSub) < 0.25) isComp = true; });
+          rareCentres.forEach(cSub => { if (Math.abs(xSubEq - cSub) < 0.25) isRare = true; });
+        }
+        ctx.fillStyle = isComp ? '#ef4444' : isRare ? '#2563eb' : '#0f172a';
+        ctx.beginPath();
+        ctx.arc(x, y, isComp || isRare ? 6 : 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        const letterY = sCm >= 0 ? y - 8 : y + 8;
+        const baseline = sCm >= 0 ? 'bottom' : 'top';
+        drawParticleLetter(letter, x, letterY, baseline);
+      }
+      ctx.restore();
     }
 
     function animate(timestamp) {
