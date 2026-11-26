@@ -490,15 +490,21 @@
       if (btn) btn.textContent = lang === 'en' ? 'EN / 中' : '中 / EN';
     }
 
-    function applyLang(next) {
+    function applyLang(next, fromSite) {
       if (next) lang = next;
       try {
         localStorage.setItem(LANG_KEY, lang);
-        localStorage.setItem(SITE_LANG_KEY, lang);
       } catch (e) {}
       setPageLangAttrs();
       if (typeof applyTranslations === 'function') applyTranslations();
-      if (window.HKDSE_UI_LANG && window.HKDSE_UI_LANG.get() !== lang) window.HKDSE_UI_LANG.set(lang);
+      // Always go through lang.js when the in-page toggle is used, so the site
+      // topnav pressed state stays in sync. Skip when the change already came
+      // from lang.js (it writes the site key and updates the topnav itself).
+      if (!fromSite && window.HKDSE_UI_LANG) {
+        window.HKDSE_UI_LANG.set(lang);
+      } else {
+        try { localStorage.setItem(SITE_LANG_KEY, lang); } catch (e) {}
+      }
     }
 
     function toggleLanguage() {
@@ -507,7 +513,7 @@
 
     document.addEventListener('ui-lang-change', e => {
       const next = (e.detail && e.detail.lang === 'en') ? 'en' : 'zh';
-      if (next !== lang) applyLang(next);
+      if (next !== lang) applyLang(next, true);
     });
 
     const i18n = {
