@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-ui-lang="zh" data-force-light>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>7.1 縱波 — 密部與疏部的傳播 — HKDSE虛擬教室</title>
+<meta name="description" content="觀察粒子左右振動與密部、疏部的傳播（波向右傳播）。" />
+<script>(function(){try{const q=new URLSearchParams(location.search).get("lang");if(q==="en"||q==="zh"){localStorage.setItem("hkdse-vc-ui-lang",q);localStorage.setItem("longitudinal-waves-lang",q);}const l=localStorage.getItem("hkdse-vc-ui-lang")||localStorage.getItem("longitudinal-waves-lang");const lang=l==="en"?"en":"zh";document.documentElement.setAttribute("data-ui-lang",lang);document.documentElement.lang=lang==="en"?"en":"zh-Hant";}catch(e){document.documentElement.setAttribute("data-ui-lang","zh");}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../styles.css">
+<meta name="color-scheme" content="light only">
+<style>:root{color-scheme:light}</style>
+<style>
+
+    #longitudinal-waves-app, #longitudinal-waves-app *{
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    #longitudinal-waves-app{
+      font-family: "Noto Sans TC", "PingFang HK", "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      padding: 16px;
+      line-height: 1.5;
+    }
+    #longitudinal-waves-app .container{
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+    #longitudinal-waves-app header{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+      margin-bottom: 14px;
+    }
+    #longitudinal-waves-app .title-group h1{
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    #longitudinal-waves-app .title-group p{
+      font-size: 0.85rem;
+      color: #475569;
+      margin-top: 2px;
+    }
+    #longitudinal-waves-app .lang-btn{
+      background-color: #1e293b;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+      letter-spacing: 0.5px;
+    }
+    #longitudinal-waves-app .lang-btn:hover{
+      background-color: #334155;
+    }
+    #longitudinal-waves-app .lang-btn:active{
+      transform: scale(0.97);
+    }
+
+    #longitudinal-waves-app .board-card{
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+      margin-bottom: 14px;
+    }
+    #longitudinal-waves-app .board-top-bar{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    #longitudinal-waves-app .playback-controls{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    #longitudinal-waves-app .btn{
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #1e293b;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    #longitudinal-waves-app .btn:hover{
+      background: #e2e8f0;
+    }
+    #longitudinal-waves-app .btn-primary{
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+    #longitudinal-waves-app .btn-primary:hover{
+      background: #1d4ed8;
+    }
+    #longitudinal-waves-app .time-badge{
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    /* Prominent Compression/Rarefaction Toggle */
+    #longitudinal-waves-app .cr-toggle-btn{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: 10px;
+      border: 2px solid #dc2626;
+      background: #fef2f2;
+      color: #991b1b;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    #longitudinal-waves-app .cr-toggle-btn.active{
+      background: #dc2626;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.28);
+    }
+    #longitudinal-waves-app .cr-status-pill{
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      background: rgba(255, 255, 255, 0.25);
+    }
+    #longitudinal-waves-app .cr-toggle-btn:not(.active) .cr-status-pill{
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    #longitudinal-waves-app .canvas-wrapper{
+      width: 100%;
+      overflow-x: auto;
+      border: 1.5px solid #64748b;
+      border-radius: 8px;
+      background: #ffffff;
+    }
+    #longitudinal-waves-app canvas{
+      display: block;
+      width: 100%;
+      min-width: 860px;
+      height: auto;
+    }
+
+    #longitudinal-waves-app .scale-bar{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #334155;
+    }
+    #longitudinal-waves-app .legend-inline{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+    }
+    #longitudinal-waves-app .legend-item{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+    #longitudinal-waves-app .dot{
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    #longitudinal-waves-app .controls-grid{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 780px) {
+      #longitudinal-waves-app .controls-grid{
+        grid-template-columns: 1fr;
+      }
+    }
+    #longitudinal-waves-app .panel{
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    #longitudinal-waves-app .panel h2{
+      font-size: 1rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    #longitudinal-waves-app .toggle-list{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    #longitudinal-waves-app .chip-btn{
+      padding: 8px 13px;
+      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    #longitudinal-waves-app .chip-btn:hover{
+      border-color: #94a3b8;
+    }
+    #longitudinal-waves-app .chip-btn.active{
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #1d4ed8;
+    }
+    #longitudinal-waves-app .sub-phase-row{
+      margin-top: 10px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+    #longitudinal-waves-app .sub-phase-row.visible{
+      display: flex;
+    }
+
+    #longitudinal-waves-app .slider-row{
+      margin-bottom: 12px;
+    }
+    #longitudinal-waves-app .slider-row:last-child{
+      margin-bottom: 0;
+    }
+    #longitudinal-waves-app .slider-header{
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #1e293b;
+    }
+    #longitudinal-waves-app input[type="range"]{
+      width: 100%;
+      accent-color: #2563eb;
+      cursor: pointer;
+    }
+    #longitudinal-waves-app .metrics-strip{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed #cbd5e1;
+      font-size: 0.86rem;
+      color: #334155;
+    }
+    #longitudinal-waves-app .metric-pill{
+      background: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+  
+    /* Hub integration only: back link, site h1/badge clash resets. Original look preserved. */
+    #longitudinal-waves-app .lw-back {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 0 4px;
+    }
+    #longitudinal-waves-app .lw-back a {
+      color: #0f172a;
+      text-decoration: none;
+      font-weight: 650;
+      font-size: 0.88rem;
+      display: inline-block;
+      padding: 2px 0 6px;
+      border-bottom: 0;
+    }
+    #longitudinal-waves-app .lw-back a:hover {
+      text-decoration: underline;
+      color: #2563eb;
+    }
+    #longitudinal-waves-app .title-group h1 {
+      letter-spacing: normal;
+      text-wrap: initial;
+      line-height: 1.3;
+      margin: 0;
+      font-family: "Noto Sans HK", "Noto Sans TC", "PingFang HK", "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    #longitudinal-waves-app .badge,
+    #longitudinal-waves-app .time-badge,
+    #longitudinal-waves-app .metric-pill,
+    #longitudinal-waves-app .cr-status-pill {
+      position: static;
+      top: auto;
+      right: auto;
+      left: auto;
+      letter-spacing: normal;
+      text-transform: none;
+      z-index: auto;
+    }
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="Main">
+  <div class="inner">
+    <a class="brand" href="../index.html"><span class="ui-zh">HKDSE虛擬教室</span><span class="ui-en">HKDSE Virtual Classroom</span></a>
+    <a href="../數學科.html"><span class="ui-zh">數學科</span><span class="ui-en">Maths</span></a>
+    <a href="../物理科.html"><span class="ui-zh">物理科</span><span class="ui-en">Physics</span></a>
+    <a href="../物理模擬實驗室.html" aria-current="page"><span class="ui-zh">物理模擬實驗室</span><span class="ui-en">Physics Simulation Lab</span></a>
+    <div class="lang-switch" role="group" aria-label="Language / 語言">
+      <button type="button" class="lang-btn" data-lang="zh" aria-pressed="true">中文</button>
+      <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</nav>
+<div id="longitudinal-waves-app">
+  <div class="lw-back">
+    <a href="../物理模擬實驗室.html"><span class="ui-zh">← 返回物理模擬實驗室</span><span class="ui-en">← Back to Physics Simulation Lab</span></a>
+  </div>
+<div class="container">
+    <header>
+      <div class="title-group">
+        <h1 data-i18n="appTitle">HKDSE 物理科｜7.1 縱波模擬實驗</h1>
+        <p data-i18n="appSubtitle">觀察粒子左右振動與密部、疏部的傳播（波向右傳播）</p>
+      </div>
+      <button id="langToggleBtn" class="lang-btn" onclick="toggleLanguage()">中 / EN</button>
+    </header>
+
+    <div class="board-card">
+      <div class="board-top-bar">
+        <div class="playback-controls">
+          <button id="playPauseBtn" class="btn btn-primary" onclick="togglePlay()">暫停</button>
+          <button class="btn" onclick="stepTime(0.5)" data-i18n="stepBtn">單步 +0.5 s</button>
+          <button class="btn" onclick="resetSim()" data-i18n="resetBtn">重設 t = 0</button>
+          <span class="time-badge" id="timeDisplay">t = 0.0 s</span>
+        </div>
+
+        <button id="crToggleBtn" class="cr-toggle-btn active" onclick="toggleFeature('showCR')">
+          <span data-i18n="btnShowCR">顯示密部與疏部</span>
+          <span id="crStatusPill" class="cr-status-pill">開</span>
+        </button>
+      </div>
+
+      <div class="canvas-wrapper">
+        <canvas id="waveCanvas" width="1040" height="330"></canvas>
+      </div>
+
+      <div class="scale-bar">
+        <div class="legend-inline">
+          <span class="legend-item">
+            <span class="dot" style="background:#0f172a;"></span>
+            <span data-i18n="legendParticle">介質粒子</span>
+          </span>
+          <span class="legend-item">
+            <span class="dot" style="background:#ef4444;"></span>
+            <span data-i18n="legendComp">密部中心 (位移 = 0)</span>
+          </span>
+          <span class="legend-item">
+            <span class="dot" style="background:#2563eb;"></span>
+            <span data-i18n="legendRare">疏部中心 (位移 = 0)</span>
+          </span>
+        </div>
+        <div>
+          <strong data-i18n="gridScale">方格比例尺：1 大格 (4 小格) = 10 cm ｜ 1 小格 = 2.5 cm</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-grid">
+      <div class="panel">
+        <h2 data-i18n="panelAnnotations">課堂標示開關（按教學進度逐一開啟）</h2>
+        <div class="toggle-list">
+          <button id="btnLambda" class="chip-btn" onclick="toggleFeature('showLambda')" data-i18n="btnLambda">
+            顯示波長 (λ)
+          </button>
+          <button id="btnAmp" class="chip-btn" onclick="toggleFeature('showAmp')" data-i18n="btnAmp">
+            顯示振幅 (A)
+          </button>
+          <button id="btnTrack" class="chip-btn" onclick="toggleFeature('trackComp')" data-i18n="btnTrack">
+            追蹤密部前進
+          </button>
+          <button id="btnPhase" class="chip-btn" onclick="toggleFeature('showPhase')" data-i18n="btnPhase">
+            顯示同相 / 反相粒子
+          </button>
+        </div>
+
+        <div id="phaseSubRow" class="sub-phase-row">
+          <span style="font-size:0.85rem;font-weight:600;" data-i18n="phaseSelectLabel">選擇粒子距離：</span>
+          <button id="btnInPhase" class="chip-btn active" onclick="setPhaseMode('in')" data-i18n="btnInPhase">
+            同相 (相距 1λ)
+          </button>
+          <button id="btnAntiPhase" class="chip-btn" onclick="setPhaseMode('anti')" data-i18n="btnAntiPhase">
+            反相 (相距 0.5λ)
+          </button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 data-i18n="panelParams">波動參數設定</h2>
+        <div class="slider-row">
+          <div class="slider-header">
+            <span data-i18n="labelAmp">振幅 A (Amplitude)</span>
+            <span id="ampValText">7.5 cm (3 小格)</span>
+          </div>
+          <input type="range" id="ampSlider" min="1" max="5" step="1" value="3" oninput="updateParams()" />
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-header">
+            <span data-i18n="labelLambda">波長 λ (Wavelength)</span>
+            <span id="lambdaValText">80 cm (8 大格 / 32 小格)</span>
+          </div>
+          <input type="range" id="lambdaSlider" min="24" max="40" step="4" value="32" oninput="updateParams()" />
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-header">
+            <span data-i18n="labelPeriod">週期 T (Period)</span>
+            <span id="periodValText">4.0 s</span>
+          </div>
+          <input type="range" id="periodSlider" min="2" max="8" step="1" value="4" oninput="updateParams()" />
+        </div>
+
+        <div class="metrics-strip">
+          <span class="metric-pill" id="freqMetric">頻率 f = 0.25 Hz</span>
+          <span class="metric-pill" id="speedMetric">波速率 v = 20.0 cm s⁻¹ (0.20 m s⁻¹)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script src="../lang.js"></script>
+<script>
+
+    const LANG_KEY = 'longitudinal-waves-lang';
+    const SITE_LANG_KEY = 'hkdse-vc-ui-lang';
+    let lang = 'zh';
+    try {
+      const l = localStorage.getItem(SITE_LANG_KEY) || localStorage.getItem(LANG_KEY);
+      if (l === 'en') lang = 'en';
+    } catch (e) {}
+
+    const TITLE_ZH = '7.1 縱波 — 密部與疏部的傳播 — HKDSE虛擬教室';
+    const TITLE_EN = '7.1 Longitudinal Waves — Compressions and Rarefactions — HKDSE Virtual Classroom';
+
+    function setPageLangAttrs() {
+      document.documentElement.lang = lang === 'en' ? 'en' : 'zh-Hant';
+      document.documentElement.setAttribute('data-ui-lang', lang === 'en' ? 'en' : 'zh');
+      document.title = lang === 'en' ? TITLE_EN : TITLE_ZH;
+      const btn = document.getElementById('langToggleBtn');
+      if (btn) btn.textContent = lang === 'en' ? 'EN / 中' : '中 / EN';
+    }
+
+    function applyLang(next) {
+      if (next) lang = next;
+      try {
+        localStorage.setItem(LANG_KEY, lang);
+        localStorage.setItem(SITE_LANG_KEY, lang);
+      } catch (e) {}
+      setPageLangAttrs();
+      if (typeof applyTranslations === 'function') applyTranslations();
+      if (window.HKDSE_UI_LANG && window.HKDSE_UI_LANG.get() !== lang) window.HKDSE_UI_LANG.set(lang);
+    }
+
+    function toggleLanguage() {
+      applyLang(lang === 'zh' ? 'en' : 'zh');
+    }
+
+    document.addEventListener('ui-lang-change', e => {
+      const next = (e.detail && e.detail.lang === 'en') ? 'en' : 'zh';
+      if (next !== lang) applyLang(next);
+    });
+
+    const i18n = {
+      zh: {
+        appTitle: 'HKDSE 物理科｜7.1 縱波模擬實驗',
+        appSubtitle: '觀察粒子左右振動與密部、疏部的傳播（波向右傳播）',
+        pause: '暫停',
+        play: '播放',
+        stepBtn: '單步 +0.5 s',
+        resetBtn: '重設 t = 0',
+        btnShowCR: '顯示密部與疏部',
+        statusOn: '開',
+        statusOff: '關',
+        legendParticle: '介質粒子',
+        legendComp: '密部中心 (位移 = 0)',
+        legendRare: '疏部中心 (位移 = 0)',
+        gridScale: '方格比例尺：1 大格 (4 小格) = 10 cm ｜ 1 小格 = 2.5 cm',
+        panelAnnotations: '課堂標示開關（按教學進度逐一開啟）',
+        btnLambda: '顯示波長 (λ)',
+        btnAmp: '顯示振幅 (A)',
+        btnTrack: '追蹤密部前進',
+        btnPhase: '顯示同相 / 反相粒子',
+        phaseSelectLabel: '選擇粒子距離：',
+        btnInPhase: '同相 (相距 1λ)',
+        btnAntiPhase: '反相 (相距 0.5λ)',
+        panelParams: '波動參數設定',
+        labelAmp: '振幅 A (Amplitude)',
+        labelLambda: '波長 λ (Wavelength)',
+        labelPeriod: '週期 T (Period)',
+        rowEq: '平衡位置',
+        rowInstant: '某一刻位置',
+        waveDir: '波的傳播方向',
+        compLabel: '密部',
+        rareLabel: '疏部',
+        trackLabel: '追蹤密部中心',
+        inPhaseTag: '同相 (Δd = 1λ)',
+        antiPhaseTag: '反相 (Δd = 0.5λ)',
+        smallGridUnit: '小格',
+        bigGridUnit: '大格',
+        freqPrefix: '頻率 f = ',
+        speedPrefix: '波速率 v = '
+      },
+      en: {
+        appTitle: 'HKDSE Physics | 7.1 Longitudinal Wave Simulation',
+        appSubtitle: 'Observe longitudinal particle oscillation and propagation of compressions & rarefactions (wave travels right)',
+        pause: 'Pause',
+        play: 'Play',
+        stepBtn: 'Step +0.5 s',
+        resetBtn: 'Reset t = 0',
+        btnShowCR: 'Show Compressions & Rarefactions',
+        statusOn: 'ON',
+        statusOff: 'OFF',
+        legendParticle: 'Medium Particle',
+        legendComp: 'Compression Centre (s = 0)',
+        legendRare: 'Rarefaction Centre (s = 0)',
+        gridScale: 'Grid Scale: 1 Major Square (4 sub-grids) = 10 cm | 1 sub-grid = 2.5 cm',
+        panelAnnotations: 'Classroom Annotation Toggles (Enable progressively)',
+        btnLambda: 'Show Wavelength (λ)',
+        btnAmp: 'Show Amplitude (A)',
+        btnTrack: 'Track Compression',
+        btnPhase: 'Show In-phase / Antiphase',
+        phaseSelectLabel: 'Particle Separation:',
+        btnInPhase: 'In-phase (Δd = 1λ)',
+        btnAntiPhase: 'Antiphase (Δd = 0.5λ)',
+        panelParams: 'Wave Parameters',
+        labelAmp: 'Amplitude (A)',
+        labelLambda: 'Wavelength (λ)',
+        labelPeriod: 'Period (T)',
+        rowEq: 'Equilibrium',
+        rowInstant: 'At time t',
+        waveDir: 'Direction of wave travel',
+        compLabel: 'Compression',
+        rareLabel: 'Rarefaction',
+        trackLabel: 'Tracked Compression',
+        inPhaseTag: 'In-phase (Δd = 1λ)',
+        antiPhaseTag: 'Antiphase (Δd = 0.5λ)',
+        smallGridUnit: 'sub-grids',
+        bigGridUnit: 'major grids',
+        freqPrefix: 'Frequency f = ',
+        speedPrefix: 'Wave speed v = '
+      }
+    };
+
+    const state = {
+      isPlaying: true,
+      t: 0,
+      lastTimestamp: null,
+      showCR: true,
+      showLambda: false,
+      showAmp: false,
+      trackComp: false,
+      showPhase: false,
+      phaseMode: 'in', // 'in' or 'anti'
+      ampSubGrids: 3,      // 1 sub-grid = 2.5 cm -> 7.5 cm
+      lambdaSubGrids: 32,  // 32 sub-grids = 8 major grids = 80 cm
+      period: 4.0          // 4.0 s
+    };
+
+    const canvas = document.getElementById('waveCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Grid layout constants
+    const MARGIN_LEFT = 115;
+    const MARGIN_RIGHT = 35;
+    const GRID_TOP = 58;
+    const SUB_GRID_PX = 14; // 1 sub-grid = 14px; 4 sub-grids = 56px (1 major square)
+    const NUM_MAJOR_X = 16; // 16 * 4 = 64 sub-grids
+    const NUM_SUB_X = NUM_MAJOR_X * 4;
+    const NUM_MAJOR_Y = 4;  // 4 major rows = 16 sub-grids
+    const NUM_SUB_Y = NUM_MAJOR_Y * 4;
+
+    const EQ_ROW_Y = GRID_TOP + 4 * SUB_GRID_PX;      // 1 major square down
+    const INST_ROW_Y = GRID_TOP + 12 * SUB_GRID_PX;   // 3 major squares down
+
+    // toggleLanguage / applyLang defined above (hub language sync)
+
+    function applyTranslations() {
+      const dict = i18n[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+      });
+      document.getElementById('playPauseBtn').textContent = state.isPlaying ? dict.pause : dict.play;
+      document.getElementById('crStatusPill').textContent = state.showCR ? dict.statusOn : dict.statusOff;
+      updateParamLabels();
+      draw();
+    }
+
+    function togglePlay() {
+      state.isPlaying = !state.isPlaying;
+      state.lastTimestamp = null;
+      document.getElementById('playPauseBtn').textContent = state.isPlaying ? i18n[lang].pause : i18n[lang].play;
+    }
+
+    function stepTime(dt) {
+      state.isPlaying = false;
+      document.getElementById('playPauseBtn').textContent = i18n[lang].play;
+      state.t = +(state.t + dt).toFixed(2);
+      document.getElementById('timeDisplay').textContent = `t = ${state.t.toFixed(1)} s`;
+      draw();
+    }
+
+    function resetSim() {
+      state.t = 0;
+      state.lastTimestamp = null;
+      document.getElementById('timeDisplay').textContent = `t = 0.0 s`;
+      draw();
+    }
+
+    function toggleFeature(key) {
+      state[key] = !state[key];
+      if (key === 'showCR') {
+        const btn = document.getElementById('crToggleBtn');
+        const pill = document.getElementById('crStatusPill');
+        btn.classList.toggle('active', state.showCR);
+        pill.textContent = state.showCR ? i18n[lang].statusOn : i18n[lang].statusOff;
+      } else if (key === 'showLambda') {
+        document.getElementById('btnLambda').classList.toggle('active', state.showLambda);
+      } else if (key === 'showAmp') {
+        document.getElementById('btnAmp').classList.toggle('active', state.showAmp);
+      } else if (key === 'trackComp') {
+        document.getElementById('btnTrack').classList.toggle('active', state.trackComp);
+      } else if (key === 'showPhase') {
+        document.getElementById('btnPhase').classList.toggle('active', state.showPhase);
+        document.getElementById('phaseSubRow').classList.toggle('visible', state.showPhase);
+      }
+      draw();
+    }
+
+    function setPhaseMode(mode) {
+      state.phaseMode = mode;
+      document.getElementById('btnInPhase').classList.toggle('active', mode === 'in');
+      document.getElementById('btnAntiPhase').classList.toggle('active', mode === 'anti');
+      draw();
+    }
+
+    function updateParams() {
+      state.ampSubGrids = parseInt(document.getElementById('ampSlider').value, 10);
+      state.lambdaSubGrids = parseInt(document.getElementById('lambdaSlider').value, 10);
+      state.period = parseFloat(document.getElementById('periodSlider').value);
+      updateParamLabels();
+      draw();
+    }
+
+    function updateParamLabels() {
+      const dict = i18n[lang];
+      const ampCm = (state.ampSubGrids * 2.5).toFixed(1);
+      const lambdaCm = (state.lambdaSubGrids * 2.5).toFixed(0);
+      const majorGrids = state.lambdaSubGrids / 4;
+      const freq = 1 / state.period;
+      const speedCm = freq * (state.lambdaSubGrids * 2.5);
+      const speedM = speedCm / 100;
+
+      document.getElementById('ampValText').textContent =
+        `${ampCm} cm (${state.ampSubGrids} ${dict.smallGridUnit})`;
+      document.getElementById('lambdaValText').textContent =
+        `${lambdaCm} cm (${majorGrids} ${dict.bigGridUnit} / ${state.lambdaSubGrids} ${dict.smallGridUnit})`;
+      document.getElementById('periodValText').textContent = `${state.period.toFixed(1)} s`;
+
+      document.getElementById('freqMetric').textContent = `${dict.freqPrefix}${freq.toFixed(2)} Hz`;
+      document.getElementById('speedMetric').textContent =
+        `${dict.speedPrefix}${speedCm.toFixed(1)} cm s⁻¹ (${speedM.toFixed(2)} m s⁻¹)`;
+    }
+
+    // Displacement function: s(x_sub, t) = A * sin(2*pi*(t/T - x/lambda))
+    // Note: s = 0 and ds/dx < 0 corresponds to Compression centre!
+    // Let's verify: ds/dx = -A*(2*pi/lambda)*cos(2*pi*(t/T - x/lambda)).
+    // When 2*pi*(t/T - x/lambda) = 0 (mod 2*pi), i.e., x = (v*t) mod lambda:
+    // s = 0, left particles (x < x_c) have (t/T - x/lambda) > 0 => s > 0 (displaced right towards x_c),
+    // right particles (x > x_c) have (t/T - x/lambda) < 0 => s < 0 (displaced left towards x_c).
+    // Thus x_c = (lambda * t / T) is ALWAYS a Compression centre!
+    function getDisplacementSub(xSub, t) {
+      const phase = 2 * Math.PI * (t / state.period - xSub / state.lambdaSubGrids);
+      return state.ampSubGrids * Math.sin(phase);
+    }
+
+    function drawArrow(fromX, fromY, toX, toY, color, lineWidth = 2.2) {
+      const headLen = 8;
+      const dx = toX - fromX;
+      const dy = toY - fromY;
+      const angle = Math.atan2(dy, dx);
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = lineWidth;
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(toX, toY);
+      ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI / 6), toY - headLen * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI / 6), toY - headLen * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawDoubleArrow(x1, x2, y, color, label) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 2;
+
+      // Vertical ticks at ends
+      ctx.beginPath();
+      ctx.moveTo(x1, y - 8);
+      ctx.lineTo(x1, y + 8);
+      ctx.moveTo(x2, y - 8);
+      ctx.lineTo(x2, y + 8);
+      ctx.stroke();
+
+      // Horizontal shaft
+      ctx.beginPath();
+      ctx.moveTo(x1, y);
+      ctx.lineTo(x2, y);
+      ctx.stroke();
+
+      // Left arrowhead
+      ctx.beginPath();
+      ctx.moveTo(x1, y);
+      ctx.lineTo(x1 + 7, y - 4);
+      ctx.lineTo(x1 + 7, y + 4);
+      ctx.closePath();
+      ctx.fill();
+
+      // Right arrowhead
+      ctx.beginPath();
+      ctx.moveTo(x2, y);
+      ctx.lineTo(x2 - 7, y - 4);
+      ctx.lineTo(x2 - 7, y + 4);
+      ctx.closePath();
+      ctx.fill();
+
+      if (label) {
+        ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
+        const textWidth = ctx.measureText(label).width;
+        const midX = (x1 + x2) / 2;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(midX - textWidth / 2 - 5, y - 10, textWidth + 10, 20);
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, midX, y);
+      }
+      ctx.restore();
+    }
+
+    function drawGrid() {
+      const gridWidth = NUM_SUB_X * SUB_GRID_PX;
+      const gridHeight = NUM_SUB_Y * SUB_GRID_PX;
+
+      // White background inside grid
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(MARGIN_LEFT, GRID_TOP, gridWidth, gridHeight);
+
+      // Sub-grid lines (clear medium-light slate so students can easily count squares)
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= NUM_SUB_X; i++) {
+        if (i % 4 === 0) continue;
+        const x = MARGIN_LEFT + i * SUB_GRID_PX + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(x, GRID_TOP);
+        ctx.lineTo(x, GRID_TOP + gridHeight);
+        ctx.stroke();
+      }
+      for (let j = 0; j <= NUM_SUB_Y; j++) {
+        if (j % 4 === 0) continue;
+        const y = GRID_TOP + j * SUB_GRID_PX + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(MARGIN_LEFT, y);
+        ctx.lineTo(MARGIN_LEFT + gridWidth, y);
+        ctx.stroke();
+      }
+
+      // Major grid lines (every 4 sub-grids = 10 cm, crisp dark slate)
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 1.35;
+      for (let i = 0; i <= NUM_SUB_X; i += 4) {
+        const x = MARGIN_LEFT + i * SUB_GRID_PX + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(x, GRID_TOP);
+        ctx.lineTo(x, GRID_TOP + gridHeight);
+        ctx.stroke();
+      }
+      for (let j = 0; j <= NUM_SUB_Y; j += 4) {
+        const y = GRID_TOP + j * SUB_GRID_PX + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(MARGIN_LEFT, y);
+        ctx.lineTo(MARGIN_LEFT + gridWidth, y);
+        ctx.stroke();
+      }
+
+      // Scale bracket at bottom-right of grid (1 major square = 10 cm)
+      const scaleX1 = MARGIN_LEFT + (NUM_SUB_X - 4) * SUB_GRID_PX;
+      const scaleX2 = MARGIN_LEFT + NUM_SUB_X * SUB_GRID_PX;
+      const scaleY = GRID_TOP + gridHeight + 18;
+      drawDoubleArrow(scaleX1, scaleX2, scaleY, '#334155', '10 cm');
+    }
+
+    function draw() {
+      const dict = i18n[lang];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Wave direction indicator at top-left
+      ctx.save();
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(dict.waveDir, MARGIN_LEFT, 22);
+      drawArrow(MARGIN_LEFT + 145, 18, MARGIN_LEFT + 225, 18, '#0f172a', 2.2);
+      ctx.restore();
+
+      // 1. Draw high-contrast exam grid
+      drawGrid();
+
+      const gridWidth = NUM_SUB_X * SUB_GRID_PX;
+      const gridHeight = NUM_SUB_Y * SUB_GRID_PX;
+
+      // Compute Compression and Rarefaction centre positions (in sub-grids)
+      const lam = state.lambdaSubGrids;
+      const waveShift = ((state.t / state.period) * lam) % lam;
+      const compCentres = [];
+      const rareCentres = [];
+
+      for (let k = -1; k <= Math.ceil(NUM_SUB_X / lam) + 1; k++) {
+        const cPos = k * lam + waveShift;
+        if (cPos >= 0 && cPos <= NUM_SUB_X) {
+          compCentres.push(cPos);
+        }
+        const rPos = cPos + lam / 2;
+        if (rPos >= 0 && rPos <= NUM_SUB_X) {
+          rareCentres.push(rPos);
+        }
+      }
+
+      // 2. Highlight Compression & Rarefaction zones if enabled
+      if (state.showCR) {
+        const bandHalfWidth = (lam * 0.22) * SUB_GRID_PX;
+        const zoneTop = INST_ROW_Y - 2.3 * SUB_GRID_PX;
+        const zoneHeight = 4.6 * SUB_GRID_PX;
+
+        compCentres.forEach(cSub => {
+          const cx = MARGIN_LEFT + cSub * SUB_GRID_PX;
+          const left = Math.max(MARGIN_LEFT, cx - bandHalfWidth);
+          const right = Math.min(MARGIN_LEFT + gridWidth, cx + bandHalfWidth);
+          if (right > left) {
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.16)';
+            ctx.fillRect(left, zoneTop, right - left, zoneHeight);
+
+            ctx.fillStyle = '#b91c1c';
+            ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(dict.compLabel, (left + right) / 2, INST_ROW_Y + 3.2 * SUB_GRID_PX);
+          }
+        });
+
+        rareCentres.forEach(rSub => {
+          const rx = MARGIN_LEFT + rSub * SUB_GRID_PX;
+          const left = Math.max(MARGIN_LEFT, rx - bandHalfWidth);
+          const right = Math.min(MARGIN_LEFT + gridWidth, rx + bandHalfWidth);
+          if (right > left) {
+            ctx.fillStyle = 'rgba(37, 99, 235, 0.14)';
+            ctx.fillRect(left, zoneTop, right - left, zoneHeight);
+
+            ctx.fillStyle = '#1d4ed8';
+            ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(dict.rareLabel, (left + right) / 2, INST_ROW_Y + 3.2 * SUB_GRID_PX);
+          }
+        });
+      }
+
+      // 3. Row labels on the left
+      ctx.save();
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 14px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(dict.rowEq, MARGIN_LEFT - 14, EQ_ROW_Y);
+      ctx.fillText(dict.rowInstant, MARGIN_LEFT - 14, INST_ROW_Y);
+      ctx.restore();
+
+      // 4. Particles (spaced every 4 sub-grids = 1 major square, matching HKDSE worksheets)
+      const particleStepSub = 4;
+      const numParticles = Math.floor(NUM_SUB_X / particleStepSub) + 1;
+
+      // Determine phase highlight indices if active
+      const pIndex = 3; // particle at xSub = 12
+      const qOffsetParticles = state.phaseMode === 'in'
+        ? Math.round(lam / particleStepSub)
+        : Math.round((lam / 2) / particleStepSub);
+      const qIndex = Math.min(numParticles - 1, pIndex + qOffsetParticles);
+
+      for (let idx = 0; idx < numParticles; idx++) {
+        const xSubEq = idx * particleStepSub;
+        const xEqPx = MARGIN_LEFT + xSubEq * SUB_GRID_PX;
+
+        const dispSub = getDisplacementSub(xSubEq, state.t);
+        const xInstPx = MARGIN_LEFT + (xSubEq + dispSub) * SUB_GRID_PX;
+
+        // Vertical dashed reference line from equilibrium down to instantaneous row
+        ctx.save();
+        ctx.setLineDash([4, 3]);
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 1.1;
+        ctx.beginPath();
+        ctx.moveTo(xEqPx, EQ_ROW_Y);
+        ctx.lineTo(xEqPx, INST_ROW_Y + 18);
+        ctx.stroke();
+        ctx.restore();
+
+        // Check if this particle is at a Compression centre or Rarefaction centre (disp ~ 0)
+        let isCompCentre = false;
+        let isRareCentre = false;
+        if (Math.abs(dispSub) < 0.08) {
+          compCentres.forEach(cSub => {
+            if (Math.abs(xSubEq - cSub) < 0.25) isCompCentre = true;
+          });
+          rareCentres.forEach(rSub => {
+            if (Math.abs(xSubEq - rSub) < 0.25) isRareCentre = true;
+          });
+        }
+
+        // Equilibrium dot
+        ctx.fillStyle = '#334155';
+        ctx.beginPath();
+        ctx.arc(xEqPx, EQ_ROW_Y, 5.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Instantaneous dot
+        let dotColor = '#0f172a';
+        let dotRadius = 6;
+        if (state.showCR && isCompCentre) {
+          dotColor = '#ef4444';
+          dotRadius = 7;
+        } else if (state.showCR && isRareCentre) {
+          dotColor = '#2563eb';
+          dotRadius = 7;
+        }
+
+        if (state.showPhase && (idx === pIndex || idx === qIndex)) {
+          dotColor = idx === pIndex ? '#059669' : '#d97706';
+          dotRadius = 7.5;
+        }
+
+        ctx.fillStyle = dotColor;
+        ctx.beginPath();
+        ctx.arc(xInstPx, INST_ROW_Y, dotRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw white inner ring for C/R centre particles when showCR is active
+        if (state.showCR && (isCompCentre || isRareCentre)) {
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.arc(xInstPx, INST_ROW_Y, 3.2, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+
+      // 5. Optional Feature: Wavelength (lambda) ruler
+      if (state.showLambda && compCentres.length >= 2) {
+        const x1 = MARGIN_LEFT + compCentres[0] * SUB_GRID_PX;
+        const x2 = MARGIN_LEFT + compCentres[1] * SUB_GRID_PX;
+        drawDoubleArrow(x1, x2, GRID_TOP - 16, '#dc2626', 'λ');
+      } else if (state.showLambda && rareCentres.length >= 2) {
+        const x1 = MARGIN_LEFT + rareCentres[0] * SUB_GRID_PX;
+        const x2 = MARGIN_LEFT + rareCentres[1] * SUB_GRID_PX;
+        drawDoubleArrow(x1, x2, GRID_TOP - 16, '#2563eb', 'λ');
+      }
+
+      // 6. Optional Feature: Amplitude (A) indicator on particle idx = 4 (xSub = 16)
+      if (state.showAmp) {
+        const targetIdx = 4;
+        const xSubEq = targetIdx * particleStepSub;
+        const xEqPx = MARGIN_LEFT + xSubEq * SUB_GRID_PX;
+        const maxAmpPx = state.ampSubGrids * SUB_GRID_PX;
+        const dispPx = getDisplacementSub(xSubEq, state.t) * SUB_GRID_PX;
+
+        // Show max amplitude range bracket above instantaneous row
+        const ampY = INST_ROW_Y - 24;
+        drawDoubleArrow(xEqPx, xEqPx + maxAmpPx, ampY, '#059669', 'A');
+
+        // Highlight instantaneous displacement vector from equilibrium line to particle
+        if (Math.abs(dispPx) > 2) {
+          drawArrow(xEqPx, INST_ROW_Y - 12, xEqPx + dispPx, INST_ROW_Y - 12, '#059669', 2);
+        }
+      }
+
+      // 7. Optional Feature: Track Compression box
+      if (state.trackComp) {
+        // Track continuous compression starting at xSub = 0 at t = 0, wrapping modulo NUM_SUB_X
+        const trackedSub = ((state.t / state.period) * lam) % NUM_SUB_X;
+        const cx = MARGIN_LEFT + trackedSub * SUB_GRID_PX;
+        const boxW = 4.5 * SUB_GRID_PX;
+        const boxH = 3.2 * SUB_GRID_PX;
+
+        ctx.save();
+        ctx.setLineDash([6, 4]);
+        ctx.strokeStyle = '#dc2626';
+        ctx.lineWidth = 2.4;
+        ctx.strokeRect(cx - boxW / 2, INST_ROW_Y - boxH / 2, boxW, boxH);
+
+        ctx.fillStyle = '#dc2626';
+        ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(dict.trackLabel, cx, INST_ROW_Y - boxH / 2 - 7);
+        ctx.restore();
+      }
+
+      // 8. Optional Feature: In-phase / Antiphase particles P & Q
+      if (state.showPhase) {
+        const pairs = [
+          { idx: pIndex, label: 'P', color: '#059669' },
+          { idx: qIndex, label: 'Q', color: '#d97706' }
+        ];
+        pairs.forEach(item => {
+          const xSubEq = item.idx * particleStepSub;
+          const dispSub = getDisplacementSub(xSubEq, state.t);
+          const xInstPx = MARGIN_LEFT + (xSubEq + dispSub) * SUB_GRID_PX;
+
+          // Particle velocity v_p = ds/dt = A * (2*pi/T) * cos(2*pi*(t/T - x/lambda))
+          const phase = 2 * Math.PI * (state.t / state.period - xSubEq / lam);
+          const vel = Math.cos(phase);
+
+          ctx.save();
+          ctx.fillStyle = item.color;
+          ctx.font = 'bold 14px "Noto Sans TC", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(item.label, xInstPx, INST_ROW_Y - 16);
+
+          // Draw velocity direction arrow if not instantaneously at rest
+          if (Math.abs(vel) > 0.15) {
+            const dir = vel > 0 ? 1 : -1;
+            drawArrow(xInstPx, INST_ROW_Y - 30, xInstPx + dir * 24, INST_ROW_Y - 30, item.color, 2.4);
+          }
+          ctx.restore();
+        });
+
+        // Connect P and Q equilibrium positions with phase separation label
+        const xP = MARGIN_LEFT + pIndex * particleStepSub * SUB_GRID_PX;
+        const xQ = MARGIN_LEFT + qIndex * particleStepSub * SUB_GRID_PX;
+        const tag = state.phaseMode === 'in' ? dict.inPhaseTag : dict.antiPhaseTag;
+        drawDoubleArrow(xP, xQ, EQ_ROW_Y - 26, '#7c3aed', tag);
+      }
+    }
+
+    function animate(timestamp) {
+      if (state.isPlaying) {
+        if (state.lastTimestamp !== null) {
+          const dt = (timestamp - state.lastTimestamp) / 1000;
+          state.t += dt;
+          document.getElementById('timeDisplay').textContent = `t = ${state.t.toFixed(1)} s`;
+        }
+        state.lastTimestamp = timestamp;
+        draw();
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // Initial setup (applyLang also runs translations + draw)
+    applyLang(lang);
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
