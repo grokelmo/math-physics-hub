@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>7.1 縱波 — 密部與疏部的傳播 — HKDSE虛擬教室</title>
+<title>縱波 — 密部與疏部的傳播 — HKDSE虛擬教室</title>
 <meta name="description" content="觀察粒子左右振動與密部、疏部的傳播（波向右傳播）。" />
 <script>(function(){try{const q=new URLSearchParams(location.search).get("lang");if(q==="en"||q==="zh"){localStorage.setItem("hkdse-vc-ui-lang",q);localStorage.setItem("longitudinal-waves-lang",q);}const l=localStorage.getItem("hkdse-vc-ui-lang")||localStorage.getItem("longitudinal-waves-lang");const lang=l==="en"?"en":"zh";document.documentElement.setAttribute("data-ui-lang",lang);document.documentElement.lang=lang==="en"?"en":"zh-Hant";}catch(e){document.documentElement.setAttribute("data-ui-lang","zh");}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&family=Noto+Sans:wght@600;700&family=Noto+Sans+HK:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="../styles.css">
 <meta name="color-scheme" content="light only">
 <style>:root{color-scheme:light}</style>
@@ -19,12 +19,35 @@
       margin: 0;
       padding: 0;
     }
+    /* Preload Inter for canvas A–Q labels (must be used in the document to fetch the files). */
+    #longitudinal-waves-app .lw-label-font-preload{
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+      font-family: Inter, "Noto Sans", sans-serif;
+      font-weight: 600;
+      font-size: 29.25px;
+      pointer-events: none;
+      user-select: none;
+    }
     #longitudinal-waves-app{
+      /* Soft sage-mint surfaces — pale, not neon, not yellow-green */
+      --lw-page: #e1efe7;
+      --lw-card: #eef7f2;
+      --lw-paper: #f6fbf8;
+      --lw-control: #e5f2eb;
+      --lw-control-hover: #d4e8dc;
+      --lw-line: #b7c9bf;
+      --lw-line-soft: #d3e2d9;
       font-family: "Noto Sans TC", "PingFang HK", "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #f1f5f9;
+      background-color: var(--lw-page);
       color: #0f172a;
       padding: 16px;
       line-height: 1.5;
+      min-height: calc(100dvh - 3.5rem);
     }
     #longitudinal-waves-app .container{
       max-width: 1120px;
@@ -34,10 +57,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #ffffff;
+      background: var(--lw-card);
       padding: 14px 20px;
       border-radius: 12px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--lw-line);
       box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
       margin-bottom: 14px;
     }
@@ -71,9 +94,9 @@
     }
 
     #longitudinal-waves-app .board-card{
-      background: #ffffff;
+      background: var(--lw-card);
       border-radius: 12px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--lw-line);
       padding: 16px;
       box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
       margin-bottom: 14px;
@@ -100,11 +123,36 @@
       align-items: center;
       gap: 8px;
     }
+    #longitudinal-waves-app .particle-select-wrap{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #1e293b;
+      white-space: nowrap;
+    }
+    #longitudinal-waves-app .particle-select-wrap select{
+      font: inherit;
+      font-weight: 700;
+      min-height: 38px;
+      min-width: 5.5rem;
+      padding: 6px 10px;
+      border: 1px solid var(--lw-line);
+      border-radius: 8px;
+      background: var(--lw-control);
+      color: #1e293b;
+      cursor: pointer;
+    }
+    #longitudinal-waves-app .particle-select-wrap select:focus{
+      outline: 2px solid #0f766e;
+      outline-offset: 2px;
+    }
     #longitudinal-waves-app .btn{
       padding: 8px 14px;
       border-radius: 8px;
-      border: 1px solid #cbd5e1;
-      background: #f8fafc;
+      border: 1px solid var(--lw-line);
+      background: var(--lw-control);
       color: #1e293b;
       font-size: 0.9rem;
       font-weight: 600;
@@ -112,7 +160,7 @@
       transition: all 0.15s ease;
     }
     #longitudinal-waves-app .btn:hover{
-      background: #e2e8f0;
+      background: var(--lw-control-hover);
     }
     #longitudinal-waves-app .btn-primary{
       background: #2563eb;
@@ -123,8 +171,8 @@
       background: #1d4ed8;
     }
     #longitudinal-waves-app .time-badge{
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
+      background: var(--lw-control);
+      border: 1px solid var(--lw-line);
       padding: 7px 12px;
       border-radius: 8px;
       font-family: "SFMono-Regular", Consolas, monospace;
@@ -167,15 +215,16 @@
     #longitudinal-waves-app .canvas-wrapper{
       width: 100%;
       overflow-x: auto;
-      border: 1.5px solid #64748b;
+      border: 1.5px solid #5a6e65;
       border-radius: 8px;
-      background: #ffffff;
+      background: var(--lw-paper);
     }
     #longitudinal-waves-app canvas{
       display: block;
       width: 100%;
       min-width: 860px;
       height: auto;
+      background: var(--lw-paper);
     }
 
     #longitudinal-waves-app .scale-bar{
@@ -218,8 +267,8 @@
       }
     }
     #longitudinal-waves-app .panel{
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
+      background: var(--lw-card);
+      border: 1px solid var(--lw-line);
       border-radius: 12px;
       padding: 16px;
     }
@@ -229,7 +278,7 @@
       color: #0f172a;
       margin-bottom: 12px;
       padding-bottom: 6px;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid var(--lw-line-soft);
     }
     #longitudinal-waves-app .toggle-list{
       display: flex;
@@ -239,8 +288,8 @@
     #longitudinal-waves-app .chip-btn{
       padding: 8px 13px;
       border-radius: 8px;
-      border: 1.5px solid #cbd5e1;
-      background: #f8fafc;
+      border: 1.5px solid var(--lw-line);
+      background: var(--lw-control);
       color: #334155;
       font-size: 0.88rem;
       font-weight: 600;
@@ -248,7 +297,7 @@
       transition: all 0.15s ease;
     }
     #longitudinal-waves-app .chip-btn:hover{
-      border-color: #94a3b8;
+      border-color: #7d9a8a;
     }
     #longitudinal-waves-app .chip-btn.active{
       background: #eff6ff;
@@ -262,9 +311,9 @@
       gap: 8px;
       flex-wrap: wrap;
       padding: 8px 10px;
-      background: #f8fafc;
+      background: var(--lw-control);
       border-radius: 8px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--lw-line-soft);
     }
     #longitudinal-waves-app .sub-phase-row.visible{
       display: flex;
@@ -295,12 +344,12 @@
       gap: 10px;
       margin-top: 12px;
       padding-top: 10px;
-      border-top: 1px dashed #cbd5e1;
+      border-top: 1px dashed var(--lw-line);
       font-size: 0.86rem;
       color: #334155;
     }
     #longitudinal-waves-app .metric-pill{
-      background: #f1f5f9;
+      background: var(--lw-control);
       padding: 4px 10px;
       border-radius: 6px;
       font-weight: 600;
@@ -314,10 +363,10 @@
     }
     #longitudinal-waves-app .view-tabs{
       display: inline-flex;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--lw-line);
       border-radius: 10px;
       overflow: hidden;
-      background: #f8fafc;
+      background: var(--lw-control);
       flex: none;
     }
     #longitudinal-waves-app .view-tab{
@@ -331,10 +380,10 @@
       cursor: pointer;
     }
     #longitudinal-waves-app .view-tab + .view-tab{
-      border-left: 1px solid #cbd5e1;
+      border-left: 1px solid var(--lw-line);
     }
     #longitudinal-waves-app .view-tab:hover{
-      background: #e2e8f0;
+      background: var(--lw-control-hover);
     }
     #longitudinal-waves-app .view-tab.active{
       background: #1e293b;
@@ -399,13 +448,14 @@
   </div>
 </nav>
 <div id="longitudinal-waves-app">
+  <span class="lw-label-font-preload" aria-hidden="true">ABCDEFGHIJKLMNOPQ</span>
   <div class="lw-back">
     <a href="../物理模擬實驗室.html"><span class="ui-zh">← 返回物理模擬實驗室</span><span class="ui-en">← Back to Physics Simulation Lab</span></a>
   </div>
 <div class="container">
     <header>
       <div class="title-group">
-        <h1 data-i18n="appTitle">HKDSE 物理科｜7.1 縱波模擬實驗</h1>
+        <h1 data-i18n="appTitle">HKDSE 物理科｜縱波模擬實驗</h1>
         <p data-i18n="appSubtitle">觀察粒子左右振動與密部、疏部的傳播（波向右傳播）</p>
       </div>
       <button id="langToggleBtn" class="lang-btn" onclick="toggleLanguage()">中 / EN</button>
@@ -424,6 +474,29 @@
           <button class="btn" onclick="resetSim()" data-i18n="resetBtn">重設 t = 0</button>
           <span class="time-badge" id="timeDisplay">t = 0.0 s</span>
         </div>
+        <label class="particle-select-wrap">
+          <span data-i18n="selectParticle">選取粒子</span>
+          <select id="particleSelect" onchange="onParticleSelectChange()">
+          <option value="all" data-i18n="selectAll">全部</option>
+          <option value="0">A</option>
+          <option value="1">B</option>
+          <option value="2">C</option>
+          <option value="3">D</option>
+          <option value="4">E</option>
+          <option value="5">F</option>
+          <option value="6">G</option>
+          <option value="7">H</option>
+          <option value="8">I</option>
+          <option value="9">J</option>
+          <option value="10">K</option>
+          <option value="11">L</option>
+          <option value="12">M</option>
+          <option value="13">N</option>
+          <option value="14">O</option>
+          <option value="15">P</option>
+          <option value="16">Q</option>
+          </select>
+        </label>
         <button id="crToggleBtn" class="cr-toggle-btn active" onclick="toggleFeature('showCR')">
           <span data-i18n="btnShowCR">顯示密部與疏部</span>
           <span id="crStatusPill" class="cr-status-pill">開</span>
@@ -451,7 +524,7 @@
           </span>
         </div>
         <div>
-          <strong data-i18n="gridScale">方格比例尺：1 大格 (4 小格) = 10 cm ｜ 1 小格 = 2.5 cm</strong>
+          <strong data-i18n="gridScale">方格比例尺：1 大格 (5 小格) = 10 cm ｜ 1 小格 = 2 cm</strong>
         </div>
       </div>
     </div>
@@ -490,7 +563,7 @@
         <div class="slider-row">
           <div class="slider-header">
             <span data-i18n="labelAmp">振幅 A (Amplitude)</span>
-            <span id="ampValText">7.5 cm (3 小格)</span>
+            <span id="ampValText">7.5 cm (3.75 小格)</span>
           </div>
           <input type="range" id="ampSlider" min="1" max="5" step="1" value="3" oninput="updateParams()" />
         </div>
@@ -498,7 +571,7 @@
         <div class="slider-row">
           <div class="slider-header">
             <span data-i18n="labelLambda">波長 λ (Wavelength)</span>
-            <span id="lambdaValText">80 cm (8 大格 / 32 小格)</span>
+            <span id="lambdaValText">80 cm (8 大格 / 40 小格)</span>
           </div>
           <input type="range" id="lambdaSlider" min="24" max="40" step="4" value="32" oninput="updateParams()" />
         </div>
@@ -531,8 +604,8 @@
       if (l === 'en') lang = 'en';
     } catch (e) {}
 
-    const TITLE_ZH = '7.1 縱波 — 密部與疏部的傳播 — HKDSE虛擬教室';
-    const TITLE_EN = '7.1 Longitudinal Waves — Compressions and Rarefactions — HKDSE Virtual Classroom';
+    const TITLE_ZH = '縱波 — 密部與疏部的傳播 — HKDSE虛擬教室';
+    const TITLE_EN = 'Longitudinal Waves — Compressions and Rarefactions — HKDSE Virtual Classroom';
 
     function setPageLangAttrs() {
       document.documentElement.lang = lang === 'en' ? 'en' : 'zh-Hant';
@@ -570,7 +643,7 @@
 
     const i18n = {
       zh: {
-        appTitle: 'HKDSE 物理科｜7.1 縱波模擬實驗',
+        appTitle: 'HKDSE 物理科｜縱波模擬實驗',
         appSubtitle: '觀察粒子左右振動與密部、疏部的傳播（波向右傳播）',
         pause: '暫停',
         play: '播放',
@@ -582,7 +655,7 @@
         legendParticle: '介質粒子',
         legendComp: '密部中心 (位移 = 0)',
         legendRare: '疏部中心 (位移 = 0)',
-        gridScale: '方格比例尺：1 大格 (4 小格) = 10 cm ｜ 1 小格 = 2.5 cm',
+        gridScale: '方格比例尺：1 大格 (5 小格) = 10 cm ｜ 1 小格 = 2 cm',
         panelAnnotations: '課堂標示開關（按教學進度逐一開啟）',
         btnLambda: '顯示波長 (λ)',
         btnAmp: '顯示振幅 (A)',
@@ -612,10 +685,16 @@
         axisS: 's（位移）',
         axisD: 'd（距離）',
         compCentre: '密部中心',
-        rareCentre: '疏部中心'
+        rareCentre: '疏部中心',
+        selectParticle: '選取粒子',
+        selectAll: '全部',
+        selectParticleHint: '選取一粒粒子後，其餘會隱藏，方便觀察位移。亦可在圖上點選粒子。選「全部」可再顯示全部粒子。',
+        dispRight: '向右（正）',
+        dispLeft: '向左（負）',
+        dispZero: '在平衡位置'
       },
       en: {
-        appTitle: 'HKDSE Physics | 7.1 Longitudinal Wave Simulation',
+        appTitle: 'HKDSE Physics | Longitudinal Wave Simulation',
         appSubtitle: 'Observe longitudinal particle oscillation and propagation of compressions & rarefactions (wave travels right)',
         pause: 'Pause',
         play: 'Play',
@@ -627,7 +706,7 @@
         legendParticle: 'Medium Particle',
         legendComp: 'Compression Centre (s = 0)',
         legendRare: 'Rarefaction Centre (s = 0)',
-        gridScale: 'Grid Scale: 1 Major Square (4 sub-grids) = 10 cm | 1 sub-grid = 2.5 cm',
+        gridScale: 'Grid Scale: 1 Major Square (5 sub-grids) = 10 cm | 1 sub-grid = 2 cm',
         panelAnnotations: 'Classroom Annotation Toggles (Enable progressively)',
         btnLambda: 'Show Wavelength (λ)',
         btnAmp: 'Show Amplitude (A)',
@@ -657,7 +736,13 @@
         axisS: 's (displacement)',
         axisD: 'd (distance)',
         compCentre: 'Compression centre',
-        rareCentre: 'Rarefaction centre'
+        rareCentre: 'Rarefaction centre',
+        selectParticle: 'Select particle',
+        selectAll: 'All',
+        selectParticleHint: 'When you pick a particle, the others are hidden so you can observe its displacement. You can also click a particle on the diagram. Choose “All” to show every particle again.',
+        dispRight: 'rightward (positive)',
+        dispLeft: 'leftward (negative)',
+        dispZero: 'at equilibrium'
       }
     };
 
@@ -674,7 +759,8 @@
       phaseMode: 'in', // 'in' or 'anti'
       ampSubGrids: 3,      // 1 sub-grid = 2.5 cm -> 7.5 cm
       lambdaSubGrids: 32,  // 32 sub-grids = 8 major grids = 80 cm
-      period: 4.0          // 4.0 s
+      period: 4.0,         // 4.0 s
+      selectedParticle: null // null = all particles visible
     };
 
     const canvas = document.getElementById('waveCanvas');
@@ -684,14 +770,24 @@
     const MARGIN_LEFT = 115;
     const MARGIN_RIGHT = 35;
     const GRID_TOP = 58;
-    const SUB_GRID_PX = 14; // 1 sub-grid = 14px; 4 sub-grids = 56px (1 major square)
-    const NUM_MAJOR_X = 16; // 16 * 4 = 64 sub-grids
+    const SUB_GRID_PX = 14; // physics unit: 2.5 cm = 14px; 1 major square (10 cm) = 56px
+    const NUM_MAJOR_X = 16; // 16 major squares across (physics width = 64 sub-units = 160 cm)
     const NUM_SUB_X = NUM_MAJOR_X * 4;
-    const NUM_MAJOR_Y = 4;  // 4 major rows = 16 sub-grids
+    const NUM_MAJOR_Y = 4;  // 4 major rows (physics height = 16 sub-units)
     const NUM_SUB_Y = NUM_MAJOR_Y * 4;
 
     const EQ_ROW_Y = GRID_TOP + 4 * SUB_GRID_PX;      // 1 major square down
     const INST_ROW_Y = GRID_TOP + 12 * SUB_GRID_PX;   // 3 major squares down
+    const PARTICLE_STEP_SUB = 4;
+    const NUM_PARTICLES = Math.floor(NUM_SUB_X / PARTICLE_STEP_SUB) + 1;
+    const CM_PER_SUB = 2.5;
+    // Visual overlay only: 5 small squares per large square. Physics still uses CM_PER_SUB.
+    const CM_PER_MAJOR = 10;
+    const MINOR_PER_MAJOR = 5;
+    const CM_PER_MINOR = CM_PER_MAJOR / MINOR_PER_MAJOR; // 2 cm
+    const MAJOR_PX = CM_PER_MAJOR * (SUB_GRID_PX / CM_PER_SUB); // 56
+    const DISP_MARK_COLOR = '#0f766e';
+    let hitTargets = [];
 
     // toggleLanguage / applyLang defined above (hub language sync)
 
@@ -703,6 +799,13 @@
       });
       document.getElementById('playPauseBtn').textContent = state.isPlaying ? dict.pause : dict.play;
       document.getElementById('crStatusPill').textContent = state.showCR ? dict.statusOn : dict.statusOff;
+      const selWrap = document.querySelector('#longitudinal-waves-app .particle-select-wrap');
+      const sel = document.getElementById('particleSelect');
+      if (selWrap) selWrap.title = dict.selectParticleHint;
+      if (sel) {
+        sel.setAttribute('aria-label', dict.selectParticle);
+        sel.title = dict.selectParticleHint;
+      }
       updateParamLabels();
       draw();
     }
@@ -763,19 +866,28 @@
       draw();
     }
 
+    function formatGridCount(n) {
+      const r = Math.round(n * 100) / 100;
+      return (Math.abs(r - Math.round(r)) < 1e-9) ? String(Math.round(r)) : String(r);
+    }
+
     function updateParamLabels() {
       const dict = i18n[lang];
-      const ampCm = (state.ampSubGrids * 2.5).toFixed(1);
-      const lambdaCm = (state.lambdaSubGrids * 2.5).toFixed(0);
-      const majorGrids = state.lambdaSubGrids / 4;
+      const ampCmNum = state.ampSubGrids * CM_PER_SUB;
+      const lambdaCmNum = state.lambdaSubGrids * CM_PER_SUB;
+      const ampCm = ampCmNum.toFixed(1);
+      const lambdaCm = lambdaCmNum.toFixed(0);
+      const majorGrids = formatGridCount(lambdaCmNum / CM_PER_MAJOR);
+      const ampMinors = formatGridCount(ampCmNum / CM_PER_MINOR);
+      const lambdaMinors = formatGridCount(lambdaCmNum / CM_PER_MINOR);
       const freq = 1 / state.period;
-      const speedCm = freq * (state.lambdaSubGrids * 2.5);
+      const speedCm = freq * lambdaCmNum;
       const speedM = speedCm / 100;
 
       document.getElementById('ampValText').textContent =
-        `${ampCm} cm (${state.ampSubGrids} ${dict.smallGridUnit})`;
+        `${ampCm} cm (${ampMinors} ${dict.smallGridUnit})`;
       document.getElementById('lambdaValText').textContent =
-        `${lambdaCm} cm (${majorGrids} ${dict.bigGridUnit} / ${state.lambdaSubGrids} ${dict.smallGridUnit})`;
+        `${lambdaCm} cm (${majorGrids} ${dict.bigGridUnit} / ${lambdaMinors} ${dict.smallGridUnit})`;
       document.getElementById('periodValText').textContent = `${state.period.toFixed(1)} s`;
 
       document.getElementById('freqMetric').textContent = `${dict.freqPrefix}${freq.toFixed(2)} Hz`;
@@ -793,6 +905,98 @@
     function getDisplacementSub(xSub, t) {
       const phase = 2 * Math.PI * (t / state.period - xSub / state.lambdaSubGrids);
       return state.ampSubGrids * Math.sin(phase);
+    }
+
+    function formatDisplacement(dispSub) {
+      const dict = i18n[lang];
+      const rounded = Math.round(dispSub * CM_PER_SUB * 10) / 10;
+      if (Math.abs(rounded) < 0.05) {
+        return { sCm: 0, text: 's = 0.0 cm', note: dict.dispZero };
+      }
+      const sign = rounded > 0 ? '+' : '−';
+      return {
+        sCm: rounded,
+        text: 's = ' + sign + Math.abs(rounded).toFixed(1) + ' cm',
+        note: rounded > 0 ? dict.dispRight : dict.dispLeft
+      };
+    }
+
+    function drawDisplacementMark(xEq, xInst, yArrow, yParticle, dispSub) {
+      const fmt = formatDisplacement(dispSub);
+      const color = DISP_MARK_COLOR;
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 1.4;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(xInst, yArrow);
+      ctx.lineTo(xInst, yParticle);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(xEq, yArrow - 8);
+      ctx.lineTo(xEq, yArrow + 8);
+      ctx.stroke();
+      if (Math.abs(xInst - xEq) >= 8) {
+        drawArrow(xEq, yArrow, xInst, yArrow, color, 2.6);
+      }
+      ctx.fillStyle = color;
+      const midX = (xEq + xInst) / 2;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+      const noteW = ctx.measureText(fmt.note).width;
+      ctx.font = 'bold 16px "Noto Sans TC", sans-serif';
+      const labelW = Math.max(ctx.measureText(fmt.text).width, noteW);
+      const labelX = Math.max(labelW / 2 + 8, Math.min(canvas.width - labelW / 2 - 8, midX));
+      ctx.fillText(fmt.text, labelX, yArrow - 26);
+      ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+      ctx.fillText(fmt.note, labelX, yArrow - 10);
+      ctx.restore();
+    }
+
+    function addHitTarget(idx, x, y, r) {
+      hitTargets.push({ idx, x, y, r });
+    }
+
+    function eventToCanvas(ev) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: (ev.clientX - rect.left) * (canvas.width / rect.width),
+        y: (ev.clientY - rect.top) * (canvas.height / rect.height)
+      };
+    }
+
+    function hitParticleAt(ev) {
+      const { x, y } = eventToCanvas(ev);
+      let best = null, bestD = Infinity;
+      for (const t of hitTargets) {
+        const d = Math.hypot(x - t.x, y - t.y);
+        if (d <= t.r && d < bestD) {
+          best = t.idx;
+          bestD = d;
+        }
+      }
+      return best;
+    }
+
+    function setSelectedParticle(idxOrNull) {
+      let next = null;
+      if (idxOrNull !== null && idxOrNull !== undefined && idxOrNull !== 'all') {
+        next = Math.max(0, Math.min(NUM_PARTICLES - 1, Number(idxOrNull)));
+        if (!Number.isFinite(next)) next = null;
+      }
+      state.selectedParticle = next;
+      const sel = document.getElementById('particleSelect');
+      if (sel) sel.value = next === null ? 'all' : String(next);
+      draw();
+    }
+
+    function onParticleSelectChange() {
+      const v = document.getElementById('particleSelect').value;
+      setSelectedParticle(v === 'all' ? null : parseInt(v, 10));
     }
 
     function drawArrow(fromX, fromY, toX, toY, color, lineWidth = 2.2) {
@@ -858,7 +1062,7 @@
         ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
         const textWidth = ctx.measureText(label).width;
         const midX = (x1 + x2) / 2;
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = PAPER_BG;
         ctx.fillRect(midX - textWidth / 2 - 5, y - 10, textWidth + 10, 20);
         ctx.fillStyle = color;
         ctx.textAlign = 'center';
@@ -872,42 +1076,44 @@
       const gridWidth = NUM_SUB_X * SUB_GRID_PX;
       const gridHeight = NUM_SUB_Y * SUB_GRID_PX;
 
-      // White background inside grid
-      ctx.fillStyle = '#ffffff';
+      // Pale mint paper inside the grid
+      ctx.fillStyle = PAPER_BG;
       ctx.fillRect(MARGIN_LEFT, GRID_TOP, gridWidth, gridHeight);
 
-      // Sub-grid lines (clear medium-light slate so students can easily count squares)
-      ctx.strokeStyle = '#cbd5e1';
+      // Visual small squares: 5 per large square (2 cm / 11.2 px). Physics units are unchanged.
+      ctx.strokeStyle = GRID_MINOR;
       ctx.lineWidth = 1;
-      for (let i = 0; i <= NUM_SUB_X; i++) {
-        if (i % 4 === 0) continue;
-        const x = MARGIN_LEFT + i * SUB_GRID_PX + 0.5;
+      const minorX = NUM_MAJOR_X * MINOR_PER_MAJOR;
+      const minorY = NUM_MAJOR_Y * MINOR_PER_MAJOR;
+      for (let i = 0; i <= minorX; i++) {
+        if (i % MINOR_PER_MAJOR === 0) continue;
+        const x = MARGIN_LEFT + (i * MAJOR_PX) / MINOR_PER_MAJOR + 0.5;
         ctx.beginPath();
         ctx.moveTo(x, GRID_TOP);
         ctx.lineTo(x, GRID_TOP + gridHeight);
         ctx.stroke();
       }
-      for (let j = 0; j <= NUM_SUB_Y; j++) {
-        if (j % 4 === 0) continue;
-        const y = GRID_TOP + j * SUB_GRID_PX + 0.5;
+      for (let j = 0; j <= minorY; j++) {
+        if (j % MINOR_PER_MAJOR === 0) continue;
+        const y = GRID_TOP + (j * MAJOR_PX) / MINOR_PER_MAJOR + 0.5;
         ctx.beginPath();
         ctx.moveTo(MARGIN_LEFT, y);
         ctx.lineTo(MARGIN_LEFT + gridWidth, y);
         ctx.stroke();
       }
 
-      // Major grid lines (every 4 sub-grids = 10 cm, crisp dark slate)
-      ctx.strokeStyle = '#64748b';
+      // Major grid lines (1 large square = 10 cm = 56 px, slightly deeper sage)
+      ctx.strokeStyle = GRID_MAJOR;
       ctx.lineWidth = 1.35;
-      for (let i = 0; i <= NUM_SUB_X; i += 4) {
-        const x = MARGIN_LEFT + i * SUB_GRID_PX + 0.5;
+      for (let i = 0; i <= NUM_MAJOR_X; i++) {
+        const x = MARGIN_LEFT + i * MAJOR_PX + 0.5;
         ctx.beginPath();
         ctx.moveTo(x, GRID_TOP);
         ctx.lineTo(x, GRID_TOP + gridHeight);
         ctx.stroke();
       }
-      for (let j = 0; j <= NUM_SUB_Y; j += 4) {
-        const y = GRID_TOP + j * SUB_GRID_PX + 0.5;
+      for (let j = 0; j <= NUM_MAJOR_Y; j++) {
+        const y = GRID_TOP + j * MAJOR_PX + 0.5;
         ctx.beginPath();
         ctx.moveTo(MARGIN_LEFT, y);
         ctx.lineTo(MARGIN_LEFT + gridWidth, y);
@@ -915,8 +1121,8 @@
       }
 
       // Scale bracket at bottom-right of grid (1 major square = 10 cm)
-      const scaleX1 = MARGIN_LEFT + (NUM_SUB_X - 4) * SUB_GRID_PX;
-      const scaleX2 = MARGIN_LEFT + NUM_SUB_X * SUB_GRID_PX;
+      const scaleX1 = MARGIN_LEFT + (NUM_MAJOR_X - 1) * MAJOR_PX;
+      const scaleX2 = MARGIN_LEFT + NUM_MAJOR_X * MAJOR_PX;
       const scaleY = GRID_TOP + gridHeight + 18;
       drawDoubleArrow(scaleX1, scaleX2, scaleY, '#334155', '10 cm');
     }
@@ -924,7 +1130,13 @@
     const CANVAS_PARTICLE = { w: 1040, h: 330 };
     const CANVAS_SD = { w: 1480, h: 440 };
     const LABEL_RED = '#c62828';
-    const LABEL_FONT = 'bold 29.25px "Noto Sans TC", sans-serif';
+    // Inter 600: cleaner Latin caps at 29.25px without the heavier 700 look.
+    const LABEL_FONT = '600 29.25px Inter, "Noto Sans", sans-serif';
+    const PAGE_BG = '#e1efe7';
+    const CARD_BG = '#eef7f2';
+    const PAPER_BG = '#f6fbf8';
+    const GRID_MINOR = '#a7bdb3';
+    const GRID_MAJOR = '#5a6e65';
 
     function syncCanvasSize() {
       const sz = state.view === 'sd' ? CANVAS_SD : CANVAS_PARTICLE;
@@ -971,9 +1183,12 @@
     }
 
     function draw() {
+      hitTargets = [];
       const dict = i18n[lang];
       syncCanvasSize();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = PAPER_BG;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       if (state.view === 'sd') drawSDView(dict);
       else drawParticleView(dict);
     }
@@ -999,7 +1214,8 @@
       const { lam, compCentres, rareCentres } = getWaveCentres();
 
       // 2. Highlight Compression & Rarefaction zones if enabled
-      if (state.showCR) {
+      // When isolating one particle, hide the bands so the displacement mark stays clear.
+      if (state.showCR && state.selectedParticle === null) {
         const bandHalfWidth = (lam * 0.22) * SUB_GRID_PX;
         const zoneTop = INST_ROW_Y - 2.3 * SUB_GRID_PX;
         const zoneHeight = 4.6 * SUB_GRID_PX;
@@ -1057,6 +1273,7 @@
       const qIndex = Math.min(numParticles - 1, pIndex + qOffsetParticles);
 
       for (let idx = 0; idx < numParticles; idx++) {
+        if (state.selectedParticle !== null && idx !== state.selectedParticle) continue;
         const xSubEq = idx * particleStepSub;
         const xEqPx = MARGIN_LEFT + xSubEq * SUB_GRID_PX;
 
@@ -1125,29 +1342,36 @@
         // Same letter on both rows (A = leftmost), so students can match equilibrium vs time t
         const letter = String.fromCharCode(65 + idx);
         ctx.save();
-        ctx.fillStyle = '#c62828';
-        ctx.font = 'bold 29.25px "Noto Sans TC", sans-serif';
+        ctx.fillStyle = LABEL_RED;
+        ctx.font = LABEL_FONT;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
         ctx.fillText(letter, xEqPx, EQ_ROW_Y - 10);
         ctx.textBaseline = 'top';
         ctx.fillText(letter, xInstPx, INST_ROW_Y + 9);
         ctx.restore();
+
+        addHitTarget(idx, xEqPx, EQ_ROW_Y, 22);
+        addHitTarget(idx, xInstPx, INST_ROW_Y, 22);
+
+        if (state.selectedParticle === idx) {
+          drawDisplacementMark(xEqPx, xInstPx, INST_ROW_Y - 40, INST_ROW_Y, dispSub);
+        }
       }
 
       // 5. Optional Feature: Wavelength (lambda) ruler
-      if (state.showLambda && compCentres.length >= 2) {
+      if (state.selectedParticle === null && state.showLambda && compCentres.length >= 2) {
         const x1 = MARGIN_LEFT + compCentres[0] * SUB_GRID_PX;
         const x2 = MARGIN_LEFT + compCentres[1] * SUB_GRID_PX;
         drawDoubleArrow(x1, x2, GRID_TOP - 16, '#dc2626', 'λ');
-      } else if (state.showLambda && rareCentres.length >= 2) {
+      } else if (state.selectedParticle === null && state.showLambda && rareCentres.length >= 2) {
         const x1 = MARGIN_LEFT + rareCentres[0] * SUB_GRID_PX;
         const x2 = MARGIN_LEFT + rareCentres[1] * SUB_GRID_PX;
         drawDoubleArrow(x1, x2, GRID_TOP - 16, '#2563eb', 'λ');
       }
 
       // 6. Optional Feature: Amplitude (A) indicator on particle idx = 4 (xSub = 16)
-      if (state.showAmp) {
+      if (state.selectedParticle === null && state.showAmp) {
         const targetIdx = 4;
         const xSubEq = targetIdx * particleStepSub;
         const xEqPx = MARGIN_LEFT + xSubEq * SUB_GRID_PX;
@@ -1165,7 +1389,7 @@
       }
 
       // 7. Optional Feature: Track Compression box
-      if (state.trackComp) {
+      if (state.selectedParticle === null && state.trackComp) {
         // Track continuous compression starting at xSub = 0 at t = 0, wrapping modulo NUM_SUB_X
         const trackedSub = ((state.t / state.period) * lam) % NUM_SUB_X;
         const cx = MARGIN_LEFT + trackedSub * SUB_GRID_PX;
@@ -1186,7 +1410,7 @@
       }
 
       // 8. Optional Feature: In-phase / Antiphase particles P & Q
-      if (state.showPhase) {
+      if (state.selectedParticle === null && state.showPhase) {
         const pairs = [
           { idx: pIndex, label: 'P', color: '#059669' },
           { idx: qIndex, label: 'Q', color: '#d97706' }
@@ -1241,15 +1465,15 @@
       const yInst = 232;
 
       ctx.save();
-      ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = '#64748b';
+      ctx.fillStyle = PAPER_BG;
+      ctx.strokeStyle = GRID_MAJOR;
       ctx.lineWidth = 1.35;
       ctx.beginPath();
       ctx.rect(leftPad, 36, plotW, 300);
       ctx.fill();
       ctx.stroke();
 
-      ctx.strokeStyle = '#cbd5e1';
+      ctx.strokeStyle = GRID_MINOR;
       ctx.lineWidth = 1;
       for (let idx = 0; idx < numParticles; idx++) {
         const x = leftPad + idx * stepPx + 0.5;
@@ -1280,8 +1504,10 @@
             }
           });
         };
-        paint(compCentres, 'rgba(239, 68, 68, 0.16)');
-        paint(rareCentres, 'rgba(37, 99, 235, 0.14)');
+        if (state.selectedParticle === null) {
+          paint(compCentres, 'rgba(239, 68, 68, 0.16)');
+          paint(rareCentres, 'rgba(37, 99, 235, 0.14)');
+        }
       }
 
       const markCentreOnSnapshot = (centres, color, caption) => {
@@ -1313,8 +1539,10 @@
           ctx.restore();
         });
       };
-      markCentreOnSnapshot(compCentres, '#b91c1c', dict.compCentre);
-      markCentreOnSnapshot(rareCentres, '#1d4ed8', dict.rareCentre);
+      if (state.selectedParticle === null) {
+        markCentreOnSnapshot(compCentres, '#b91c1c', dict.compCentre);
+        markCentreOnSnapshot(rareCentres, '#1d4ed8', dict.rareCentre);
+      }
 
       ctx.fillStyle = '#0f172a';
       ctx.font = 'bold 14px "Noto Sans TC", sans-serif';
@@ -1324,6 +1552,7 @@
       ctx.fillText(dict.rowInstant, leftPad - 12, yInst);
 
       for (let idx = 0; idx < numParticles; idx++) {
+        if (state.selectedParticle !== null && idx !== state.selectedParticle) continue;
         const xSubEq = idx * particleStepSub;
         const xEq = leftPad + idx * stepPx;
         const dispSub = getDisplacementSub(xSubEq, state.t);
@@ -1371,6 +1600,11 @@
         }
 
         drawParticleLetter(letter, xEq, yEq - 10, 'bottom');
+        addHitTarget(idx, xEq, yEq, 22);
+        addHitTarget(idx, xInst, yInst, 22);
+        if (state.selectedParticle === idx) {
+          drawDisplacementMark(xEq, xInst, yInst - 28, yInst, dispSub);
+        }
       }
 
       const s1 = leftPad + (numParticles - 2) * stepPx;
@@ -1409,8 +1643,8 @@
       const sToY = sCm => midY - (sCm / sMaxCm) * ((midY - plotT) * 0.88);
 
       ctx.save();
-      ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = '#64748b';
+      ctx.fillStyle = PAPER_BG;
+      ctx.strokeStyle = GRID_MAJOR;
       ctx.lineWidth = 1.35;
       ctx.beginPath();
       ctx.rect(graphX, 16, W - graphX - 12, H - 32);
@@ -1448,8 +1682,10 @@
           ctx.restore();
         });
       };
-      markCentreOnGraph(compCentres, '#b91c1c', dict.compCentre);
-      markCentreOnGraph(rareCentres, '#1d4ed8', dict.rareCentre);
+      if (state.selectedParticle === null) {
+        markCentreOnGraph(compCentres, '#b91c1c', dict.compCentre);
+        markCentreOnGraph(rareCentres, '#1d4ed8', dict.rareCentre);
+      }
 
       ctx.strokeStyle = '#0f172a';
       ctx.fillStyle = '#0f172a';
@@ -1509,13 +1745,14 @@
       }
       ctx.stroke();
 
-      if (state.showLambda && compCentres.length >= 2) {
+      if (state.selectedParticle === null && state.showLambda && compCentres.length >= 2) {
         const x1 = dToX(compCentres[0] * cmPerSub);
         const x2 = dToX(compCentres[1] * cmPerSub);
         drawDoubleArrow(x1, x2, plotB - 8, '#dc2626', 'λ');
       }
 
       for (let idx = 0; idx < numParticles; idx++) {
+        if (state.selectedParticle !== null && idx !== state.selectedParticle) continue;
         const xSubEq = idx * particleStepSub;
         const dCm = xSubEq * cmPerSub;
         const sCm = getDisplacementSub(xSubEq, state.t) * cmPerSub;
@@ -1527,13 +1764,46 @@
           compCentres.forEach(cSub => { if (Math.abs(xSubEq - cSub) < 0.25) isComp = true; });
           rareCentres.forEach(cSub => { if (Math.abs(xSubEq - cSub) < 0.25) isRare = true; });
         }
+        const isolated = state.selectedParticle === idx;
         ctx.fillStyle = isComp ? '#ef4444' : isRare ? '#2563eb' : '#0f172a';
         ctx.beginPath();
-        ctx.arc(x, y, isComp || isRare ? 6 : 4.5, 0, Math.PI * 2);
+        ctx.arc(x, y, isolated ? 7 : (isComp || isRare ? 6 : 4.5), 0, Math.PI * 2);
         ctx.fill();
+        if (isolated) {
+          ctx.strokeStyle = DISP_MARK_COLOR;
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.arc(x, y, 11, 0, Math.PI * 2);
+          ctx.stroke();
+        }
         const letterY = sCm >= 0 ? y - 8 : y + 8;
         const baseline = sCm >= 0 ? 'bottom' : 'top';
         drawParticleLetter(letter, x, letterY, baseline);
+        addHitTarget(idx, x, y, 22);
+        if (state.selectedParticle === idx) {
+          const fmt = formatDisplacement(sCm / cmPerSub);
+          ctx.save();
+          ctx.setLineDash([5, 4]);
+          ctx.strokeStyle = DISP_MARK_COLOR;
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(plotL, y);
+          ctx.lineTo(x, y);
+          ctx.moveTo(x, midY);
+          ctx.lineTo(x, y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = DISP_MARK_COLOR;
+          ctx.font = 'bold 16px "Noto Sans TC", sans-serif';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'bottom';
+          const labelX = Math.min(x + 16, plotR - 8);
+          ctx.fillText(fmt.text, labelX, y - 6);
+          ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+          ctx.textBaseline = 'top';
+          ctx.fillText(fmt.note, labelX, y + 6);
+          ctx.restore();
+        }
       }
       ctx.restore();
     }
@@ -1554,6 +1824,26 @@
     // Initial setup (applyLang also runs translations + draw)
     applyLang(lang);
     requestAnimationFrame(animate);
+
+    function redrawWhenLabelFontReady() {
+      const load = (spec) => {
+        try {
+          if (document.fonts && document.fonts.load) return document.fonts.load(spec);
+        } catch (err) {}
+        return Promise.resolve();
+      };
+      const ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+      Promise.all([load(LABEL_FONT), ready]).then(() => { draw(); }).catch(() => { draw(); });
+    }
+    redrawWhenLabelFontReady();
+
+    canvas.addEventListener('click', ev => {
+      const idx = hitParticleAt(ev);
+      if (idx !== null) setSelectedParticle(idx);
+    });
+    canvas.addEventListener('mousemove', ev => {
+      canvas.style.cursor = hitParticleAt(ev) !== null ? 'pointer' : 'default';
+    });
   </script>
 </body>
 </html>
